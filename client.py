@@ -1,4 +1,6 @@
-query = """
+import requests
+
+raw_introspection_query = """
   query IntrospectionQuery {
     __schema {
       queryType { name }
@@ -87,3 +89,15 @@ query = """
     }
   }
 """
+
+def query(url: str, query: str) -> dict:
+  return requests.post(url, 
+    json={"query": query},
+    headers={"Content-Type": "application/json"}
+  ).json()["data"]
+  
+def introspection(url: str) -> dict:
+  return requests.post(url, 
+    json={"query": raw_introspection_query},
+    headers={"Content-Type": "application/json"}
+  ).json()["data"]
