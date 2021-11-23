@@ -1,12 +1,12 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import Field, dataclass, field
+from dataclasses import dataclass, field
 import typing
 import operator
 from enum import Enum, auto
 
 from subgrounds.utils import flatten
-from subgrounds.query2 import *
+from subgrounds.query import *
 
 # ================================================================
 # Schema definitions and data structures
@@ -37,6 +37,39 @@ class ArgumentMeta:
   name: str
   type_: TypeRef
   description: str = ""
+
+  def fmt_value(self, value):
+    def mk_input_value(value, type_, non_null=False):    
+      match (value, type_, non_null):
+        # Only allow Null values when non_null=True
+        case (None, _, False):
+          return Iv_Null
+        
+        # If type is non_null, recurse with non_null=True
+        case (_, NonNull(t), _):
+          return mk_input_value(value, t, non_null=True)
+
+        case (list(), List(t), _):
+          return Iv_List([mk_input_value(val, t, non_null) for val in value])          
+
+        case (int(), Named("BigInt"), _):
+          return Iv_String(str(value))
+        case (int(), Named("Int"), _):
+          return Iv_Int(value)
+        case (int() | float(), Named("BigDecimal"), _):
+          return Iv_String(str(float(value)))
+        case (int() | float(), Named("BigDecimal"), _):
+          return Iv_Float(float(value))
+        case (str(), Named("String" | "Bytes"), _):
+          return Iv_String(value)
+        case (str(), _, _):
+          return Iv_Enum(value)
+        case (bool(), Named("Boolean"), _):
+          return Iv_Boolean(value)
+        case (value, typ, non_null):
+          raise TypeError(f"mk_input_value({value}, {typ}, {non_null})")
+    
+    return mk_input_value(value, self.type_)
 
 @dataclass
 class FieldMeta:
@@ -93,14 +126,18 @@ class TypeError(Exception):
 class TypeMeta(ABC):
   meta: ScalarMeta | ObjectMeta | EnumValueMeta | EnumMeta | InterfaceMeta | UnionMeta | InputObjectMeta
 
-  def get_field(self, fname: str, parent: typing.Optional[FieldPath] = None) -> FieldMeta:
+  def get_field(self, fname: str) -> FieldMeta | SyntheticField:
     raise TypeError(f"Cannot get field {fname} on non-Object type")
 
   def __getattribute__(self, __name: str) -> typing.Any:
     try:
       return super().__getattribute__(__name)
     except:
-      return self.get_field(__name, None)
+      match self.get_field(__name):
+        case FieldMeta(_) as field:
+          return FieldPath(schema=self.schema, object_=self, path=[FieldPath.FieldData(field)])
+        case SyntheticField(_) as field:
+          return FieldPath(schema=self.schema, object_=self, path=[field])
 
 @dataclass
 class Scalar(TypeMeta):
@@ -110,27 +147,26 @@ class Scalar(TypeMeta):
 class Object(TypeMeta):
   meta: ObjectMeta
   schema: typing.Optional[Schema] = None
+  synthetic_fields: typing.List[SyntheticField] = field(default_factory=list)
 
-  def get_field(self, fname: str, parent: typing.Optional[FieldPath] = None) -> FieldMeta:
+  def get_field(self, fname: str) -> FieldMeta | SyntheticField:
     try:
-      field = next(filter(lambda field: field.name == fname, self.meta.fields))
-      new_field_path = FieldPath(schema=self.schema, object_=self, field=field, parent=parent)
-      if parent is not None:
-        parent.child = new_field_path
-      return new_field_path
+      # When fname refers to a "native" field
+      return next(filter(lambda field: field.name == fname, self.meta.fields))
     except:
       try:
-        field = self.__dict__[fname]
-        if parent is not None:
-          parent.child = field
-          field.parent = parent
-        return field
+        # When fname refers to a synthetic field
+        return next(filter(lambda field: field.name == fname, self.synthetic_fields))
       except:
         raise TypeError(f"Object {self.meta.name} has no field {fname}")
 
-  # TODO: Set attribute to add SyntheticField
-  # def __setattr__(self, __name: str, __value: Any) -> None:
-  #     return super().__setattr__(__name, __value)
+  def __setattr__(self, __name: str, __value: typing.Any) -> None:
+    match __value:
+      case SyntheticField(_):
+        __value.name = __name
+        self.synthetic_fields.append(__value)
+      case _:
+        return super().__setattr__(__name, __value)
 
 @dataclass
 class Enum(TypeMeta):
@@ -140,19 +176,26 @@ class Enum(TypeMeta):
 class Interface(TypeMeta):
   meta: InterfaceMeta
   schema: typing.Optional[Schema] = None
+  synthetic_fields: typing.List[SyntheticField] = field(default_factory=list)
 
   def get_field(self, fname: str, parent: typing.Optional[FieldPath] = None) -> FieldMeta:
     try:
-      field = next(filter(lambda field: field.name == fname, self.meta.fields))
-      new_field_path = FieldPath(schema=self.schema, object_=self, field=field, parent=parent)
-      parent.child = new_field_path
-      return new_field_path
+      # When fname refers to a "native" field
+      return next(filter(lambda field: field.name == fname, self.meta.fields))
     except:
-      raise TypeError(f"Interface {self.meta.name} has no field {fname}")
+      try:
+        # When fname refers to a synthetic field
+        return next(filter(lambda field: field.name == fname, self.synthetic_fields))
+      except:
+        raise TypeError(f"Object {self.meta.name} has no field {fname}")
 
-  # TODO: Set attribute to add SyntheticField
-  # def __setattr__(self, __name: str, __value: Any) -> None:
-  #     return super().__setattr__(__name, __value)
+  def __setattr__(self, __name: str, __value: typing.Any) -> None:
+    match __value:
+      case SyntheticField(_):
+        __value.name = __name
+        self.synthetic_fields.append(__value)
+      case _:
+        return super().__setattr__(__name, __value)
 
 @dataclass
 class Union(TypeMeta):
@@ -260,6 +303,19 @@ def mk_schema(json):
 # Query building
 # ================================================================
 @dataclass
+class SyntheticField:
+  counter: typing.ClassVar[int] = 0
+  
+  func: function
+  args: typing.List[typing.Any]
+
+  def __init__(self, func: function, *args: typing.List[typing.Any]) -> None:
+    self.func = func
+    self.args = args
+    self.name = f"SyntheticField_{SyntheticField.counter}"
+    SyntheticField.counter += 1
+
+@dataclass
 class Where:
   filters: typing.List[Filter]
 
@@ -271,77 +327,96 @@ class Where:
     GT  = auto()
     GTE = auto()
 
-  @dataclass
+  @dataclass 
   class Filter:
-    name: str
-    type_: Where.Operator
+    field: FieldPath
+    op: Where.Operator
     value: typing.Any
+
+    @property
+    def name(self):
+      match self.op:
+        case Where.Operator.EQ:
+          return self.field.leaf.field.name
+        case Where.Operator.NEQ:
+          return f"{self.field.leaf.field.name}_not"
+        case Where.Operator.LT:
+          return f"{self.field.leaf.field.name}_lt"
+        case Where.Operator.GT:
+          return f"{self.field.leaf.field.name}_gt"
+        case Where.Operator.LTE:
+          return f"{self.field.leaf.field.name}_lte"
+        case Where.Operator.GTE:
+          return f"{self.field.leaf.field.name}_gte"
 
   @staticmethod
   def and_(wheres):
     return Where(flatten([w.filters for w in wheres]))
 
+  @property
   def argument(self):
-    def name_of_arg(filter):
-      if filter.type_ == Where.Operator.EQ:
-        return filter.name
-      else:
-        return f'{filter.name}_{filter.type_.name.lower()}'
-    
-    return {name_of_arg(f): f.value for f in self.filters}
+    return dict([f.argument for f in self.filters])
 
-class QueryField(ABC):
+class QueryElement(ABC):
   pass
 
 @dataclass
-class FieldPath(QueryField):
+class FieldPath(QueryElement):
   schema: Schema
   object_: Object | Interface
-  field: FieldMeta
-  parent: typing.Optional[FieldPath] = None
-  child: typing.Optional[FieldPath] = None
-  args: typing.Dict[str, typing.Any] = field(default_factory=dict)
+  path: typing.List[FieldData | SyntheticField]
 
-  def get_field(self, fname: str) -> FieldPath:
-    tname = self.field.type_.root_type_name()
-    return self.schema.type_map[tname].get_field(fname, self)
+  @dataclass
+  class FieldData:
+    field: FieldMeta
+    args: typing.Dict[str, typing.Any] = field(default_factory=dict)
 
-  def path(self) -> typing.List[FieldPath]:
-    if self.parent is not None:
-      path = self.parent.path()
-      path.append(self)
-      return path
-    else:
-      return [self]
+  @property
+  def root(self):
+    return self.path[0]
+
+  @property
+  def leaf(self):
+    return self.path[-1]
+
+  def add_field(self, fname: str) -> FieldPath:
+    tname = self.leaf.field.type_.root_type_name()
+    match self.schema.type_map[tname].get_field(fname):
+      case FieldMeta(_) as field:
+        self.path.append(FieldPath.FieldData(field))
+      case SyntheticField(_) as field:
+        self.path.append(field)
+
+    return self
 
   def path_string(self) -> List[str]:
-    if self.parent is not None:
-      path = self.parent.path()
-      path.append(self.field.name)
-      return path
-    else:
-      return [self.object_.meta.name, self.field.name]
-
-  def get_selection(self) -> Selection:
-    return self.path()[0].to_selection()
-
-  def to_selection(self) -> Selection:
-    if self.child is not None:
-      select = self.child.to_selection()
-    else:
-      select = None
-
-    args = [Argument(key, value) for key, value in self.args.items()]
-
-    return [Selection(name=self.field.name, arguments=args, selection=select)]
+    return f"{self.object_.meta.name}." + '.'.join([fdata.field.name for fdata in self.path])
 
   def __call__(self, **kwargs: typing.Any) -> typing.Any:
     def validate_args(args: typing.Dict[str, typing.Any]):
       for key, _ in args.items():
         try:
-          next(filter(lambda arg_meta: arg_meta.name == key, self.field.arguments))
+          next(filter(lambda arg_meta: arg_meta.name == key, self.leaf.field.arguments))
         except:
           raise TypeError(f"Invalid argument {key} for Field {'.'.join(self.path_string())}")
+
+    def fmt_where(where: Where) -> typing.Tuple[str, InputValue]:
+      def get_where_input_object():
+        where_arg = next(filter(lambda arg: arg.name == 'where', self.leaf.field.arguments))
+        return self.schema.type_map[where_arg.type_.root_type_name()]
+
+      input_object = get_where_input_object()
+
+      where_object = {}
+      for f in where.filters:
+        try:
+          arg_meta = next(filter(lambda arg: arg.name == f.name, input_object.meta.input_fields))
+          arg_value = arg_meta.fmt_value(f.value)
+          where_object[f.name] = arg_value
+        except:
+          raise TypeError(f"Field {self.path_string()}: 'where' argument does not support field {f.name}")
+
+      return where_object
 
     def mk_input_value(value: typing.Any, arg: ArgumentMeta):
       arg_typ = self.schema.type_map[arg.type_.root_type_name()]
@@ -362,21 +437,20 @@ class FieldPath(QueryField):
           return Iv_String(value)
         case (bool(), _, _):
           return Iv_Boolean(value)
-        # case (list(), _, "where"):    # If list of Where objects
-        #   if isinstance(value[0], Where):
-        #     Where.and_(value).argument
-        #   return Iv_Object({key: mk_input_value(v) for key, v in value.items()})
+        case (list(), _, "where"):    # If list of Where objects
+          if isinstance(value[0], Where):
+            return Iv_Object(fmt_where(Where.and_(value)))
         case (list(), _, _):
           return Iv_List([mk_input_value(v) for v in value])
         case (dict(), _, _):
           return Iv_Object({key: mk_input_value(v) for key, v in value.items()})
 
-    if self.field.arguments:
-      if not self.args:
+    if self.leaf.field.arguments:
+      if not self.leaf.args:
         validate_args(kwargs)
-        for arg in self.field.arguments:
+        for arg in self.leaf.field.arguments:
           if arg.name in kwargs:
-            self.args[arg.name] = mk_input_value(kwargs[arg.name], arg)
+            self.leaf.args[arg.name] = mk_input_value(kwargs[arg.name], arg)
 
       return self
     else:
@@ -385,92 +459,79 @@ class FieldPath(QueryField):
   def __getattribute__(self, __name: str) -> typing.Any:
     try:
       return super().__getattribute__(__name)
-    except:
-      return self.get_field(__name)
+    except AttributeError:
+      return self.add_field(__name)
 
   # Filter construction
-  # def __eq__(self, value: typing.Any) -> Where:
-  #   return Where([Where.Filter(self.graphql_name(), Where.Operator.EQ, value)])
+  def __eq__(self, value: typing.Any) -> Where:
+    return Where([Where.Filter(self, Where.Operator.EQ, value)])
 
-  # def __lt__(self, value: typing.Any) -> Where:
-  #   return Where([Where.Filter(self.graphql_name(), Where.Operator.LT, value)])
+  def __lt__(self, value: typing.Any) -> Where:
+    return Where([Where.Filter(self, Where.Operator.LT, value)])
 
-  # def __lte__(self, value: typing.Any) -> Where:
-  #   return Where([Where.Filter(self.graphql_name(), Where.Operator.LTE, value)])
+  def __lte__(self, value: typing.Any) -> Where:
+    return Where([Where.Filter(self, Where.Operator.LTE, value)])
 
-  # def __gt__(self, value: typing.Any) -> Where:
-  #   return Where([Where.Filter(self.graphql_name(), Where.Operator.GT, value)])
+  def __gt__(self, value: typing.Any) -> Where:
+    return Where([Where.Filter(self, Where.Operator.GT, value)])
 
-  # def __gte__(self, value: typing.Any) -> Where:
-  #   return Where([Where.Filter(self.graphql_name(), Where.Operator.GTE, value)])
+  def __gte__(self, value: typing.Any) -> Where:
+    return Where([Where.Filter(self, Where.Operator.GTE, value)])
 
   # SyntheticField arithmetic
-  def __add__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.add, self, other)
-
-  def __sub__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.sub, self, other)
-
-  def __mul__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.mul, self, other)
-
-  def __truediv__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.truediv, self, other)
-
-  def __pow__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.pow, self, other)
-
-  def __neg__(self) -> SyntheticField:
-    return SyntheticField(operator.neg, self)
-
-  def __abs__(self) -> SyntheticField:
-    return SyntheticField(operator.abs, self)
-
-@dataclass
-class SyntheticField(QueryField):
-  counter: typing.ClassVar[int] = 0
-  
-  func: function
-  args: List[QueryField]
-  parent: typing.Optional[FieldPath] = None
-
-  def __init__(self, func: function, *args: typing.List[typing.Any]) -> None:
-    self.func = func
-    self.args = args
-    self.name = f"SyntheticField_{SyntheticField.counter}"
-    SyntheticField.counter += 1 
-
-  def path(self) -> typing.List[QueryField]:
-    if self.parent is not None:
-      path = self.parent.path()
-      path.append(self)
-      return path
-    else:
-      return [self]
-
-  def get_selection(self) -> Selection:
-    return self.path()[0].to_selection()
-
-  def to_selection(self) -> Selection:
-    return flatten([field.to_selection() for field in self.args if isinstance(field, QueryField)])
+  def mk_synthetic_field(self, op: function, other: typing.Any) -> SyntheticField:
+    match other:
+      case FieldPath(_):
+        return SyntheticField(op, self.leaf, other.leaf)
+      case _:
+        return SyntheticField(op, self.leaf, other)
 
   def __add__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.add, self, other)
+    return self.mk_synthetic_field(operator.add, other)
 
   def __sub__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.sub, self, other)
+    return self.mk_synthetic_field(operator.sub, other)
 
   def __mul__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.mul, self, other)
+    return self.mk_synthetic_field(operator.mul, other)
 
   def __truediv__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.truediv, self, other)
+    return self.mk_synthetic_field(operator.truediv, other)
 
   def __pow__(self, other: typing.Any) -> SyntheticField:
-    return SyntheticField(operator.pow, self, other)
+    return self.mk_synthetic_field(operator.pow, other)
 
   def __neg__(self) -> SyntheticField:
-    return SyntheticField(operator.neg, self)
+    return SyntheticField(operator.neg, self.leaf)
 
   def __abs__(self) -> SyntheticField:
-    return SyntheticField(operator.abs, self)
+    return SyntheticField(operator.abs, self.leaf)
+
+def mk_selection(field: FieldPath) -> Selection:
+  def mk_path_selection(path: typing.List[FieldPath.FieldData | SyntheticField]) -> typing.List[Selection]:
+    match path:
+      case [FieldPath.FieldData(field, args), *rest]:
+        args = [Argument(key, value) for key, value in args.items()]
+        return [Selection(name=field.name, arguments=args, selection=mk_path_selection(rest))]
+      case [SyntheticField(args=args), *_]:
+        return [Selection(name=fdata.field.name, arguments=fdata.args, selection=None) for fdata in args if isinstance(fdata, FieldPath.FieldData)]
+      case []:
+        return None
+
+  return mk_path_selection(field.path)
+
+def mk_query(fields: typing.List[FieldPath], toplevel_query: typing.Optional[FieldPath] = None) -> Query:
+  if toplevel_query:
+    toplevel_selection = mk_selection(toplevel_query)[0]
+
+    for field in fields:
+      toplevel_selection.add_selections(mk_selection(field))
+
+    return Query([toplevel_selection])
+  else:
+    query = Query([])
+
+    for field in fields:
+      query.add_selections(mk_selection(field))
+
+    return query
