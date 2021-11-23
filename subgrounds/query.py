@@ -130,4 +130,3 @@ class Query:
   def add_selections(self, new_selections):
     for s in new_selections:
       self.add_selection(s)
-

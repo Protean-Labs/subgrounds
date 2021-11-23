@@ -1,49 +1,35 @@
+from dataclasses import dataclass
 from typing import Any
-from sgqlc.endpoint.http import HTTPEndpoint
-from sgqlc.introspection import query, variables
-from sgqlc.codegen.schema import CodeGen
-from sgqlc.operation import Selector
-import imp
+import os
+import json
 
-from subgrounds.query import Entity
+import subgrounds.client as client
+from subgrounds.query import Query
+from subgrounds.schema import Schema, mk_schema
 
-def gen_module(name, url):
-  endpoint = HTTPEndpoint(url, base_headers={"Content-Type": "application/json"})
-
-  data = endpoint(query, variables(
-    include_description=True,
-    include_deprecated=True,
-  ))
-
-  out_file = open(f"{name}.py", "w")
-  gen = CodeGen(name, data["data"]["__schema"], out_file.write, False)
-  gen.write()
-  out_file.close()
-
+@dataclass
 class Subgraph:
-  def __init__(self, name, url) -> None:
-    self.name = name
+  url: str
+  schema: Schema
+
+  def __init__(self, url: str) -> None:
+    filename = url.split("/")[-1] + ".json"
+    if os.path.isfile(filename):
+      with open(filename) as f:
+        schema = json.load(f)
+    else:
+      schema = client.get_schema(url)
+      with open(filename, mode="w") as f:
+        json.dump(schema, f)
+
     self.url = url
-    self.endpoint = HTTPEndpoint(url, {"Content-Type": "application/json"})
+    self.schema = mk_schema(schema)
 
-    try:
-      fp, path, desc = imp.find_module(name)
-    except:
-      gen_module(name, url)
-      fp, path, desc = imp.find_module(name)
-
-    # load_modules loads the module 
-    # dynamically and takes the filepath
-    # module and description as parameter
-    self.module = imp.load_module(name, fp, path, desc)
+  def query(self, query: Query) -> dict:
+    return client.query(self.url, query.graphql_string())
 
   def __getattribute__(self, __name: str) -> Any:
-    # if type(getattr(self.module, __name)) == Selector:
-    #   return Field()
     try:
-      return Entity(self, getattr(self.module, __name))
-    except:
       return super().__getattribute__(__name)
-
-  def schema(self):
-    return getattr(self.module, self.name)
+    except:
+      return self.schema.__getattribute__(__name)

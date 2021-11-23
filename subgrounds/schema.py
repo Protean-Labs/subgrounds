@@ -279,7 +279,17 @@ def mk_schema(json):
         raise ParsingError(f"mk_type_meta: {json}")
 
   match json["__schema"]:
-    case {"queryType": query_type, "mutationType": mutation_type, "subscriptionType": subscription_type, "types": types}:
+    case {"queryType": query_type, "types": types}:
+      try:
+        mutation_type = json["__schema"]["mutationType"]["name"]
+      except:
+        mutation_type = None
+
+      try:
+        subscription_type = json["__schema"]["subscriptionType"]["name"]
+      except:
+        subscription_type = None
+
       types_meta = [mk_type_meta(type_) for type_ in types]
       schema = Schema(
         meta=SchemaMeta(query_type, mutation_type, subscription_type),
