@@ -194,9 +194,9 @@ class FieldPath:
           field = schema.field_of_object(self.type_, __name)
           match schema.type_of_field(self.schema, field):
             case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() | TypeMeta.SyntheticFieldMeta() as type_:
-              self.type_ = type_
-              self.path.append(FieldPath.PathElement(field, None))
-              return self
+              path = self.path.copy()
+              path.append(FieldPath.PathElement(field, None))
+              return FieldPath(self.subgraph, self.root_type, type_, path)
             case _:
               raise TypeError(f"FieldPath: field {__name} is not a valid field for object {self.type_.name} at path {self}")
 

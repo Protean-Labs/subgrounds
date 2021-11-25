@@ -1,6 +1,6 @@
 import unittest
-from subgrounds.query import Argument, InputValue, Selection
 
+from subgrounds.query import Argument, InputValue, Selection
 from subgrounds.schema import TypeMeta, TypeRef, arguments_of_field_args, input_value_of_argument, selections_of_synthetic_field
 from subgrounds.utils import identity
 

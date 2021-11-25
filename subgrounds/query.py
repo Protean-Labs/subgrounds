@@ -86,11 +86,11 @@ class Selection:
         args_str = "(" + ", ".join([arg.graphql_string() for arg in args]) + ")"
         return f"{indent}{self.name}{args_str}"
       case (None | [], inner_selection):
-        inner_str = f"{indent}{indent}\n".join([f.graphql_string(level=level+1) for f in inner_selection])
+        inner_str = f"\n".join([f.graphql_string(level=level+1) for f in inner_selection])
         return f"{indent}{self.name} {{\n{inner_str}\n{indent}}}"
       case (args, inner_selection):
         args_str = "(" + ", ".join([arg.graphql_string() for arg in args]) + ")"
-        inner_str = f"{indent}{indent}\n".join([f.graphql_string(level=level+1) for f in inner_selection])
+        inner_str = f"\n".join([f.graphql_string(level=level+1) for f in inner_selection])
         return f"{indent}{self.name}{args_str} {{\n{inner_str}\n{indent}}}"
 
   def add_selection(self, new_selection):
