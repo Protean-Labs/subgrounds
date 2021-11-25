@@ -73,7 +73,8 @@ class SyntheticField:
                 return fmeta
               case _:
                 raise TypeError(f"FieldPath element {path_ele} is not a PathElement")
-          return [f(ele) for ele in fpath.path]
+                
+          return list(map(f, fpath.path))
 
         case SyntheticField() as sfield:
           return sfield.meta
@@ -153,7 +154,7 @@ class FieldPath:
     return self.path[-1]
 
   def __str__(self):
-    return '.'.join([path_ele.type_.name for path_ele in self.path])
+    return '.'.join(map(lambda ele: ele.type_.name, self.path))
 
   # When setting arguments
   def __call__(self, **kwargs: Any) -> Any:
@@ -320,7 +321,7 @@ class Subgraph:
 
   @staticmethod
   def mk_query(fpaths: List[FieldPath]) -> Query:
-    selections = flatten([selections_of_path(fpath.fieldmeta_path) for fpath in fpaths])
+    selections = flatten(map(lambda fpath: selections_of_path(fpath.fieldmeta_path), fpaths))
     query = Query()
     query.add_selections(selections)
     return query

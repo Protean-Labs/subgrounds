@@ -125,10 +125,8 @@ class LinePlot(dcc.Graph):
     selection = [FieldPath.extend(entrypoint, s) for s in selection]
 
     query = Subgraph.mk_query(selection)
-    print(query.graphql_string())
     data = entrypoint.subgraph.query(query)
     entrypoint.subgraph.process_data(selection, data)
-    print(data)
 
     data = [dict(values(row)) for row in data[entrypoint.root.type_.name]]
     

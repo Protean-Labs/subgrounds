@@ -57,9 +57,9 @@ class InputValue:
       case InputValue.Enum(value):
         return value
       case InputValue.List(value):
-        return f"[{', '.join([InputValue.graphql_string(value) for value in value])}]"
+        return f"[{', '.join(map(InputValue.graphql_string, value))}]"
       case InputValue.Object(value):
-        return f"{{{', '.join([f'{key}: {InputValue.graphql_string(value)}' for key, value in value.items()])}}}"
+        return f"{{{', '.join(map(lambda key: f'{key}: {InputValue.graphql_string(value[key])}', value))}}}"
 
 @dataclass
 class Argument:
