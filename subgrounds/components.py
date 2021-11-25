@@ -86,16 +86,16 @@ class BarChart(dcc.Graph):
 
     query = Subgraph.mk_query(selection)
     data = entrypoint.subgraph.query(query)
+    entrypoint.subgraph.process_data(selection, data)
 
-    # cols = list(columns(data[0]))
-    data = [dict(values(row)) for row in data]
+    data = [dict(values(row)) for row in data[entrypoint.root.type_.name]]
 
     # fig = px.bar(data, x=x.data_name(), y=y.data_name())
     
-    xdata = [row[x.data_name()] for row in data]
-    fig = go.Figure(data=[go.Bar(name=y.data_name(), y=[row[y.data_name()] for row in data], x=xdata) for y in y])
+    xdata = [row[x.longname] for row in data]
+    fig = go.Figure(data=[go.Bar(name=y.longname, y=[row[y.longname] for row in data], x=xdata) for y in y])
 
-    super().__init__(id=f'{query.name}-bar-chart', figure=fig, **kwargs)
+    super().__init__(id=f'{entrypoint.leaf.type_.name}-bar-chart', figure=fig, **kwargs)
 
 class LinePlot(dcc.Graph):
   def __init__(
@@ -130,7 +130,7 @@ class LinePlot(dcc.Graph):
 
     data = [dict(values(row)) for row in data[entrypoint.root.type_.name]]
     
-    xdata = [row[x.leaf.type_.name] for row in data]
-    fig = go.Figure(data=[go.Scatter(name=y.leaf.type_.name, y=[row[y.leaf.type_.name] for row in data], x=xdata) for y in y])
+    xdata = [row[x.longname] for row in data]
+    fig = go.Figure(data=[go.Scatter(name=y.longname, y=[row[y.longname] for row in data], x=xdata) for y in y])
 
     super().__init__(id=f'{entrypoint.leaf.type_.name}-bar-chart', figure=fig, **kwargs)

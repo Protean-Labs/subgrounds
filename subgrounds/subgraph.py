@@ -73,7 +73,7 @@ class SyntheticField:
                 return fmeta
               case _:
                 raise TypeError(f"FieldPath element {path_ele} is not a PathElement")
-                
+
           return list(map(f, fpath.path))
 
         case SyntheticField() as sfield:
@@ -86,7 +86,7 @@ class SyntheticField:
       name=f'SyntheticField_{SyntheticField.counter}', 
       description='', 
       func=self.func,
-      dependencies=[f(dep) for dep in self.deps]
+      dependencies=list(map(f, self.deps))
     )
 
     SyntheticField.counter += 1
@@ -144,6 +144,10 @@ class FieldPath:
           raise TypeError(f"fieldmeta_path: Unexptected type in FieldPath {self}: {path_ele}")
 
     return list(map(f, self.path))
+
+  @property
+  def longname(self):
+    return '_'.join(map(lambda ele: ele.type_.name, self.path))
 
   @property
   def root(self):

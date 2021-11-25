@@ -400,7 +400,7 @@ def selections_of_path(fpath: Path) -> List[Selection]:
       case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
         return [Selection(fmeta.name, arguments=args, selection=selection_of_fmeta_path(rest))]
       case TypeMeta.SyntheticFieldMeta() as sfmeta:
-        return flatten([selection_of_sfmeta_dep(dep) for dep in sfmeta.dependencies])
+        return flatten(map(selection_of_sfmeta_dep, sfmeta.dependencies))
       case int() | float() | str() | bool():
         return []
       case _:
