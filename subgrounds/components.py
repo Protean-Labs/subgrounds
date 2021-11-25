@@ -4,7 +4,7 @@ from dash import dcc
 from dash import dash_table
 import plotly.graph_objects as go
 
-from subgrounds.query import Query, OrderDirection, Entity, ScalarField, Where
+from subgrounds.subgraph2 import Filter, Subgraph, FieldPath
 
 def columns(row):
   for key, value in row.items():
@@ -27,16 +27,24 @@ def values(row):
 class EntityTable(dash_table.DataTable):
   def __init__(
     self, 
-    entity: Entity,
+    entrypoint: FieldPath,
     first: int = 10,
-    selection: List[ScalarField] = [], 
-    order_by: Optional[ScalarField] = None, 
-    order_direction: Optional[OrderDirection] = None,
-    where: Optional[List[Where]] = None,
+    selection: List[FieldPath] = [], 
+    orderBy: Optional[FieldPath] = None, 
+    orderDirection: Optional[str] = None,
+    where: Optional[List[Filter]] = None,
     **kwargs
   ) -> None:
-    query = Query(entity, first=first, selection=selection, order_by=order_by, order_direction=order_direction, where=where)
-    data = query.execute()
+    entrypoint = entrypoint(
+      first=first,
+      orderBy=orderBy,
+      orderDirection=orderDirection,
+      where=where
+    )
+    selection = [FieldPath.extend(entrypoint, s) for s in selection]
+
+    query = Subgraph.mk_query(selection)
+    data = entrypoint.subgraph.query(query)
     
     # Generate table
     cols = list(columns(data[0]))
@@ -52,13 +60,13 @@ class EntityTable(dash_table.DataTable):
 class BarChart(dcc.Graph):
   def __init__(
     self,
-    entity: Entity,
-    x: ScalarField,
-    y: Union[ScalarField, List[ScalarField]],
+    entrypoint: FieldPath,
+    x: FieldPath,
+    y: Union[FieldPath, List[FieldPath]],
     first: int = 10,
-    order_by: Optional[ScalarField] = None, 
-    order_direction: Optional[OrderDirection] = None,
-    where: Optional[List[Where]] = None,
+    orderBy: Optional[FieldPath] = None, 
+    orderDirection: Optional[str] = None,
+    where: Optional[List[Filter]] = None,
     **kwargs
   ) -> None:
     if type(y) is not list:
@@ -68,8 +76,16 @@ class BarChart(dcc.Graph):
       selection = y
     selection.append(x)
     
-    query = Query(entity, selection=selection, first=first, order_by=order_by, order_direction=order_direction, where=where)
-    data = query.execute()
+    entrypoint = entrypoint(
+      first=first,
+      orderBy=orderBy,
+      orderDirection=orderDirection,
+      where=where
+    )
+    selection = [FieldPath.extend(entrypoint, s) for s in selection]
+
+    query = Subgraph.mk_query(selection)
+    data = entrypoint.subgraph.query(query)
 
     # cols = list(columns(data[0]))
     data = [dict(values(row)) for row in data]
@@ -84,13 +100,13 @@ class BarChart(dcc.Graph):
 class LinePlot(dcc.Graph):
   def __init__(
     self,
-    entity: Entity,
-    x: ScalarField,
-    y: Union[ScalarField, List[ScalarField]],
+    entrypoint: FieldPath,
+    x: FieldPath,
+    y: Union[FieldPath, List[FieldPath]],
     first: int = 10,
-    order_by: Optional[ScalarField] = None, 
-    order_direction: Optional[OrderDirection] = None,
-    where: Optional[List[Where]] = None,
+    orderBy: Optional[FieldPath] = None, 
+    orderDirection: Optional[str] = None,
+    where: Optional[List[Filter]] = None,
     **kwargs
   ) -> None:
     if type(y) is not list:
@@ -100,12 +116,23 @@ class LinePlot(dcc.Graph):
       selection = y
     selection.append(x)
     
-    query = Query(entity, selection=selection, first=first, order_by=order_by, order_direction=order_direction, where=where)
-    data = query.execute()
+    entrypoint = entrypoint(
+      first=first,
+      orderBy=orderBy,
+      orderDirection=orderDirection,
+      where=where
+    )
+    selection = [FieldPath.extend(entrypoint, s) for s in selection]
 
-    data = [dict(values(row)) for row in data]
+    query = Subgraph.mk_query(selection)
+    print(query.graphql_string())
+    data = entrypoint.subgraph.query(query)
+    entrypoint.subgraph.process_data(selection, data)
+    print(data)
+
+    data = [dict(values(row)) for row in data[entrypoint.root.type_.name]]
     
-    xdata = [row[x.data_name()] for row in data]
-    fig = go.Figure(data=[go.Scatter(name=y.data_name(), y=[row[y.data_name()] for row in data], x=xdata) for y in y])
+    xdata = [row[x.leaf.type_.name] for row in data]
+    fig = go.Figure(data=[go.Scatter(name=y.leaf.type_.name, y=[row[y.leaf.type_.name] for row in data], x=xdata) for y in y])
 
-    super().__init__(id=f'{query.name}-bar-chart', figure=fig, **kwargs)
+    super().__init__(id=f'{entrypoint.leaf.type_.name}-bar-chart', figure=fig, **kwargs)

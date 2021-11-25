@@ -3,66 +3,63 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import typing
 
-# from subgrounds.schema import FieldPath
+# ================================================================
+# Query definitions, data structures and types
+# ================================================================
 
-class InputValue(ABC):
-  @abstractmethod
-  def graphql_string(self) -> str:
+class InputValue:
+  class T(ABC):
     pass
 
-@dataclass
-class Iv_Null(InputValue):
-  def graphql_string(self) -> str:
-    return "null"
+  @dataclass
+  class Null(T):
+    pass
 
-@dataclass
-class Iv_Int(InputValue):
-  value: int
+  @dataclass
+  class Int(T):
+    value: int
+    
+  @dataclass
+  class Float(T):
+    value: float
 
-  def graphql_string(self) -> str:
-    return str(self.value)
-  
-@dataclass
-class Iv_Float(InputValue):
-  value: float
+  @dataclass
+  class String(T):
+    value: str
 
-  def graphql_string(self) -> str:
-    return str(self.value)
+  @dataclass
+  class Boolean(T):
+    value: bool
 
-@dataclass
-class Iv_String(InputValue):
-  value: str
+  @dataclass
+  class Enum(T):
+    value: str
 
-  def graphql_string(self) -> str:
-    return f"\"{self.value}\""
+  @dataclass
+  class List(T):
+    value: typing.List[InputValue.T]
 
-@dataclass
-class Iv_Boolean(InputValue):
-  value: bool
+  @dataclass
+  class Object(T):
+    value: typing.Dict[str, InputValue.T]
 
-  def graphql_string(self) -> str:
-    return str(self.value)
-
-@dataclass
-class Iv_Enum(InputValue):
-  value: str
-
-  def graphql_string(self) -> str:
-    return self.value
-
-@dataclass
-class Iv_List(InputValue):
-  value: typing.List[InputValue]
-
-  def graphql_string(self) -> str:
-    return f"[{', '.join([value.graphql_string() for value in self.value])}]"
-
-@dataclass
-class Iv_Object(InputValue):
-  value: typing.Dict[str, InputValue]
-
-  def graphql_string(self) -> str:
-    return f"{{{', '.join([f'{key}: {value.graphql_string()}' for key, value in self.value.items()])}}}"
+  @staticmethod
+  def graphql_string(input_value: T):
+    match input_value:
+      case InputValue.Null():
+        return "null"
+      case InputValue.Int(value) | InputValue.Float(value):
+        return str(value)
+      case InputValue.String(value):
+        return f"\"{value}\""
+      case InputValue.Boolean(value):
+        return str(value).lower()
+      case InputValue.Enum(value):
+        return value
+      case InputValue.List(value):
+        return f"[{', '.join([InputValue.graphql_string(value) for value in value])}]"
+      case InputValue.Object(value):
+        return f"{{{', '.join([f'{key}: {InputValue.graphql_string(value)}' for key, value in value.items()])}}}"
 
 @dataclass
 class Argument:
@@ -70,7 +67,7 @@ class Argument:
   value: InputValue
 
   def graphql_string(self) -> str:
-    return f"{self.name}: {self.value.graphql_string()}"
+    return f"{self.name}: {InputValue.graphql_string(self.value)}"
 
 @dataclass
 class Selection:
@@ -82,16 +79,19 @@ class Selection:
   def graphql_string(self, level:int=0) -> str:
     indent = "  " * level
 
-    if self.arguments:
-      args_str = "(" + ", ".join([arg.graphql_string() for arg in self.arguments]) + ")"
-    else:
-      args_str = ""
-
-    if self.selection == None:
-      return f"{indent}{self.name}{args_str}"
-    else:
-      selection_str = f"{indent}{indent}\n".join([f.graphql_string(level=level+1) for f in self.selection])
-      return f"{indent}{self.name}{args_str} {{\n{selection_str}\n{indent}}}"
+    match (self.arguments, self.selection):
+      case (None | [], None | []):
+        return f"{indent}{self.name}"
+      case (args, None | []):
+        args_str = "(" + ", ".join([arg.graphql_string() for arg in args]) + ")"
+        return f"{indent}{self.name}{args_str}"
+      case (None | [], inner_selection):
+        inner_str = f"{indent}{indent}\n".join([f.graphql_string(level=level+1) for f in inner_selection])
+        return f"{indent}{self.name} {{\n{inner_str}\n{indent}}}"
+      case (args, inner_selection):
+        args_str = "(" + ", ".join([arg.graphql_string() for arg in args]) + ")"
+        inner_str = f"{indent}{indent}\n".join([f.graphql_string(level=level+1) for f in inner_selection])
+        return f"{indent}{self.name}{args_str} {{\n{inner_str}\n{indent}}}"
 
   def add_selection(self, new_selection):
     if self.selection is None:
@@ -110,7 +110,7 @@ class Selection:
 
 @dataclass
 class Query:
-  selection: typing.List[Selection]
+  selection: typing.Optional[typing.List[Selection]] = None
 
   def graphql_string(self) -> str:
     selection_str = "\n".join([f.graphql_string(level=1) for f in self.selection])

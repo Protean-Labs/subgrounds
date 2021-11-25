@@ -9,6 +9,7 @@ mypy = "*"
 types-requests = "*"
 sgqlc = "*"
 dash = "*"
+nose2 = "*"
 
 [dev-packages]
 
