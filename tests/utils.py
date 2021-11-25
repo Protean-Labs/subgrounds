@@ -1,5 +1,5 @@
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, input_value_of_argument
-from subgrounds.subgraph2 import Subgraph
+from subgrounds.subgraph import Subgraph
 
 def schema():
   return SchemaMeta(query_type='Query', type_map={

@@ -4,7 +4,7 @@ from dash import dcc
 from dash import dash_table
 import plotly.graph_objects as go
 
-from subgrounds.subgraph2 import Filter, Subgraph, FieldPath
+from subgrounds.subgraph import Filter, Subgraph, FieldPath
 
 def columns(row):
   for key, value in row.items():

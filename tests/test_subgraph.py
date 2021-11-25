@@ -2,7 +2,7 @@ import unittest
 import operator
 
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef
-from subgrounds.subgraph2 import FieldPath, Filter, Object, Subgraph, SyntheticField
+from subgrounds.subgraph import FieldPath, Filter, Object, Subgraph, SyntheticField
 from subgrounds.query import Argument, InputValue, Query, Selection
 from subgrounds.utils import identity
 
