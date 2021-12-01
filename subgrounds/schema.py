@@ -245,6 +245,9 @@ def typeref_of_input_field(meta: TypeMeta.T, fname: str) -> TypeRef.T:
 
 def input_value_of_string(type_: TypeRef.T, value: str) -> InputValue:
   match type_:
+    case (TypeRef.Named("ID"), _, str()):
+      return InputValue.String(value)
+
     case TypeRef.Named("Int"):
       return InputValue.Int(int(value))
     case TypeRef.Named("BigInt"):
@@ -268,6 +271,9 @@ def input_value_of_string(type_: TypeRef.T, value: str) -> InputValue:
 
 def input_value_of_value(type_: TypeRef.T, value: Any) -> InputValue:
   match type_:
+    case (TypeRef.Named("ID"), _, str()):
+      return InputValue.String(value)
+
     case TypeRef.Named("Int"):
       return InputValue.Int(int(value))
     case TypeRef.Named("BigInt"):
