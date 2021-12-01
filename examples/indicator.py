@@ -1,9 +1,11 @@
 import dash
 from dash import html
+from dash import dcc
+# from dash.dependencies import Input
 
 from datetime import datetime
 
-from subgrounds.components import LinePlot
+from subgrounds.components import Indicator, LinePlot
 from subgrounds.subgraph import Subgraph, SyntheticField
 
 uniswapV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
@@ -28,17 +30,16 @@ app = dash.Dash(__name__)
 app.layout = html.Div(
   html.Div([
     html.Div([
-      LinePlot(
+      Indicator(
         Query.swaps,
-        component_id='price',
+        component_id='price-indicator',
         orderBy=Swap.timestamp,
         orderDirection="desc",
-        first=500,
+        first=1,
         where=[
           Swap.pair == "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"
         ],
-        x=Swap.datetime,
-        y=Swap.price1
+        x=Swap.price1
       )
     ])
   ])

@@ -160,6 +160,18 @@ class FieldPath:
   def __str__(self):
     return '.'.join(map(lambda ele: ele.type_.name, self.path))
 
+  def split_args(self, kwargs: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    query_args = {}
+    other_args = {}
+    for key, item in kwargs.items():
+      try:
+        next(filter(lambda arg: arg.name == key, self.leaf.type_.arguments))
+        query_args[key] = item
+      except StopIteration:
+        other_args[key] = item
+
+    return query_args, other_args
+
   # When setting arguments
   def __call__(self, **kwargs: Any) -> Any:
     def fmt_arg(name, raw_arg):

@@ -37,17 +37,25 @@ class TypeRef:
         return name
 
   @staticmethod
-  def non_null(name: str):
+  def non_null(name: str) -> TypeRef.T:
     return TypeRef.NonNull(TypeRef.Named(name))
 
   @staticmethod
-  def non_null_list(name: str):
+  def non_null_list(name: str) -> TypeRef.T:
     return TypeRef.NonNull(TypeRef.List(TypeRef.NonNull(TypeRef.Named(name))))
 
   @staticmethod
-  def is_non_null(type_: TypeRef.T):
+  def is_non_null(type_: TypeRef.T) -> bool:
     match type_:
       case TypeRef.NonNull():
+        return True
+      case _:
+        return False
+
+  @staticmethod
+  def is_list(type_: TypeRef.T) -> bool:
+    match type_:
+      case TypeRef.List() | TypeRef.NonNull(TypeRef.List()):
         return True
       case _:
         return False
@@ -293,7 +301,10 @@ def input_value_of_argument(schema: SchemaMeta, meta: TypeMeta.T, value: Any) ->
 
       # If type is non_null, recurse with non_null=True
       case (TypeRef.NonNull(t), _, _):
-        return fmt_value(value, t, non_null=True)
+        return fmt_value(t, value, non_null=True)
+
+      case (TypeRef.Named("ID"), _, str()):
+        return InputValue.String(value)
 
       case (TypeRef.Named("Int"), _, int()):
         return InputValue.Int(value)
@@ -314,7 +325,7 @@ def input_value_of_argument(schema: SchemaMeta, meta: TypeMeta.T, value: Any) ->
         return InputValue.Boolean(value)
 
       case (TypeRef.List(t), _, list()):
-        return InputValue.List([fmt_value(val, t, non_null) for val in value])
+        return InputValue.List([fmt_value(t, val, non_null) for val in value])
 
       case (TypeRef.Named(), TypeMeta.InputObjectMeta() as input_object, dict()):
         return InputValue.Object({key: fmt_value(typeref_of_input_field(input_object, key), val, non_null) for key, val in value.items()})
@@ -332,7 +343,7 @@ def add_object_field(object_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta, sfie
   object_.fields.append(sfield)
 
 def arguments_of_field_args(schema: SchemaMeta, field: TypeMeta.FieldMeta, args: Dict[str, Any]) -> List[Argument]:
-  def f(arg_meta):
+  def f(arg_meta: TypeMeta.ArgumentMeta):
     if arg_meta.name in args:
       return Argument(arg_meta.name, input_value_of_argument(schema, arg_meta, args[arg_meta.name]))
     else:

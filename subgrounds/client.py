@@ -103,6 +103,7 @@ def get_schema(url):
     raise Exception(resp["errors"])
 
 def query(url, query):
+  # print(f"Query:\n{query}")
   resp = requests.post(
     url,
     json={"query": query}, 
