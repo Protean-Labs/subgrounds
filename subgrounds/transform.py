@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List
 from functools import partial
 
 from subgrounds.query import Query, Selection
-from subgrounds.schema import FieldMeta
+from subgrounds.schema import FieldMeta, TypeRef
 from subgrounds.utils import flatten
 
 
@@ -70,6 +70,23 @@ def transform_data(fmeta: FieldMeta, func: Callable, args: List[Selection], quer
     transform(select, data)
 
   return data
+
+
+def transform_data_scalar(f: Callable, type_: TypeRef.T, query: Query, data: dict) -> dict:
+  def transform(select: Selection, data: dict) -> None:
+    match (select, data):
+      case (Selection(FieldMeta(name, _, _, ftype), _, _, [] | None), dict() as data) if type_ == ftype:
+        data[name] = f(data[name])
+      case 
+
+class SubgraphTypesTransform(Transform):
+  def __init__(self) -> None:
+    super().__init__()
+
+  def transform_selection(self, query: Query) -> Query:
+    return query
+
+  def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 class LocalSyntheticField(Transform):
