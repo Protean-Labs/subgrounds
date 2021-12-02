@@ -20,13 +20,13 @@ class Transform(ABC):
 def transform_selection(fmeta: FieldMeta, replacement: List[Selection], query: Query) -> Query:
   def transform(select: Selection):
     match select:
-      case Selection(name, _, _, [] | None) if name == fmeta.name:
+      case Selection(FieldMeta(name), _, _, [] | None) if name == fmeta.name:
         return replacement
       case Selection(_, _, _, [] | None):
         return [select]
-      case Selection(name, alias, args, inner_select):
+      case Selection(FieldMeta(name) as select_fmeta, alias, args, inner_select):
         new_inner_select = flatten(list(map(transform, inner_select)))
-        return Selection(name, alias, args, new_inner_select)
+        return Selection(select_fmeta, alias, args, new_inner_select)
       case _:
         raise Exception(f"transform_selection: unhandled selection {select}")
 
@@ -35,9 +35,9 @@ def transform_selection(fmeta: FieldMeta, replacement: List[Selection], query: Q
 
 def select_data(select: Selection, data: dict) -> list[Any]:
   match (select, data):
-    case (Selection(name, _, _, [] | None), dict() as data) if name in data:
+    case (Selection(FieldMeta(name), _, _, [] | None), dict() as data) if name in data:
       return [data[name]]
-    case (Selection(name, _, _, inner_select), dict() as data) if name in data:
+    case (Selection(FieldMeta(name), _, _, inner_select), dict() as data) if name in data:
       return flatten(list(map(partial(select_data, data=data[name]), inner_select)))
     case (select, data):
       raise Exception(f"select_data: invalid selection {select} for data {data}")
@@ -46,12 +46,12 @@ def select_data(select: Selection, data: dict) -> list[Any]:
 def transform_data(fmeta: FieldMeta, func: Callable, args: List[Selection], query: Query, data: dict) -> dict:
   def transform(select: Selection, data: dict) -> None:
     match (select, data):
-      case (Selection(name, _, _, [] | None), dict() as data) if name == fmeta.name and name not in data:
+      case (Selection(FieldMeta(name), _, _, [] | None), dict() as data) if name == fmeta.name and name not in data:
         arg_values = flatten(list(map(partial(select_data, data=data), args)))
         data[name] = func(*arg_values)
-      case (Selection(name, _, _, [] | None), dict() as data):
+      case (Selection(FieldMeta(name), _, _, [] | None), dict() as data):
         pass
-      case (Selection(name, _, _, inner_select), dict() as data) if name in data:
+      case (Selection(FieldMeta(name), _, _, inner_select), dict() as data) if name in data:
         match data[name]:
           case list() as elts:
             for elt in elts:

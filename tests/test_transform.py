@@ -4,30 +4,31 @@ from subgrounds.query import Query, Selection
 from subgrounds.schema import FieldMeta, TypeRef
 from subgrounds.transform import transform_data, transform_selection
 
+
 class TestQueryTransform(unittest.TestCase):
   def test_transform_selection1(self):
     expected = Query([
-      Selection('swaps', None, None, [
-        Selection('amount0In', None, None, None),
-        Selection('amount0Out', None, None, None),
-        Selection('amount1In', None, None, None),
-        Selection('amount1Out', None, None, None),
+      Selection(FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+        Selection(FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+        Selection(FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+        Selection(FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+        Selection(FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
       ])
     ])
 
     fmeta = FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
     query = Query([
-      Selection('swaps', None, None, [
-        Selection('price1', None, None, None),
+      Selection(FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+        Selection(FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
       ])
     ])
 
     replacement = [
-      Selection('amount0In', None, None, None),
-      Selection('amount0Out', None, None, None),
-      Selection('amount1In', None, None, None),
-      Selection('amount1Out', None, None, None),
+      Selection(FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
     new_query = transform_selection(fmeta, replacement, query)
@@ -56,14 +57,14 @@ class TestQueryTransform(unittest.TestCase):
       return abs(in0 - out0) / abs(in1 - out1)
 
     arg_select = [
-      Selection('amount0In', None, None, None),
-      Selection('amount0Out', None, None, None),
-      Selection('amount1In', None, None, None),
-      Selection('amount1Out', None, None, None),
+      Selection(FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
     query = Query([
-      Selection('price1', None, None, None),
+      Selection(FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None)
     ])
 
     transformed_data = transform_data(fmeta, f, arg_select, query, data)
@@ -96,15 +97,15 @@ class TestQueryTransform(unittest.TestCase):
       return abs(in0 - out0) / abs(in1 - out1)
 
     arg_select = [
-      Selection('amount0In', None, None, None),
-      Selection('amount0Out', None, None, None),
-      Selection('amount1In', None, None, None),
-      Selection('amount1Out', None, None, None),
+      Selection(FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
     query = Query([
-      Selection('swap', None, None, [
-        Selection('price1', None, None, None),
+      Selection(FieldMeta('swap', '', [], TypeRef.Named('Swap')), None, None, [
+        Selection(FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
       ])
     ])
 
@@ -136,17 +137,17 @@ class TestQueryTransform(unittest.TestCase):
       return abs(in0 - out0) / abs(in1 - out1)
 
     arg_select = [
-      Selection('amount0In', None, None, None),
-      Selection('amount0Out', None, None, None),
-      Selection('amount1In', None, None, None),
-      Selection('amount1Out', None, None, None),
+      Selection(FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      Selection(FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
     fmeta = FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
     query = Query([
-      Selection('swaps', None, None, [
-        Selection('price1', None, None, None),
+      Selection(FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+        Selection(FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
       ])
     ])
 

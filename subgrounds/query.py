@@ -13,7 +13,6 @@ from subgrounds.schema import (
   SchemaMeta,
   TypeMeta,
   TypeRef,
-  # type_of_field,
   typeref_of_input_field
 )
 
@@ -102,7 +101,8 @@ class Argument:
 
 @dataclass
 class Selection:
-  name: str
+  # name: str
+  fmeta: FieldMeta
   alias: Optional[str] = None
   arguments: Optional[list[Argument]] = None
   selection: Optional[list[Selection]] = None
@@ -112,30 +112,30 @@ class Selection:
 
     match (self.arguments, self.selection):
       case (None | [], None | []):
-        return f"{indent}{self.name}"
+        return f"{indent}{self.fmeta.name}"
       case (args, None | []):
         args_str = "(" + ", ".join([arg.graphql_string() for arg in args]) + ")"
-        return f"{indent}{self.name}{args_str}"
+        return f"{indent}{self.fmeta.name}{args_str}"
       case (None | [], inner_selection):
         inner_str = "\n".join(
           [f.graphql_string(level=level + 1) for f in inner_selection]
         )
-        return f"{indent}{self.name} {{\n{inner_str}\n{indent}}}"
+        return f"{indent}{self.fmeta.name} {{\n{inner_str}\n{indent}}}"
       case (args, inner_selection):
         args_str = "(" + ", ".join(
           [arg.graphql_string() for arg in args]
         ) + ")"
         inner_str = "\n".join([f.graphql_string(level=level + 1) for f in inner_selection])
-        return f"{indent}{self.name}{args_str} {{\n{inner_str}\n{indent}}}"
+        return f"{indent}{self.fmeta.name}{args_str} {{\n{inner_str}\n{indent}}}"
 
-  def add_selection(self, new_selection):
+  def add_selection(self, new_selection: Selection) -> None:
     if self.selection is None:
       self.selection = []
 
     try:
-      select = next(filter(lambda select: select.name == new_selection.name, self.selection))
-      for s in new_selection.selection:
-        select.add_selection(s)
+      select = next(filter(lambda select: select.fmeta.name == new_selection.fmeta.name, self.selection))
+      for new_select in new_selection.selection:
+        select.add_selection(new_select)
     except StopIteration:
       self.selection.append(new_selection)
 
