@@ -220,14 +220,15 @@ class IndicatorWithChange(Component):
     fig = go.Figure(go.Indicator(
       mode='number+delta',
       value=value,
-      delta = {'position': "right", "reference": self.last, "valueformat": ".02f"},
-      number = {'valueformat':'.02f'},
+      delta={'position': "right", "reference": self.last, "valueformat": ".02f"},
+      number={'valueformat': '.02f'},
       **kwargs
     ))
 
     self.last = value
 
     return fig
+
 
 # Live update wrapper
 class AutoUpdate(html.Div):
@@ -247,7 +248,7 @@ class AutoUpdate(html.Div):
     super().__init__([
       dcc.Interval(
         id=id,
-        interval=sec_interval * 1000, # in milliseconds
+        interval=sec_interval * 1000,  # in milliseconds
         n_intervals=0
       ),
       component

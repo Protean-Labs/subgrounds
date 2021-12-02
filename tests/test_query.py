@@ -1,9 +1,10 @@
 import unittest
 
-from subgrounds.query import Argument, InputValue, Query, Selection
-from subgrounds.subgraph import FieldPath, Filter, Object, Subgraph, SyntheticField
+from subgrounds.query import Argument, Enum, Int, Object, Query, Selection, String
+from subgrounds.subgraph import Subgraph, SyntheticField
 
 from tests.utils import schema
+
 
 class TestQueryString(unittest.TestCase):
   def setUp(self):
@@ -29,12 +30,13 @@ class TestQueryString(unittest.TestCase):
 }"""
 
     query = Query([
-      Selection("pairs", 
+      Selection(
+        "pairs",
         arguments=[
-          Argument('first', InputValue.Int(100)),
-          Argument('where', InputValue.Object({'reserveUSD_lt': InputValue.String('10.0')})),
-          Argument('orderBy', InputValue.Enum('reserveUSD')),
-          Argument('orderDirection', InputValue.Enum('desc'))
+          Argument('first', Int(100)),
+          Argument('where', Object({'reserveUSD_lt': String('10.0')})),
+          Argument('orderBy', Enum('reserveUSD')),
+          Argument('orderDirection', Enum('desc'))
         ],
         selection=[
           Selection("id"),
@@ -85,6 +87,7 @@ class TestQueryString(unittest.TestCase):
     ])
 
     self.assertEqual(query.graphql_string(), expected)
+
 
 class TestQueryDataProcessing(unittest.TestCase):
   def setUp(self):
@@ -167,7 +170,6 @@ class TestQueryDataProcessing(unittest.TestCase):
     self.subgraph.process_data(selections, data)
 
     self.assertEqual(data, expected)
-
 
   def test_query_data_process_3(self):
     expected = {'swaps': [

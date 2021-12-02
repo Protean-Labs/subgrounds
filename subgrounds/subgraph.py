@@ -7,9 +7,10 @@ import json
 import operator
 
 import subgrounds.client as client
-from subgrounds.query import Argument, Query
 import subgrounds.schema as schema
-from subgrounds.schema import Path, SchemaMeta, TypeMeta, apply_field_path, mk_schema, selections_of_path
+from subgrounds.query import Query, selection_of_path
+from subgrounds.schema import FieldMeta, InterfaceMeta, ObjectMeta, SchemaMeta, TypeMeta, mk_schema
+from subgrounds.transform import Transform
 from subgrounds.utils import flatten, identity
 
 @dataclass
@@ -83,7 +84,7 @@ class SyntheticField:
           return value
 
     self.meta = TypeMeta.SyntheticFieldMeta(
-      name=f'SyntheticField_{SyntheticField.counter}', 
+      name=f'SyntheticField_{SyntheticField.counter}',
       description='', 
       func=self.func,
       dependencies=list(map(f, self.deps))
@@ -116,34 +117,35 @@ class SyntheticField:
   def __abs__(self) -> SyntheticField:
     return SyntheticField(self.subgraph, operator.abs, self)
 
+
 @dataclass
 class FieldPath:
   subgraph: Subgraph
-  root_type: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta
-  type_: TypeMeta.T
-  path: List[FieldPath.PathElement]
+  root_type: ObjectMeta | InterfaceMeta
+  type_: TypeMeta
+  path: List[Tuple[Optional[Dict[str, Any]], FieldMeta]]
 
-  @dataclass 
-  class PathElement:
-    type_: TypeMeta.FieldMeta | TypeMeta.SyntheticFieldMeta
-    args: Optional[List[Argument]] = None
+  # @dataclass 
+  # class PathElement:
+  #   type_: TypeMeta.FieldMeta | TypeMeta.SyntheticFieldMeta
+  #   args: Optional[List[Argument]] = None
 
   @property
   def schema(self):
     return self.subgraph.schema
 
-  @property
-  def fieldmeta_path(self) -> Path:
-    def f(path_ele):
-      match path_ele:
-        case FieldPath.PathElement(type_=TypeMeta.FieldMeta() as fmeta, args=args):
-          return (args, fmeta)
-        case FieldPath.PathElement(type_=TypeMeta.SyntheticFieldMeta() as sfmeta):
-          return sfmeta
-        case _:
-          raise TypeError(f"fieldmeta_path: Unexptected type in FieldPath {self}: {path_ele}")
+  # @property
+  # def fieldmeta_path(self) -> Path:
+  #   def f(path_ele):
+  #     match path_ele:
+  #       case FieldPath.PathElement(type_=TypeMeta.FieldMeta() as fmeta, args=args):
+  #         return (args, fmeta)
+  #       case FieldPath.PathElement(type_=TypeMeta.SyntheticFieldMeta() as sfmeta):
+  #         return sfmeta
+  #       case _:
+  #         raise TypeError(f"fieldmeta_path: Unexptected type in FieldPath {self}: {path_ele}")
 
-    return list(map(f, self.path))
+  #   return list(map(f, self.path))
 
   @property
   def longname(self):
@@ -321,6 +323,7 @@ class Object:
 class Subgraph:
   url: str
   schema: SchemaMeta
+  transforms: List[Transform] = field(default_factory=list)
 
   @staticmethod
   def of_url(url: str) -> None:

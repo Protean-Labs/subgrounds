@@ -10,6 +10,8 @@ types-requests = "*"
 sgqlc = "*"
 dash = "*"
 nose2 = "*"
+flake8 = "*"
+pylint = "*"
 
 [dev-packages]
 
