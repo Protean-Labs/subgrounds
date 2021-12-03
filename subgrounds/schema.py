@@ -56,73 +56,65 @@ class TypeRef:
         return False
 
 
-@dataclass
-class TypeMeta(ABC):
-  name: str
-  description: str
+class TypeMeta:
+  @dataclass
+  class T(ABC):
+    name: str
+    description: str
 
+  @dataclass
+  class ArgumentMeta(T):
+    type_: TypeRef.T
+    default_value: Optional[str]
 
-@dataclass
-class ArgumentMeta(TypeMeta):
-  type_: TypeRef.T
-  default_value: Optional[str]
+  @dataclass
+  class FieldMeta(T):
+    arguments: list[TypeMeta.ArgumentMeta]
+    type_: TypeRef.T
 
+  # 
+  # @dataclass
+  # class SyntheticFieldMeta(T):
+  #   func: function
+  #   dependencies: List[(
+  #     # E.g.: In `Entity.newField = Entity.sfield1 + Entity.sfield2 / Entity.sfield3`, `Entity.sfield2 / Entity.sfield3` is an anonymous synthetic field
+  #     TypeMeta.SyntheticFieldMeta
+  #     # Field Path
+  #     | List[Tuple[Optional[List[Argument]], TypeMeta.FieldMeta] | TypeMeta.SyntheticFieldMeta] 
+  #     # Constants
+  #     | int 
+  #     | float 
+  #     | str
+  #   )]
 
-@dataclass
-class FieldMeta(TypeMeta):
-  arguments: list[ArgumentMeta]
-  type_: TypeRef.T
+  @dataclass
+  class ScalarMeta(T):
+    pass
 
-# 
-# @dataclass
-# class SyntheticFieldMeta(T):
-#   func: function
-#   dependencies: List[(
-#     # E.g.: In `Entity.newField = Entity.sfield1 + Entity.sfield2 / Entity.sfield3`, `Entity.sfield2 / Entity.sfield3` is an anonymous synthetic field
-#     TypeMeta.SyntheticFieldMeta
-#     # Field Path
-#     | List[Tuple[Optional[List[Argument]], TypeMeta.FieldMeta] | TypeMeta.SyntheticFieldMeta] 
-#     # Constants
-#     | int 
-#     | float 
-#     | str
-#   )]
+  @dataclass
+  class ObjectMeta(T):
+    fields: list[TypeMeta.FieldMeta]
+    interfaces: list[str] = field(default_factory=list)
 
+  @dataclass
+  class EnumValueMeta(T):
+    pass
 
-@dataclass
-class ScalarMeta(TypeMeta):
-  pass
+  @dataclass
+  class EnumMeta(T):
+    values: list[TypeMeta.EnumValueMeta]
 
+  @dataclass
+  class InterfaceMeta(T):
+    fields: list[TypeMeta.FieldMeta]
 
-@dataclass
-class ObjectMeta(TypeMeta):
-  fields: list[FieldMeta]
-  interfaces: list[str] = field(default_factory=list)
+  @dataclass
+  class UnionMeta(T):
+    types: list[str]
 
-
-@dataclass
-class EnumValueMeta(TypeMeta):
-  pass
-
-
-@dataclass
-class EnumMeta(TypeMeta):
-  values: list[EnumValueMeta]
-
-
-@dataclass
-class InterfaceMeta(TypeMeta):
-  fields: list[FieldMeta]
-
-
-@dataclass
-class UnionMeta(TypeMeta):
-  types: list[str]
-
-
-@dataclass
-class InputObjectMeta(TypeMeta):
-  input_fields: list[ArgumentMeta]
+  @dataclass
+  class InputObjectMeta(T):
+    input_fields: list[TypeMeta.ArgumentMeta]
 
 
 @dataclass
@@ -152,41 +144,41 @@ def mk_schema(json):
       case _ as json:
         raise ParsingError(f"mk_type_ref: {json}")
 
-  def mk_argument_meta(json: dict) -> ArgumentMeta:
+  def mk_argument_meta(json: dict) -> TypeMeta.ArgumentMeta:
     match json:
       case {'name': name, 'description': desc, 'type': type_, 'defaultValue': default_value}:
-        return ArgumentMeta(name=name, type_=mk_type_ref(type_), description=desc, default_value=default_value)
+        return TypeMeta.ArgumentMeta(name=name, type_=mk_type_ref(type_), description=desc, default_value=default_value)
       case _ as json:
         raise ParsingError(f"mk_argument_meta: {json}")
 
-  def mk_field_meta(json: dict) -> FieldMeta:
+  def mk_field_meta(json: dict) -> TypeMeta.FieldMeta:
     match json:
       case {'name': name, 'description': desc, 'args': args, 'type': type_}:
-        return FieldMeta(name, arguments=[mk_argument_meta(arg) for arg in args], type_=mk_type_ref(type_), description=desc)
+        return TypeMeta.FieldMeta(name, arguments=[mk_argument_meta(arg) for arg in args], type_=mk_type_ref(type_), description=desc)
       case _ as json:
         raise ParsingError(f"mk_field_meta: {json}")
 
-  def mk_enum_value(json: dict) -> EnumValueMeta:
+  def mk_enum_value(json: dict) -> TypeMeta.EnumValueMeta:
     match json:
       case {'name': name, 'description': desc}:
-        return EnumValueMeta(name, description=desc)
+        return TypeMeta.EnumValueMeta(name, description=desc)
       case _ as json:
         raise ParsingError(f"mk_enum_value: {json}")
 
   def mk_type_meta(json: dict) -> TypeMeta:
     match json:
       case {'kind': 'SCALAR', 'name': name, 'description': desc}:
-        return ScalarMeta(name, description=desc)
+        return TypeMeta.ScalarMeta(name, description=desc)
       case {'kind': 'OBJECT', 'name': name, 'description': desc, 'fields': fields, 'interfaces': intfs}:
-        return ObjectMeta(name, fields=[mk_field_meta(f) for f in fields], interfaces=intfs, description=desc)
+        return TypeMeta.ObjectMeta(name, fields=[mk_field_meta(f) for f in fields], interfaces=intfs, description=desc)
       case {'kind': 'ENUM', 'name': name, 'description': desc, 'enumValues': enum_values}:
-        return EnumMeta(name, values=[mk_enum_value(val) for val in enum_values], description=desc)
+        return TypeMeta.EnumMeta(name, values=[mk_enum_value(val) for val in enum_values], description=desc)
       case {'kind': 'INTERFACE', 'name': name, 'description': desc, 'fields': fields}:
-        return InterfaceMeta(name, fields=[mk_field_meta(f) for f in fields], description=desc)
+        return TypeMeta.InterfaceMeta(name, fields=[mk_field_meta(f) for f in fields], description=desc)
       case {'kind': 'UNION', 'name': name, 'description': desc, 'possibleTypes': types}:
-        return UnionMeta(name, types=types, description=desc)
+        return TypeMeta.UnionMeta(name, types=types, description=desc)
       case {'kind': 'INPUT_OBJECT', 'name': name, 'description': desc, 'inputFields': input_feilds}:
-        return InputObjectMeta(name, input_fields=[mk_argument_meta(f) for f in input_feilds], description=desc)
+        return TypeMeta.InputObjectMeta(name, input_fields=[mk_argument_meta(f) for f in input_feilds], description=desc)
       case _ as json:
         raise ParsingError(f"mk_type_meta: {json}")
 
@@ -220,9 +212,9 @@ def mk_schema(json):
 # ================================================================
 
 
-def field_of_object(meta: TypeMeta, fname: str) -> FieldMeta:
+def field_of_object(meta: TypeMeta, fname: str) -> TypeMeta.FieldMeta:
   match meta:
-    case ObjectMeta(fields=fields) | InterfaceMeta(fields=fields):
+    case TypeMeta.ObjectMeta(fields=fields) | TypeMeta.InterfaceMeta(fields=fields):
       return next(filter(lambda field: field.name == fname, fields))
     case _:
       raise TypeError(f"field_of_object: TypeMeta {meta.name} is not of type ObjectMeta or InterfaceMeta")
@@ -230,7 +222,7 @@ def field_of_object(meta: TypeMeta, fname: str) -> FieldMeta:
 
 def type_of_arg(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
   match meta:
-    case ArgumentMeta(type_=type_):
+    case TypeMeta.ArgumentMeta(type_=type_):
       tname = TypeRef.root_type_name(type_)
       return schema.type_map[tname]
     case _:
@@ -239,7 +231,7 @@ def type_of_arg(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
 
 def type_of_field(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
   match meta:
-    case FieldMeta(type_=type_):
+    case TypeMeta.FieldMeta(type_=type_):
       tname = TypeRef.root_type_name(type_)
       return schema.type_map[tname]
     # case SyntheticFieldMeta() as type_:
@@ -250,7 +242,7 @@ def type_of_field(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
 
 def typeref_of_input_field(meta: TypeMeta, fname: str) -> TypeRef.T:
   match meta:
-    case InputObjectMeta(input_fields=input_fields):
+    case TypeMeta.InputObjectMeta(input_fields=input_fields):
       arg = next(filter(lambda field: field.name == fname, input_fields))
       return arg.type_
     case _:

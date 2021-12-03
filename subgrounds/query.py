@@ -4,14 +4,8 @@ from dataclasses import dataclass
 from typing import Any, Optional, Tuple
 
 from subgrounds.schema import (
-  ArgumentMeta,
-  EnumMeta,
-  FieldMeta,
-  InputObjectMeta,
-  InterfaceMeta,
-  ObjectMeta,
-  SchemaMeta,
   TypeMeta,
+  SchemaMeta,
   TypeRef,
   typeref_of_input_field
 )
@@ -95,7 +89,7 @@ class Argument:
 @dataclass
 class Selection:
   # name: str
-  fmeta: FieldMeta
+  fmeta: TypeMeta.FieldMeta
   alias: Optional[str] = None
   arguments: Optional[list[Argument]] = None
   selection: Optional[list[Selection]] = None
@@ -257,7 +251,7 @@ def input_value_of_argument(
 
       case (TypeRef.Named("String" | "Bytes"), _, str()):
         return InputValue.String(value)
-      case (TypeRef.Named(), EnumMeta(_), str()):
+      case (TypeRef.Named(), TypeMeta.EnumMeta(_), str()):
         return InputValue.Enum(value)
 
       case (TypeRef.Named("Boolean"), _, bool()):
@@ -266,32 +260,32 @@ def input_value_of_argument(
       case (TypeRef.List(t), _, list()):
         return InputValue.List([fmt_value(t, val, non_null) for val in value])
 
-      case (TypeRef.Named(), InputObjectMeta() as input_object, dict()):
+      case (TypeRef.Named(), TypeMeta.InputObjectMeta() as input_object, dict()):
         return InputValue.Object({key: fmt_value(typeref_of_input_field(input_object, key), val, non_null) for key, val in value.items()})
 
       case (value, typ, non_null):
         raise TypeError(f"mk_input_value({value}, {typ}, {non_null})")
 
   match meta:
-    case ArgumentMeta(type_=type_):
+    case TypeMeta.ArgumentMeta(type_=type_):
       return fmt_value(type_, value)
     case _:
       raise TypeError(f"input_value_of_argument: TypeMeta {meta.name} is not of type TypeMeta.ArgumentMeta")
 
 
 def add_object_field(
-  object_: ObjectMeta | InterfaceMeta,
-  field: FieldMeta
+  object_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta,
+  field: TypeMeta.FieldMeta
 ) -> None:
   object_.fields.append(field)
 
 
 def arguments_of_field_args(
   schema: SchemaMeta,
-  field: FieldMeta,
+  field: TypeMeta.FieldMeta,
   args: dict[str, Any]
 ) -> list[Argument]:
-  def f(arg_meta: ArgumentMeta) -> Optional[Argument]:
+  def f(arg_meta: TypeMeta.ArgumentMeta) -> Optional[Argument]:
     if arg_meta.name in args:
       return Argument(
         arg_meta.name,
@@ -306,7 +300,7 @@ def arguments_of_field_args(
   # TODO: Add warnings if arguments are not used
 
   match field:
-    case FieldMeta() as field:
+    case TypeMeta.FieldMeta() as field:
       args = [f(arg_meta) for arg_meta in field.arguments]
       return list(filter(lambda arg: arg is not None, args))
     case _:
@@ -315,10 +309,10 @@ def arguments_of_field_args(
 
 def selection_of_path(
   schema: SchemaMeta,
-  fpath: list[Tuple[Optional[dict[str, Any]], FieldMeta]]
+  fpath: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]
 ) -> Optional[Selection]:
   match fpath:
-    case [(args, FieldMeta() as fmeta), *rest]:
+    case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
       return Selection(
         fmeta.name,
         arguments=arguments_of_field_args(schema, fmeta, args),
