@@ -21,73 +21,66 @@ from subgrounds.schema import (
 # ================================================================
 
 
-@dataclass
-class InputValue(ABC):
-  @abstractmethod
-  def graphql_string(self) -> str:
-    pass
+class InputValue:
+  @dataclass
+  class T(ABC):
+    @abstractmethod
+    def graphql_string(self) -> str:
+      pass
 
+  @dataclass
+  class Null(T):
+    def graphql_string(self) -> str:
+      return "null"
 
-@dataclass
-class Null(InputValue):
-  def graphql_string(self) -> str:
-    return "null"
+  @dataclass
+  class Int(T):
+    value: int
 
+    def graphql_string(self) -> str:
+      return str(self.value)
 
-@dataclass
-class Int(InputValue):
-  value: int
+  @dataclass
+  class Float(T):
+    value: float
 
-  def graphql_string(self) -> str:
-    return str(self.value)
+    def graphql_string(self) -> str:
+      return str(self.value)
 
+  @dataclass
+  class String(T):
+    value: str
 
-@dataclass
-class Float(InputValue):
-  value: float
+    def graphql_string(self) -> str:
+      return f"\"{self.value}\""
 
-  def graphql_string(self) -> str:
-    return str(self.value)
+  @dataclass
+  class Boolean(T):
+    value: bool
 
+    def graphql_string(self) -> str:
+      return str(self.value).lower()
 
-@dataclass
-class String(InputValue):
-  value: str
+  @dataclass
+  class Enum(T):
+    value: str
 
-  def graphql_string(self) -> str:
-    return f"\"{self.value}\""
+    def graphql_string(self) -> str:
+      return self.value
 
+  @dataclass
+  class List(T):
+    value: list[InputValue.T]
 
-@dataclass
-class Boolean(InputValue):
-  value: bool
+    def graphql_string(self) -> str:
+      return f"[{', '.join([val.graphql_string() for val in self.value])}]"
 
-  def graphql_string(self) -> str:
-    return str(self.value).lower()
+  @dataclass
+  class Object(T):
+    value: dict[str, InputValue.T]
 
-
-@dataclass
-class Enum(InputValue):
-  value: str
-
-  def graphql_string(self) -> str:
-    return self.value
-
-
-@dataclass
-class List(InputValue):
-  value: list[InputValue]
-
-  def graphql_string(self) -> str:
-    return f"[{', '.join([val.graphql_string() for val in self.value])}]"
-
-
-@dataclass
-class Object(InputValue):
-  value: dict[str, InputValue]
-
-  def graphql_string(self) -> str:
-    return f"{{{', '.join([f'{key}: {value.graphql_string()}' for key, value in self.value.items()])}}}"
+    def graphql_string(self) -> str:
+      return f"{{{', '.join([f'{key}: {value.graphql_string()}' for key, value in self.value.items()])}}}"
 
 
 @dataclass
@@ -180,25 +173,25 @@ class Query:
 def input_value_of_string(type_: TypeRef.T, value: str) -> InputValue:
   match type_:
     case TypeRef.Named("ID"):
-      return String(value)
+      return InputValue.String(value)
 
     case TypeRef.Named("Int"):
-      return Int(int(value))
+      return InputValue.Int(int(value))
     case TypeRef.Named("BigInt"):
-      return String(value)
+      return InputValue.String(value)
 
     case (TypeRef.Named("Float")):
-      return Float(float(value))
+      return InputValue.Float(float(value))
     case (TypeRef.Named("BigDecimal")):
-      return String(value)
+      return InputValue.String(value)
 
     case (TypeRef.Named("Boolean")):
-      return Boolean(bool(value))
+      return InputValue.Boolean(bool(value))
 
     case (TypeRef.Named("String" | "Bytes")):
-      return String(value)
+      return InputValue.String(value)
     case (TypeRef.Named()):
-      return Enum(value)
+      return InputValue.Enum(value)
 
     case type_:
       raise TypeError(f"input_value_of_string: invalid type {type_}")
@@ -207,25 +200,25 @@ def input_value_of_string(type_: TypeRef.T, value: str) -> InputValue:
 def input_value_of_value(type_: TypeRef.T, value: Any) -> InputValue:
   match type_:
     case (TypeRef.Named("ID"), _, str()):
-      return String(str(value))
+      return InputValue.String(str(value))
 
     case TypeRef.Named("Int"):
-      return Int(int(value))
+      return InputValue.Int(int(value))
     case TypeRef.Named("BigInt"):
-      return String(str(value))
+      return InputValue.String(str(value))
 
     case (TypeRef.Named("Float")):
-      return Float(float(value))
+      return InputValue.Float(float(value))
     case (TypeRef.Named("BigDecimal")):
-      return String(str(value))
+      return InputValue.String(str(value))
 
     case (TypeRef.Named("Boolean")):
-      return Boolean(bool(value))
+      return InputValue.Boolean(bool(value))
 
     case (TypeRef.Named("String" | "Bytes")):
-      return String(str(value))
+      return InputValue.String(str(value))
     case (TypeRef.Named()):
-      return Enum(str(value))
+      return InputValue.Enum(str(value))
 
     case type_:
       raise TypeError(f"input_value_of_value: invalid type {type_}")
@@ -241,7 +234,7 @@ def input_value_of_argument(
       # Only allow Null values when non_null=True
       case (_, _, None):
         if not non_null:
-          return Null()
+          return InputValue.Null()
         else:
           raise TypeError(f"Argument {meta.name} cannot be None!")
 
@@ -250,31 +243,31 @@ def input_value_of_argument(
         return fmt_value(t, value, non_null=True)
 
       case (TypeRef.Named("ID"), _, str()):
-        return String(value)
+        return InputValue.String(value)
 
       case (TypeRef.Named("Int"), _, int()):
-        return Int(value)
+        return InputValue.Int(value)
       case (TypeRef.Named("BigInt"), _, int()):
-        return String(str(value))
+        return InputValue.String(str(value))
 
       case (TypeRef.Named("Float"), _, int() | float()):
-        return Float(float(value))
+        return InputValue.Float(float(value))
       case (TypeRef.Named("BigDecimal"), _, int() | float()):
-        return String(str(float(value)))
+        return InputValue.String(str(float(value)))
 
       case (TypeRef.Named("String" | "Bytes"), _, str()):
-        return String(value)
+        return InputValue.String(value)
       case (TypeRef.Named(), EnumMeta(_), str()):
-        return Enum(value)
+        return InputValue.Enum(value)
 
       case (TypeRef.Named("Boolean"), _, bool()):
-        return Boolean(value)
+        return InputValue.Boolean(value)
 
       case (TypeRef.List(t), _, list()):
-        return List([fmt_value(t, val, non_null) for val in value])
+        return InputValue.List([fmt_value(t, val, non_null) for val in value])
 
       case (TypeRef.Named(), InputObjectMeta() as input_object, dict()):
-        return Object({key: fmt_value(typeref_of_input_field(input_object, key), val, non_null) for key, val in value.items()})
+        return InputValue.Object({key: fmt_value(typeref_of_input_field(input_object, key), val, non_null) for key, val in value.items()})
 
       case (value, typ, non_null):
         raise TypeError(f"mk_input_value({value}, {typ}, {non_null})")

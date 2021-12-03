@@ -5,6 +5,7 @@ from functools import partial
 from subgrounds.query import Query, Selection
 from subgrounds.schema import FieldMeta, TypeRef
 from subgrounds.utils import flatten
+import subgrounds.client as client
 
 
 class Transform(ABC):
@@ -100,7 +101,17 @@ def transform_data_type(type_: TypeRef.T, f: Callable, query: Query, data: dict)
   return data
 
 
-class SubgraphTypesTransform(Transform):
+def chain_transforms(transforms: list[Transform], query: Query, url: str) -> dict:
+  match transforms:
+    case []:
+      return client.query(url, query.graphql_string())
+    case [transform, *rest]:
+      new_query = transform.transform_selection(query)
+      data = chain_transforms(rest, new_query, url)
+      return transform.transform_data(query, data)
+
+
+class TypeTransform(Transform):
   def __init__(self, type_, f) -> None:
     self.type_ = type_
     self.f = f
