@@ -61,6 +61,7 @@ class EntityTable(dash_table.DataTable):
       **kwargs
     )
 
+
 class Component(dcc.Graph):
   entrypoint: FieldPath
 
@@ -76,12 +77,13 @@ class Component(dcc.Graph):
     super().__init__(id=f'{entrypoint.leaf.type_.name}-{component_id}', figure=self.make_figure(**other_args))
 
   def make_figure(self, **kwargs):
-    raise NotImplemented(f"{self.name}.figure")
+    raise NotImplementedError(f"{self.name}.figure")
 
   def update(self):
     self.figure = self.make_figure()
 
-class BarChart(Component):  
+
+class BarChart(Component):
   def __init__(
     self,
     entrypoint: FieldPath,
