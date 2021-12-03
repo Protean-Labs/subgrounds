@@ -61,10 +61,10 @@ def transform_data(fmeta: FieldMeta, func: Callable, args: List[Selection], quer
             for select in inner_select:
               transform(select, elt)
           case _:
-            raise Exception(f"transform: data for selection {select} is neither list or dict {data[name]}")
+            raise Exception(f"transform_data: data for selection {select} is neither list or dict {data[name]}")
 
       case (select, data):
-        raise Exception(f"transform: invalid selection {select} for data {data}")
+        raise Exception(f"transform_data: invalid selection {select} for data {data}")
 
   for select in query.selection:
     transform(select, data)
@@ -72,32 +72,56 @@ def transform_data(fmeta: FieldMeta, func: Callable, args: List[Selection], quer
   return data
 
 
-def transform_data_scalar(f: Callable, type_: TypeRef.T, query: Query, data: dict) -> dict:
+def transform_data_type(type_: TypeRef.T, f: Callable, query: Query, data: dict) -> dict:
   def transform(select: Selection, data: dict) -> None:
     match (select, data):
       case (Selection(FieldMeta(name, _, _, ftype), _, _, [] | None), dict() as data) if type_ == ftype:
         data[name] = f(data[name])
-      case 
+      case (Selection(_, _, _, [] | None), dict()):
+        pass
+      case (Selection(FieldMeta(name), _, _, inner_select), dict() as data):
+        match data[name]:
+          case list() as elts:
+            for elt in elts:
+              for select in inner_select:
+                transform(select, elt)
+          case dict() as elt:
+            for select in inner_select:
+              transform(select, elt)
+          case _:
+            raise Exception(f"transform_data_type: data for selection {select} is neither list or dict {data[name]}")
+
+      case (select, data):
+        raise Exception(f"transform_data_type: invalid selection {select} for data {data}")
+
+  for select in query.selection:
+    transform(select, data)
+
+  return data
+
 
 class SubgraphTypesTransform(Transform):
-  def __init__(self) -> None:
+  def __init__(self, type_, f) -> None:
+    self.type_ = type_
+    self.f = f
     super().__init__()
 
   def transform_selection(self, query: Query) -> Query:
     return query
 
   def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+    return transform_data_type(self.type_, self.f, query, data)
 
 
 class LocalSyntheticField(Transform):
-  def __init__(self, subgraph, fmeta: FieldMeta, func: Callable, args: List[Selection]) -> None:
+  def __init__(self, subgraph, fmeta: FieldMeta, f: Callable, args: List[Selection]) -> None:
     self.subgraph = subgraph
     self.fmeta = fmeta
-    self.func = func
+    self.f = f
     self.args = args
 
   def transform_selection(self, query: Query) -> Query:
     return transform_selection(self.fmeta, self.args, query)
 
   def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
-    return transform_data(self.fmeta, self.func, self.args, query, data)
+    return transform_data(self.fmeta, self.f, self.args, query, data)

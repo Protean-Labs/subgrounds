@@ -2,7 +2,7 @@ import unittest
 
 from subgrounds.query import Query, Selection
 from subgrounds.schema import FieldMeta, TypeRef
-from subgrounds.transform import transform_data, transform_selection
+from subgrounds.transform import transform_data, transform_data_type, transform_selection
 
 
 class TestQueryTransform(unittest.TestCase):
@@ -152,5 +152,42 @@ class TestQueryTransform(unittest.TestCase):
     ])
 
     transformed_data = transform_data(fmeta, f, arg_select, query, data)
+
+    self.assertEqual(transformed_data, expected)
+
+  def test_transform_data_type1(self):
+    expected = {
+      'swaps': [{
+        'amount0In': 0.0,
+        'amount0Out': 10.0,
+        'amount1In': 20.0,
+        'amount1Out': 0.0
+      }]
+    }
+
+    data = {
+      'swaps': [{
+        'amount0In': '0.0',
+        'amount0Out': '10.0',
+        'amount1In': '20.0',
+        'amount1Out': '0.0'
+      }]
+    }
+
+    def f(bigdecimal):
+      return float(bigdecimal)
+
+    query = Query([
+      Selection(FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+        Selection(FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+        Selection(FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+        Selection(FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+        Selection(FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+      ])
+    ])
+
+    type_ = TypeRef.Named('BigDecimal')
+
+    transformed_data = transform_data_type(type_, f, query, data)
 
     self.assertEqual(transformed_data, expected)
