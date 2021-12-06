@@ -1,5 +1,4 @@
 import unittest
-import operator
 
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef
 from subgrounds.subgraph import FieldPath, Filter, Object, Subgraph, SyntheticField

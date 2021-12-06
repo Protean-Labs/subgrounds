@@ -105,7 +105,7 @@ class TypeMeta:
 @dataclass
 class SchemaMeta:
   query_type: str
-  type_map: dict[str, TypeMeta]
+  type_map: dict[str, TypeMeta.T]
   mutation_type: Optional[str] = None
   subscription_type: Optional[str] = None
 
@@ -150,7 +150,7 @@ def mk_schema(json):
       case _ as json:
         raise ParsingError(f"mk_enum_value: {json}")
 
-  def mk_type_meta(json: dict) -> TypeMeta:
+  def mk_type_meta(json: dict) -> TypeMeta.T:
     match json:
       case {'kind': 'SCALAR', 'name': name, 'description': desc}:
         return TypeMeta.ScalarMeta(name, description=desc)
@@ -208,7 +208,7 @@ def field_of_object(meta: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta, fname: s
       raise TypeError(f"field_of_object: TypeMeta {meta.name} is not of type ObjectMeta or InterfaceMeta")
 
 
-def type_of_arg(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
+def type_of_arg(schema: SchemaMeta, meta: TypeMeta.T) -> TypeMeta.T:
   match meta:
     case TypeMeta.ArgumentMeta(type_=type_):
       tname = TypeRef.root_type_name(type_)
@@ -217,7 +217,7 @@ def type_of_arg(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
       raise TypeError(f"type_of_arg: TypeMeta {meta.name} is not of type ArgumentMeta")
 
 
-def type_of_field(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
+def type_of_field(schema: SchemaMeta, meta: TypeMeta.T) -> TypeMeta.T:
   match meta:
     case TypeMeta.FieldMeta(type_=type_):
       tname = TypeRef.root_type_name(type_)
@@ -226,7 +226,7 @@ def type_of_field(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
       raise TypeError(f"type_of_field: TypeMeta {meta.name} is not a field type")
 
 
-def type_of_typeref(schema: SchemaMeta, typeref: TypeRef.T) -> TypeMeta:
+def type_of_typeref(schema: SchemaMeta, typeref: TypeRef.T) -> TypeMeta.T:
   tname = TypeRef.root_type_name(typeref)
   return schema.type_map[tname]
 
