@@ -63,6 +63,13 @@ class InputValue:
       return self.value
 
   @dataclass
+  class Variable(T):
+    name: str
+
+    def graphql_string(self) -> str:
+      return f'${self.name}'
+
+  @dataclass
   class List(T):
     value: list[InputValue.T]
 
@@ -78,9 +85,22 @@ class InputValue:
 
 
 @dataclass
+class VariableDefinition:
+  type_: TypeRef.T
+  name: str
+  default: Optional[InputValue.T] = None
+
+  def graphql_string(self) -> str:
+    if self.default is None:
+      return f'${self.name}: {TypeRef.graphql_string(self.type_)}'
+    else:
+      return f'${self.name}: {TypeRef.graphql_string(self.type_)} = {self.default.graphql_string()}'
+
+
+@dataclass
 class Argument:
   name: str
-  value: InputValue
+  value: InputValue.T
 
   def graphql_string(self) -> str:
     return f"{self.name}: {self.value.graphql_string()}"
@@ -133,11 +153,12 @@ class Selection:
 
 @dataclass
 class Query:
-  selection: Optional[list[Selection]] = None
+  selection: list[Selection] = field(default_factory=list)
+  variables: list[VariableDefinition] = field(default_factory=list)
 
   def graphql_string(self) -> str:
     selection_str = "\n".join(
-      [f.graphql_string(level=1) for f in self.selection]
+      [select.graphql_string(level=1) for select in self.selection]
     )
     return f"""query {{\n{selection_str}\n}}"""
 
@@ -160,6 +181,19 @@ class Query:
   def add_selections(self, new_selections):
     for s in new_selections:
       self.add_selection(s)
+
+
+@dataclass
+class Fragment:
+  name: str
+  type_: TypeRef.T
+  selection: list[Selection] = field(default_factory=list)
+
+  def graphql_string(self):
+    selection_str = "\n".join(
+      [select.graphql_string(level=1) for select in self.selection]
+    )
+    return f"""fragment {self.name} on {TypeRef.root_type_name(self.type_)} {{\n{selection_str}\n}}"""
 
 
 # ================================================================

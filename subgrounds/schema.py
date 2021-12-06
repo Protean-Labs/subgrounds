@@ -55,6 +55,16 @@ class TypeRef:
       case _:
         return False
 
+  @staticmethod
+  def graphql_string(type_: TypeRef.T) -> str:
+    match type_:
+      case TypeRef.Named(name):
+        return name
+      case TypeRef.NonNull(t):
+        return f'{TypeRef.graphql_string(t)}!'
+      case TypeRef.List(t):
+        return f'[{TypeRef.graphql_string(t)}]'
+
 
 class TypeMeta:
   @dataclass
