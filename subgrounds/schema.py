@@ -212,7 +212,7 @@ def mk_schema(json):
 # ================================================================
 
 
-def field_of_object(meta: TypeMeta, fname: str) -> TypeMeta.FieldMeta:
+def field_of_object(meta: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta, fname: str) -> TypeMeta.FieldMeta:
   match meta:
     case TypeMeta.ObjectMeta(fields=fields) | TypeMeta.InterfaceMeta(fields=fields):
       return next(filter(lambda field: field.name == fname, fields))
@@ -240,7 +240,7 @@ def type_of_field(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
       raise TypeError(f"type_of_field: TypeMeta {meta.name} is not a field type")
 
 
-def typeref_of_input_field(meta: TypeMeta, fname: str) -> TypeRef.T:
+def typeref_of_input_field(meta: TypeMeta.InputObjectMeta, fname: str) -> TypeRef.T:
   match meta:
     case TypeMeta.InputObjectMeta(input_fields=input_fields):
       arg = next(filter(lambda field: field.name == fname, input_fields))

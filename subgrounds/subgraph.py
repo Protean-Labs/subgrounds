@@ -1,17 +1,18 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, ClassVar, Dict, List, Optional, Tuple
+from typing import Any, Callable, ClassVar, Dict, List, Optional, Tuple
 import os
 import json
 import operator
 
 import subgrounds.client as client
 import subgrounds.schema as schema
-from subgrounds.query import Query, selection_of_path
-from subgrounds.schema import FieldMeta, InterfaceMeta, ObjectMeta, SchemaMeta, TypeMeta, mk_schema
+from subgrounds.query import Query
+from subgrounds.schema import SchemaMeta, TypeMeta, mk_schema
 from subgrounds.transform import Transform
 from subgrounds.utils import flatten, identity
+
 
 @dataclass
 class Filter:
@@ -44,9 +45,9 @@ class Filter:
         return f"{self.field.name}_lte"
       case Filter.Operator.GTE:
         return f"{self.field.name}_gte"
-        
+
   @staticmethod
-  def to_dict(filters: List[Filter]) -> Dict[str, Any]:
+  def to_dict(filters: list[Filter]) -> dict[str, Any]:
     return {f.name: f.value for f in filters}
 
 @dataclass
@@ -54,41 +55,62 @@ class SyntheticField:
   counter: ClassVar[int] = 0
 
   subgraph: Subgraph
-  func: function
-  deps: List[FieldPath | SyntheticField]
-  meta: TypeMeta.SyntheticFieldMeta
+  f: Callable
+  deps: list[FieldPath | SyntheticField]
 
-  def __init__(self, subgraph: Subgraph, func: function, *deps: List[FieldPath | SyntheticField]) -> None:
+  def __init__(self, subgraph: Subgraph, f: Callable, *deps: list[FieldPath | SyntheticField]) -> None:
     self.subgraph = subgraph
-    self.func = func
+
+    def mk_deps(
+      deps: list(FieldPath | SyntheticField),
+      f: Callable,
+      acc: list[Tuple[Optional[Callable], list[FieldPath]]] = []
+    ) -> Tuple[Callable, list[FieldPath]]:
+      match deps:
+        case []:
+          def new_f(*args):
+            new_args = []
+            counter = 0
+            for (f_, deps) in acc:
+              if f_ is None:
+                new_args.append(args[counter])
+                counter += 1
+              else:
+                new_args.append(f_(*args[counter:counter + len(deps)]))
+                counter += len(deps)
+
+            return f(*new_args)
+
+          new_deps = flatten([args_ for (_, args_) in acc])
+          return (new_f, new_deps)
+
+        case [SyntheticField(_, f=inner_f, deps=inner_deps), *rest]:
+          acc.append((inner_f, inner_deps))
+          return mk_deps(rest, f, acc)
+
+        case [FieldPath() as dep, *rest]:
+          acc.append((None, [dep]))
+          return mk_deps(rest, f, acc)
+
+    (f, deps) = mk_deps(deps, f)
+    self.f = f
     self.deps = deps
 
-    def f(dep):
-      match dep:
-        case FieldPath() as fpath:
-          def f(path_ele):
-            match path_ele:
-              case FieldPath.PathElement(type_=TypeMeta.FieldMeta(_) as fmeta, args=args):
-                return (args, fmeta)
-              case FieldPath.PathElement(type_=TypeMeta.SyntheticFieldMeta(_) as fmeta):
-                return fmeta
-              case _:
-                raise TypeError(f"FieldPath element {path_ele} is not a PathElement")
+    # def f(dep):
+    #   match dep:
 
-          return list(map(f, fpath.path))
+    #     case SyntheticField() as sfield:
+    #       return sfield.meta
 
-        case SyntheticField() as sfield:
-          return sfield.meta
+    #     case int() | float() | str() as value:
+    #       return value
 
-        case int() | float() | str() as value:
-          return value
-
-    self.meta = TypeMeta.SyntheticFieldMeta(
-      name=f'SyntheticField_{SyntheticField.counter}',
-      description='', 
-      func=self.func,
-      dependencies=list(map(f, self.deps))
-    )
+    # self.meta = TypeMeta.SyntheticFieldMeta(
+    #   name=f'SyntheticField_{SyntheticField.counter}',
+    #   description='', 
+    #   func=self.func,
+    #   dependencies=list(map(f, self.deps))
+    # )
 
     SyntheticField.counter += 1
 
@@ -121,9 +143,9 @@ class SyntheticField:
 @dataclass
 class FieldPath:
   subgraph: Subgraph
-  root_type: ObjectMeta | InterfaceMeta
+  root_type: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta
   type_: TypeMeta
-  path: List[Tuple[Optional[Dict[str, Any]], FieldMeta]]
+  path: List[Tuple[Optional[Dict[str, Any]], TypeMeta.FieldMeta]]
 
   # @dataclass 
   # class PathElement:
@@ -204,7 +226,7 @@ class FieldPath:
   def __getattribute__(self, __name: str) -> Any:
     try:
       return super().__getattribute__(__name)
-    except:
+    except AttributeError:
       match self.type_:
         case TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() | TypeMeta.SyntheticFieldMeta():
           raise TypeError(f"FieldPath: field {__name} of path {self} is terminal! cannot select field {__name}")
@@ -241,7 +263,7 @@ class FieldPath:
   @staticmethod
   def mk_filter(fpath: FieldPath, op: Filter.Operator, value: Any) -> Filter:
     match fpath.leaf:
-      case FieldPath.PathElement(type_=TypeMeta.FieldMeta() as fmeta):
+      case TypeMeta.FieldMeta() as fmeta:
         return Filter(fmeta, op, value)
       case _:
         raise TypeError(f"Cannot create filter on FieldPath {fpath}: not a native field!")
@@ -299,12 +321,12 @@ class Object:
   def __getattribute__(self, __name: str) -> Any:
     try:
       return super().__getattribute__(__name)
-    except:
+    except AttributeError:
       field = schema.field_of_object(self.object_, __name)
       match schema.type_of_field(self.schema, field):
-        case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() | TypeMeta.SyntheticFieldMeta() as type_:
-          return FieldPath(self.subgraph, self.object_, type_, [FieldPath.PathElement(field)])
-        case _ as type_:
+        case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() as type_:
+          return FieldPath(self.subgraph, self.object_, type_, [field])
+        case TypeMeta.T as type_:
           raise TypeError(f"Object: Unexpected type {type_.name} when selection {__name} on {self}")
 
   def __setattr__(self, __name: str, __value: Any) -> None:
@@ -357,3 +379,10 @@ class Subgraph:
       return super().__getattribute__(__name)
     except:
       return Object(self, self.schema.type_map[__name])
+
+# @dataclass
+# class Subgraph2:
+#   schema: SchemaMeta
+#   transforms: list[Transform]
+
+#   def add_field()

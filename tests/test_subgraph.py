@@ -747,3 +747,71 @@ class TestQueryBuilding(unittest.TestCase):
     Filter.test_mode = True
     self.maxDiff = None
     self.assertEqual(query, expected)
+
+
+class TestSyntheticField(unittest.TestCase):
+  def setUp(self):
+    self.schema = schema()
+    self.subgraph = Subgraph("", self.schema)
+
+  def tearDown(self) -> None:
+    SyntheticField.counter = 0
+
+  def test_synthetic_field_1(self):
+    Swap = self.subgraph.Swap
+
+    expected_deps = [
+      Swap.amount0In
+    ]
+
+    sfield = SyntheticField(
+      self.subgraph,
+      lambda x: x * 10,
+      Swap.amount0In
+    )
+
+    self.assertEqual(sfield.f(1), 10)
+    self.assertEqual(sfield.deps, expected_deps)
+
+  def test_synthetic_field_2(self):
+    Swap = self.subgraph.Swap
+
+    expected_deps = [
+      Swap.amount0In,
+      Swap.amount0Out
+    ]
+
+    sfield: SyntheticField = Swap.amount0In - Swap.amount0Out
+
+    self.assertEqual(sfield.f(10, 0), 10)
+    self.assertEqual(sfield.deps, expected_deps)
+
+  def test_synthetic_field_3(self):
+    Swap = self.subgraph.Swap
+
+    expected_deps = [
+      Swap.amount0In,
+      Swap.amount0Out,
+      Swap.amount1In,
+      # Swap.amount1Out
+    ]
+
+    sfield: SyntheticField = Swap.amount0In - Swap.amount0Out + Swap.amount1In
+
+    self.assertEqual(sfield.f(10, 0, 4), 14)
+    self.assertEqual(sfield.deps, expected_deps)
+
+  def test_synthetic_field_5(self):
+    Swap = self.subgraph.Swap
+
+    expected_deps = [
+      Swap.amount0In,
+      Swap.amount0Out,
+      Swap.amount1In,
+      Swap.amount1Out
+    ]
+
+    sfield: SyntheticField = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
+
+    self.assertEqual(sfield.f(10, 0, 0, 20), 0.5)
+    self.assertEqual(sfield.deps, expected_deps)
