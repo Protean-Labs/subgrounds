@@ -31,18 +31,14 @@ app.layout = html.Div(
   html.Div([
     html.Div([
       LinePlot(
-
         Query.swaps,
         component_id='price',
-        
         orderBy=Swap.timestamp,
         orderDirection="desc",
         first=500,
-        
         where=[
           Swap.pair == "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"
         ],
-        
         x=Swap.datetime,
         y=Swap.price1
       )
@@ -51,5 +47,4 @@ app.layout = html.Div(
 )
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
- 
+  app.run_server(debug=True)

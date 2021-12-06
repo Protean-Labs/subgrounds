@@ -72,21 +72,6 @@ class TypeMeta:
     arguments: list[TypeMeta.ArgumentMeta]
     type_: TypeRef.T
 
-  # 
-  # @dataclass
-  # class SyntheticFieldMeta(T):
-  #   func: function
-  #   dependencies: List[(
-  #     # E.g.: In `Entity.newField = Entity.sfield1 + Entity.sfield2 / Entity.sfield3`, `Entity.sfield2 / Entity.sfield3` is an anonymous synthetic field
-  #     TypeMeta.SyntheticFieldMeta
-  #     # Field Path
-  #     | List[Tuple[Optional[List[Argument]], TypeMeta.FieldMeta] | TypeMeta.SyntheticFieldMeta] 
-  #     # Constants
-  #     | int 
-  #     | float 
-  #     | str
-  #   )]
-
   @dataclass
   class ScalarMeta(T):
     pass

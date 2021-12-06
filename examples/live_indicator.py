@@ -1,12 +1,8 @@
 import dash
 from dash import html
-from dash import dcc
-# from dash.dependencies import Input
 
-from datetime import datetime
-
-from subgrounds.components import AutoUpdate, Indicator, IndicatorWithChange
-from subgrounds.subgraph import Subgraph, SyntheticField
+from subgrounds.components import AutoUpdate, IndicatorWithChange
+from subgrounds.subgraph import Subgraph
 
 uniswapV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
 

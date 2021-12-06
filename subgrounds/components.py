@@ -32,12 +32,12 @@ def values(row):
 
 class EntityTable(dash_table.DataTable):
   def __init__(
-    self, 
+    self,
     entrypoint: FieldPath,
     component_id: str,
     first: int = 10,
-    selection: List[FieldPath] = [], 
-    orderBy: Optional[FieldPath] = None, 
+    selection: List[FieldPath] = [],
+    orderBy: Optional[FieldPath] = None,
     orderDirection: Optional[str] = None,
     where: Optional[List[Filter]] = None,
     **kwargs
@@ -168,7 +168,7 @@ class Indicator(Component):
       query = Subgraph.mk_query(selection)
       data = self.entrypoint.subgraph.query(query)
 
-      data = [dict(values(row)) for row in data[self.entrypoint.root.type_]]
+      data = [dict(values(row)) for row in data[self.entrypoint.root.name]]
       value = [row[self.x.longname] for row in data][0]
     else:
       selection = [FieldPath.extend(self.entrypoint, self.x)]
