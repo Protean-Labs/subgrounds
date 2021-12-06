@@ -88,7 +88,6 @@ class Argument:
 
 @dataclass
 class Selection:
-  # name: str
   fmeta: TypeMeta.FieldMeta
   alias: Optional[str] = None
   arguments: list[Argument] = field(default_factory=list)

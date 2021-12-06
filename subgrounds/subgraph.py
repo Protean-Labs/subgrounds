@@ -74,9 +74,9 @@ def typeref_of_binary_op(op: str, t1: TypeRef.T, t2: int | float | str | bool | 
 
       case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int', int()):
         return TypeRef.Named('Int')
-      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int'), float():
+      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int', float()):
         return TypeRef.Named('Float')
-      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigDecimal' | 'Float'), int() | float():
+      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigDecimal' | 'Float', int() | float()):
         return TypeRef.Named('Float')
 
       case _ as args:

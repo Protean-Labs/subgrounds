@@ -297,7 +297,7 @@ class TestFieldPath(unittest.TestCase):
     ])
 
     expected = Object(self.subgraph, object_)
-    
+
     Pair = self.subgraph.Pair
 
     Filter.test_mode = True

@@ -1,10 +1,10 @@
 import unittest
 
-from subgrounds.query import Argument, InputValue, Selection
-from subgrounds.schema import TypeMeta, TypeRef, arguments_of_field_args, input_value_of_argument, selections_of_synthetic_field
-from subgrounds.utils import identity
+from subgrounds.query import Argument, InputValue, arguments_of_field_args, input_value_of_argument
+from subgrounds.schema import TypeMeta, TypeRef
 
 from tests.utils import schema
+
 
 class TestArguments(unittest.TestCase):
   def setUp(self):
@@ -50,82 +50,3 @@ class TestArguments(unittest.TestCase):
     args = arguments_of_field_args(self.schema, field, raw_args)
 
     self.assertEqual(args, expected)
-
-class TestQueryBuilding(unittest.TestCase):
-  def setUp(self):
-    self.schema = schema()
-
-  def test_selections_of_sfield_1(self):
-    expected = [
-      Selection('field1', selection=[Selection('field1_1')]),
-      Selection('field1', selection=[Selection('field1_2')]),
-      Selection('field2')
-    ]
-
-    sfield = TypeMeta.SyntheticFieldMeta('customField', '', identity, [
-      [
-        (None, TypeMeta.FieldMeta('field1', '', [], TypeRef.Named("Entity1"))),
-        (None, TypeMeta.FieldMeta('field1_1', '', [], TypeRef.Named("Entity1"))),
-      ],
-      [
-        (None, TypeMeta.FieldMeta('field1', '', [], TypeRef.Named("Entity1"))),
-        (None, TypeMeta.FieldMeta('field1_2', '', [], TypeRef.Named("Entity1"))),
-      ],
-      [
-        (None, TypeMeta.FieldMeta('field2', '', [], TypeRef.Named("String"))),
-      ],
-      100
-    ])
-
-    self.assertEqual(selections_of_synthetic_field(sfield), expected)
-
-  def test_selections_of_sfield_2(self):
-    expected = [
-      Selection('field1', selection=[Selection('field1_1')]),
-      Selection('field2')
-    ]
-
-    sfield = TypeMeta.SyntheticFieldMeta('customField', '', identity, [
-      TypeMeta.SyntheticFieldMeta('customField', '', identity, [
-        [
-          (None, TypeMeta.FieldMeta('field1', '', [], TypeRef.Named("Entity1"))),
-          (None, TypeMeta.FieldMeta('field1_1', '', [], TypeRef.Named("Entity1"))),
-        ],
-      ]),
-      TypeMeta.SyntheticFieldMeta('customField', '', identity, [
-        [
-          (None, TypeMeta.FieldMeta('field2', '', [], TypeRef.Named("String"))),
-        ],
-      ]),
-      100
-    ])
-
-    self.assertEqual(selections_of_synthetic_field(sfield), expected)
-
-  def test_selections_of_sfield_3(self):
-    expected = [
-      Selection('field1', selection=[
-        Selection('field1_1'),
-        Selection('field1_2'),
-      ]),
-      Selection('field2'),
-    ]
-
-    sfield = TypeMeta.SyntheticFieldMeta('customField', '', identity, [
-      [
-        (None, TypeMeta.FieldMeta('field1', '', [], TypeRef.Named("Entity1"))),
-        TypeMeta.SyntheticFieldMeta('customField', '', identity, [
-          [
-            (None, TypeMeta.FieldMeta('field1_1', '', [], TypeRef.Named("String"))),
-          ],
-          [
-            (None, TypeMeta.FieldMeta('field1_2', '', [], TypeRef.Named("String"))),
-          ]
-        ])
-      ],
-      [
-        (None, TypeMeta.FieldMeta('field2', '', [], TypeRef.Named("String"))),
-      ]
-    ])
-
-    self.assertEqual(selections_of_synthetic_field(sfield), expected)
