@@ -153,6 +153,7 @@ class Selection:
 
 @dataclass
 class Query:
+  name: Optional[str] = None
   selection: list[Selection] = field(default_factory=list)
   variables: list[VariableDefinition] = field(default_factory=list)
 
@@ -194,6 +195,17 @@ class Fragment:
       [select.graphql_string(level=1) for select in self.selection]
     )
     return f"""fragment {self.name} on {TypeRef.root_type_name(self.type_)} {{\n{selection_str}\n}}"""
+
+
+@dataclass
+class Document:
+  url: str
+  queries: list[Query] = field(default_factory=list)
+  fragments: list[Query] = field(default_factory=list)
+
+  @staticmethod
+  def mk_single_query(url: str, query: Query) -> Document:
+    return Document(url, [query])
 
 
 # ================================================================

@@ -7,7 +7,7 @@ from subgrounds.transform import LocalSyntheticField, TypeTransform, chain_trans
 
 class TestTransform(unittest.TestCase):
   def test_transform_selection1(self):
-    expected = Query([
+    expected = Query(None, [
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
         Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
         Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
@@ -18,7 +18,7 @@ class TestTransform(unittest.TestCase):
 
     fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
-    query = Query([
+    query = Query(None, [
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
         Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
       ])
@@ -63,7 +63,7 @@ class TestTransform(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
-    query = Query([
+    query = Query(None, [
       Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None)
     ])
 
@@ -103,7 +103,7 @@ class TestTransform(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
-    query = Query([
+    query = Query(None, [
       Selection(TypeMeta.FieldMeta('swap', '', [], TypeRef.Named('Swap')), None, None, [
         Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
       ])
@@ -145,7 +145,7 @@ class TestTransform(unittest.TestCase):
 
     fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
-    query = Query([
+    query = Query(None, [
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
         Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
       ])
@@ -184,7 +184,7 @@ class TestTransform(unittest.TestCase):
       ])
     ]
 
-    query = Query([
+    query = Query(None, [
       Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.Named('Pair')), None, None, [
         Selection(TypeMeta.FieldMeta('token0Symbol', '', [], TypeRef.Named('String')), None, None, None),
       ])
@@ -216,7 +216,7 @@ class TestTransform(unittest.TestCase):
     def f(bigdecimal):
       return float(bigdecimal)
 
-    query = Query([
+    query = Query(None, [
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
         Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
         Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
@@ -245,7 +245,7 @@ class TestQueryTransform(unittest.TestCase):
 
     transform = TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal))
 
-    query = Query([
+    query = Query(None, [
       Selection(
         TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
         None,
@@ -296,7 +296,7 @@ class TestQueryTransform(unittest.TestCase):
       TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal))
     ]
 
-    query = Query([
+    query = Query(None, [
       Selection(
         TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
         None,

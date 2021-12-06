@@ -30,7 +30,7 @@ class TestQueryString(unittest.TestCase):
   }
 }"""
 
-    query = Query([
+    query = Query(None, [
       Selection(
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
