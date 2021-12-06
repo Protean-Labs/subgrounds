@@ -75,8 +75,9 @@ def transform_data(fmeta: TypeMeta.FieldMeta, func: Callable, args: List[Selecti
 
 def transform_data_type(type_: TypeRef.T, f: Callable, query: Query, data: dict) -> dict:
   def transform(select: Selection, data: dict) -> None:
+    # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
     match (select, data):
-      case (Selection(TypeMeta.FieldMeta(name, _, _, ftype), _, _, [] | None), dict() as data) if type_ == ftype:
+      case (Selection(TypeMeta.FieldMeta(name, _, _, ftype), _, _, [] | None), dict() as data) if TypeRef.root_type_name(type_) == TypeRef.root_type_name(ftype):
         data[name] = f(data[name])
       case (Selection(_, _, _, [] | None), dict()):
         pass

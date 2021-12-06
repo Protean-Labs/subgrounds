@@ -10,6 +10,7 @@ from subgrounds.subgraph import Subgraph
 def schema():
   return SchemaMeta(query_type='Query', type_map={
     'Int': TypeMeta.ScalarMeta('Int', ''),
+    'Float': TypeMeta.ScalarMeta('Float', ''),
     'BigInt': TypeMeta.ScalarMeta('BigInt', ''),
     'BigDecimal': TypeMeta.ScalarMeta('BigDecimal', ''),
     'String': TypeMeta.ScalarMeta('String', ''),
@@ -68,6 +69,7 @@ def schema():
 def subgraph():
   return Subgraph("", SchemaMeta(query_type='Query', type_map={
     'Int': TypeMeta.ScalarMeta('Int', ''),
+    'Float': TypeMeta.ScalarMeta('Float', ''),
     'BigInt': TypeMeta.ScalarMeta('BigInt', ''),
     'BigDecimal': TypeMeta.ScalarMeta('BigDecimal', ''),
     'String': TypeMeta.ScalarMeta('String', ''),

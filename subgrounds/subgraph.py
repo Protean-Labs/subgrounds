@@ -9,7 +9,7 @@ import operator
 import subgrounds.client as client
 import subgrounds.schema as schema
 from subgrounds.query import Query, Selection, selection_of_path
-from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field
+from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
 from subgrounds.transform import DEFAULT_TRANSFORMS, LocalSyntheticField, Transform, chain_transforms
 from subgrounds.utils import flatten, identity
 
@@ -51,15 +51,70 @@ class Filter:
     return {f.name: f.value for f in filters}
 
 
+def typeref_of_binary_op(op: str, t1: TypeRef.T, t2: int | float | str | bool | FieldPath | SyntheticField):
+  def f_typeref(t1, t2):
+    match (op, TypeRef.root_type_name(t1), TypeRef.root_type_name(t2)):
+      case ('add', 'String' | 'Bytes', 'String' | 'Bytes'):
+        return TypeRef.Named('String')
+
+      case ('add' | 'sub' | 'mul' | 'div', 'BigInt' | 'Int', 'BigInt' | 'Int'):
+        return TypeRef.Named('Int')
+      case ('add' | 'sub' | 'mul' | 'div', 'BigInt' | 'Int', 'BigDecimal' | 'Float'):
+        return TypeRef.Named('Float')
+      case ('add' | 'sub' | 'mul' | 'div', 'BigDecimal' | 'Float', 'BigInt' | 'Int' | 'BigDecimal' | 'Float'):
+        return TypeRef.Named('Float')
+
+      case _ as args:
+        raise Exception(f'typeref_of_binary_op: f_typeref: unhandled arguments {args}')
+
+  def f_const(t1, const):
+    match (op, TypeRef.root_type_name(t1), const):
+      case ('add', 'String' | 'Bytes', str()):
+        return TypeRef.Named('String')
+
+      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int', int()):
+        return TypeRef.Named('Int')
+      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int'), float():
+        return TypeRef.Named('Float')
+      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigDecimal' | 'Float'), int() | float():
+        return TypeRef.Named('Float')
+
+      case _ as args:
+        raise Exception(f'typeref_of_binary_op: f_typeref: unhandled arguments {args}')
+
+  match t2:
+    case int() | float() | str() | bool() as constant:
+      return f_const(t1, constant)
+    case FieldPath() | SyntheticField() as field:
+      return f_typeref(t1, field.type_)
+
+
+def type_ref_of_unary_op(op: str, t: TypeRef.T):
+  match (op, TypeRef.root_type_name(t)):
+    case ('abs', 'BigInt' | 'Int'):
+      return TypeRef.Named('Int')
+    case ('abs', 'BigDecimal' | 'Float'):
+      return TypeRef.Named('Float')
+
+    case ('neg', 'BigInt' | 'Int'):
+      return TypeRef.Named('Int')
+    case ('neg', 'BigDecimal' | 'Float'):
+      return TypeRef.Named('Float')
+
+    case _ as args:
+      raise Exception(f'typeref_of_binary_op: f_typeref: unhandled arguments {args}')
+
+
 @dataclass
 class SyntheticField:
   counter: ClassVar[int] = 0
 
   subgraph: Subgraph
   f: Callable
+  type_: TypeRef.T
   deps: list[FieldPath | SyntheticField]
 
-  def __init__(self, subgraph: Subgraph, f: Callable, *deps: list[FieldPath | SyntheticField]) -> None:
+  def __init__(self, subgraph: Subgraph, f: Callable, type_: TypeRef.T, *deps: list[FieldPath | SyntheticField]) -> None:
     self.subgraph = subgraph
 
     def mk_deps(
@@ -127,6 +182,7 @@ class SyntheticField:
 
     (f, deps) = mk_deps(deps, f)
     self.f = f
+    self.type_ = type_
     self.deps = deps
 
     SyntheticField.counter += 1
@@ -136,32 +192,32 @@ class SyntheticField:
     return self.subgraph.schema
 
   def __add__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.add, self, other)
+    return SyntheticField(self.subgraph, operator.add, typeref_of_binary_op('add', self.type_, other), self, other)
 
   def __sub__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.sub, self, other)
+    return SyntheticField(self.subgraph, operator.sub, typeref_of_binary_op('sub', self.type_, other), self, other)
 
   def __mul__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.mul, self, other)
+    return SyntheticField(self.subgraph, operator.mul, typeref_of_binary_op('mul', self.type_, other), self, other)
 
   def __truediv__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.truediv, self, other)
+    return SyntheticField(self.subgraph, operator.truediv, typeref_of_binary_op('div', self.type_, other), self, other)
 
   def __pow__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.pow, self, other)
+    return SyntheticField(self.subgraph, operator.pow, typeref_of_binary_op('pow', self.type_, other), self, other)
 
   def __neg__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.neg, self)
+    return SyntheticField(self.subgraph, operator.neg, type_ref_of_unary_op('neg', self.type_), self)
 
   def __abs__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.abs, self)
+    return SyntheticField(self.subgraph, operator.abs, type_ref_of_unary_op('abs', self.type_), self)
 
 
 @dataclass
 class FieldPath:
   subgraph: Subgraph
   root_type: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta
-  type_: TypeMeta
+  type_: TypeRef.T
   path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]
 
   @property
@@ -228,22 +284,22 @@ class FieldPath:
     try:
       return super().__getattribute__(__name)
     except AttributeError:
-      match self.type_:
+      match type_of_typeref(self.schema, self.type_):
         case TypeMeta.EnumMeta() | TypeMeta.ScalarMeta():
           raise TypeError(f"FieldPath: field {__name} of path {self} is terminal! cannot select field {__name}")
 
-        case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta():
-          field = field_of_object(self.type_, __name)
+        case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() as obj:
+          field = field_of_object(obj, __name)
           match type_of_field(self.schema, field):
-            case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() as type_:
+            case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta():
               path = self.path.copy()
               path.append((None, field))
-              return FieldPath(self.subgraph, self.root_type, type_, path)
+              return FieldPath(self.subgraph, self.root_type, field.type_, path)
             case _:
-              raise TypeError(f"FieldPath: field {__name} is not a valid field for object {self.type_.name} at path {self}")
+              raise TypeError(f"FieldPath: field {__name} is not a valid field for object {TypeRef.root_type_name(self.type_)} at path {self}")
 
-        case _ as type_:
-          raise TypeError(f"FieldPath: Unexpected type {type_.name} when selection {__name} on {self}")
+        case _:
+          raise TypeError(f"FieldPath: Unexpected type {TypeRef.root_type_name(self.type_)} when selection {__name} on {self}")
 
   @staticmethod
   def extend(fpath: FieldPath, ext: FieldPath) -> FieldPath:
@@ -290,25 +346,25 @@ class FieldPath:
 
   # SyntheticField operations
   def __add__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.add, self, other)
+    return SyntheticField(self.subgraph, operator.add, typeref_of_binary_op('add', self.type_, other), self, other)
 
   def __sub__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.sub, self, other)
+    return SyntheticField(self.subgraph, operator.sub, typeref_of_binary_op('sub', self.type_, other), self, other)
 
   def __mul__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.mul, self, other)
+    return SyntheticField(self.subgraph, operator.mul, typeref_of_binary_op('mul', self.type_, other), self, other)
 
   def __truediv__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.truediv, self, other)
+    return SyntheticField(self.subgraph, operator.truediv, typeref_of_binary_op('div', self.type_, other), self, other)
 
   def __pow__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.pow, self, other)
+    return SyntheticField(self.subgraph, operator.pow, typeref_of_binary_op('pow', self.type_, other), self, other)
 
   def __neg__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.neg, self)
+    return SyntheticField(self.subgraph, operator.neg, type_ref_of_unary_op('neg', self.type_), self)
 
   def __abs__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.abs, self)
+    return SyntheticField(self.subgraph, operator.abs, type_ref_of_unary_op('abs', self.type_), self)
 
 
 @dataclass
@@ -325,9 +381,11 @@ class Object:
       return super().__getattribute__(__name)
     except AttributeError:
       field = schema.field_of_object(self.object_, __name)
+
       match schema.type_of_field(self.schema, field):
         case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() as type_:
-          return FieldPath(self.subgraph, self.object_, type_, [(None, field)])
+          return FieldPath(self.subgraph, self.object_, field.type_, [(None, field)])
+
         case TypeMeta.T as type_:
           raise TypeError(f"Object: Unexpected type {type_.name} when selection {__name} on {self}")
 
@@ -336,7 +394,7 @@ class Object:
       case SyntheticField() as sfield:
         self.subgraph.add_synthetic_field(self.object_, __name, sfield)
       case FieldPath() as fpath:
-        sfield = SyntheticField(self.schema, identity, fpath)
+        sfield = SyntheticField(self.schema, identity, fpath.type_, fpath)
         self.subgraph.add_synthetic_field(self.object_, __name, sfield)
       case _:
         super().__setattr__(__name, __value)
@@ -376,7 +434,7 @@ class Subgraph:
     name: str,
     sfield: SyntheticField
   ) -> None:
-    fmeta = TypeMeta.FieldMeta(name, '', [], TypeRef.Named('String'))
+    fmeta = TypeMeta.FieldMeta(name, '', [], sfield.type_)
     object_.fields.append(fmeta)
 
     transform = LocalSyntheticField(

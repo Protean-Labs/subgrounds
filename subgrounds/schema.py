@@ -202,6 +202,9 @@ def mk_schema(json):
         type_map={type_.name: type_ for type_ in types_meta}
       )
 
+      # Manually add Float type
+      schema.type_map['Float'] = TypeMeta.ScalarMeta('Float', '')
+
       return schema
 
     case _ as json:
@@ -234,10 +237,13 @@ def type_of_field(schema: SchemaMeta, meta: TypeMeta) -> TypeMeta:
     case TypeMeta.FieldMeta(type_=type_):
       tname = TypeRef.root_type_name(type_)
       return schema.type_map[tname]
-    # case SyntheticFieldMeta() as type_:
-    #   return type_
     case _:
       raise TypeError(f"type_of_field: TypeMeta {meta.name} is not a field type")
+
+
+def type_of_typeref(schema: SchemaMeta, typeref: TypeRef.T) -> TypeMeta:
+  tname = TypeRef.root_type_name(typeref)
+  return schema.type_map[tname]
 
 
 def typeref_of_input_field(meta: TypeMeta.InputObjectMeta, fname: str) -> TypeRef.T:

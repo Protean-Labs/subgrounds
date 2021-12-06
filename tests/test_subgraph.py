@@ -18,10 +18,11 @@ class TestAddType(unittest.TestCase):
     SyntheticField.counter = 0
 
   def test_add_synthetic_field_1(self):
-    sfield = SyntheticField(self.subgraph, identity)
+    sfield = SyntheticField(self.subgraph, identity, TypeRef.Named('Float'))
 
     expected = SchemaMeta(query_type='Query', type_map={
       'Int': TypeMeta.ScalarMeta('Int', ''),
+      'Float': TypeMeta.ScalarMeta('Float', ''),
       'BigInt': TypeMeta.ScalarMeta('BigInt', ''),
       'BigDecimal': TypeMeta.ScalarMeta('BigDecimal', ''),
       'String': TypeMeta.ScalarMeta('String', ''),
@@ -59,7 +60,7 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String'))
+        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float'))
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
@@ -85,6 +86,7 @@ class TestAddType(unittest.TestCase):
   def test_add_synthetic_field_2(self):
     expected = SchemaMeta(query_type='Query', type_map={
       'Int': TypeMeta.ScalarMeta('Int', ''),
+      'Float': TypeMeta.ScalarMeta('Float', ''),
       'BigInt': TypeMeta.ScalarMeta('BigInt', ''),
       'BigDecimal': TypeMeta.ScalarMeta('BigDecimal', ''),
       'String': TypeMeta.ScalarMeta('String', ''),
@@ -122,7 +124,7 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String'))
+        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float'))
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
@@ -148,6 +150,7 @@ class TestAddType(unittest.TestCase):
   def test_add_synthetic_field_3(self):
     expected = SchemaMeta(query_type='Query', type_map={
       'Int': TypeMeta.ScalarMeta('Int', ''),
+      'Float': TypeMeta.ScalarMeta('Float', ''),
       'BigInt': TypeMeta.ScalarMeta('BigInt', ''),
       'BigDecimal': TypeMeta.ScalarMeta('BigDecimal', ''),
       'String': TypeMeta.ScalarMeta('String', ''),
@@ -185,19 +188,8 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String')),
-        TypeMeta.FieldMeta('reserveEUR', '', [], TypeRef.Named('String')),
-        # TypeMeta.SyntheticFieldMeta('reserveCAD', '', operator.mul, [
-        #   [(None, TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))],
-        #   1.3
-        # ]),
-        # TypeMeta.SyntheticFieldMeta('reserveEUR', '', operator.mul, [[
-        #   TypeMeta.SyntheticFieldMeta('reserveCAD', '', operator.mul, [
-        #     [(None, TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))],
-        #     1.3
-        #   ])],
-        #   1.5
-        # ])
+        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float')),
+        TypeMeta.FieldMeta('reserveEUR', '', [], TypeRef.Named('Float')),
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
@@ -224,6 +216,7 @@ class TestAddType(unittest.TestCase):
   def test_add_synthetic_field_4(self):
     expected = SchemaMeta(query_type='Query', type_map={
       'Int': TypeMeta.ScalarMeta('Int', ''),
+      'Float': TypeMeta.ScalarMeta('Float', ''),
       'BigInt': TypeMeta.ScalarMeta('BigInt', ''),
       'BigDecimal': TypeMeta.ScalarMeta('BigDecimal', ''),
       'String': TypeMeta.ScalarMeta('String', ''),
@@ -262,37 +255,6 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('tokenString', '', [], TypeRef.Named('String')),
-      #   TypeMeta.SyntheticFieldMeta('tokenString', '', operator.add, [
-      #     TypeMeta.SyntheticFieldMeta('SyntheticField_4', '', operator.add, [
-      #       TypeMeta.SyntheticFieldMeta('SyntheticField_3', '', operator.add, [
-      #         TypeMeta.SyntheticFieldMeta('SyntheticField_2', '', operator.add, [
-      #           TypeMeta.SyntheticFieldMeta('SyntheticField_1', '', operator.add, [
-      #             TypeMeta.SyntheticFieldMeta('SyntheticField_0', '', operator.add, [
-      #               [
-      #                 (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))), 
-      #                 (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')))
-      #               ], 
-      #               '_'
-      #             ]), 
-      #             [
-      #               (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))), 
-      #               (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
-      #             ]
-      #           ]), 
-      #           '_'
-      #         ]), 
-      #         [
-      #           (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))), 
-      #           (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')))
-      #         ]
-      #       ]), 
-      #       '_'
-      #     ]), 
-      #     [
-      #       (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))), 
-      #       (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
-      #     ]
-      #   ])
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
@@ -352,12 +314,7 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
       ]),
-      TypeMeta.ObjectMeta('Token', '', fields=[
-        TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-        TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')),
-        TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')),
-        TypeMeta.FieldMeta('decimals', '', [], TypeRef.Named('Int')),
-      ]),
+      TypeRef.Named('Token'),
       [
         (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
       ]
@@ -379,7 +336,7 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
       ]),
-      TypeMeta.ScalarMeta('String', ''),
+      TypeRef.Named('String'),
       [
         (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
       ]
@@ -401,7 +358,7 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
       ]),
-      TypeMeta.ScalarMeta('String', ''),
+      TypeRef.Named('String'),
       [
         (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
         (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
@@ -414,7 +371,7 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_1(self):
-    sfield = SyntheticField(self.subgraph, identity)
+    sfield = SyntheticField(self.subgraph, identity, TypeRef.Named('Float'))
 
     expected = FieldPath(
       self.subgraph,
@@ -426,9 +383,9 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
       ]),
-      TypeMeta.ScalarMeta('String', ''),
+      TypeRef.Named('Float'),
       [
-        (None, TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String'))),
+        (None, TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float'))),
       ]
     )
 
@@ -439,7 +396,7 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_2(self):
-    sfield = SyntheticField(self.subgraph, identity)
+    sfield = SyntheticField(self.subgraph, identity, TypeRef.Named('String'))
 
     expected = FieldPath(
       self.subgraph,
@@ -449,7 +406,7 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('decimals', '', [], TypeRef.Named('Int')),
       ]),
-      TypeMeta.ScalarMeta('String', ''),
+      TypeRef.Named('String'),
       [
         (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
         (None, TypeMeta.FieldMeta("frenchName", "", [], TypeRef.Named('String'))),
@@ -474,7 +431,7 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')),
       ]),
-      TypeMeta.ScalarMeta('String', ''),
+      TypeRef.Named('String'),
       [
         (None, TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')))
       ]
@@ -510,14 +467,15 @@ class TestFieldPath(unittest.TestCase):
         ], TypeRef.non_null_list('Pair')),
         TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
       ]),
-      TypeMeta.ObjectMeta('Pair', '', fields=[
-        TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-        TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
-        TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token')),
-        TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      ]),
+      # TypeMeta.ObjectMeta('Pair', '', fields=[
+      #   TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
+      #   TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
+      #   TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token')),
+      #   TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
+      #   TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
+      #   TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
+      # ]),
+      TypeRef.non_null_list('Pair'),
       [
         (
           {
@@ -528,13 +486,6 @@ class TestFieldPath(unittest.TestCase):
             'orderBy': 'reserveUSD',
             'orderDirection': 'desc'
           },
-
-          # [
-          #   Argument('first', InputValue.Int(100)),
-          #   Argument('where', InputValue.Object({'reserveUSD_lt': InputValue.String('10.0')})),
-          #   Argument('orderBy', InputValue.Enum('reserveUSD')),
-          #   Argument('orderDirection', InputValue.Enum('desc'))
-          # ],
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
@@ -567,14 +518,7 @@ class TestFieldPath(unittest.TestCase):
         ], TypeRef.non_null_list('Pair')),
         TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
       ]),
-      TypeMeta.ObjectMeta('Pair', '', fields=[
-        TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-        TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
-        TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token')),
-        TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      ]),
+      TypeRef.non_null_list('Pair'),
       [
         (
           {
@@ -621,14 +565,7 @@ class TestFieldPath(unittest.TestCase):
         ], TypeRef.non_null_list('Pair')),
         TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
       ]),
-      TypeMeta.ObjectMeta('Pair', '', fields=[
-        TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-        TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
-        TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token')),
-        TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      ]),
+      TypeRef.non_null_list('Pair'),
       [
         (
           {
@@ -669,7 +606,7 @@ class TestFieldPath(unittest.TestCase):
         ], TypeRef.non_null_list('Pair')),
         TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
       ]),
-      TypeMeta.ScalarMeta('String', ''),
+      TypeRef.Named('String'),
       [
         (
           None,
@@ -763,7 +700,7 @@ class TestQueryBuilding(unittest.TestCase):
     expected = Query(selection=[
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), selection=[
         Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
-        Selection(TypeMeta.FieldMeta('price', '', [], TypeRef.Named('String')))
+        Selection(TypeMeta.FieldMeta('price', '', [], TypeRef.Named('Float')))
       ])
     ])
 
@@ -798,6 +735,7 @@ class TestSyntheticField(unittest.TestCase):
     sfield = SyntheticField(
       self.subgraph,
       lambda x: x * 10,
+      TypeRef.Named('Int'),
       Swap.amount0In
     )
 
