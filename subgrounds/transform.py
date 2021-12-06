@@ -136,3 +136,9 @@ class LocalSyntheticField(Transform):
 
   def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
     return transform_data(self.fmeta, self.f, self.args, query, data)
+
+
+DEFAULT_TRANSFORMS = [
+  TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal)),
+  TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint)),
+]

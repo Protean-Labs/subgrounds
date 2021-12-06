@@ -186,12 +186,12 @@ def mk_schema(json):
     case {'queryType': query_type, 'types': types}:
       try:
         mutation_type = json['__schema']['mutationType']['name']
-      except KeyError:
+      except (KeyError, TypeError):
         mutation_type = None
 
       try:
         subscription_type = json['__schema']['subscriptionType']['name']
-      except KeyError:
+      except (KeyError, TypeError):
         subscription_type = None
 
       types_meta = [mk_type_meta(type_) for type_ in types]

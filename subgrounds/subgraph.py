@@ -8,9 +8,9 @@ import operator
 
 import subgrounds.client as client
 import subgrounds.schema as schema
-from subgrounds.query import Argument, Query, Selection, arguments_of_field_args, selection_of_path
+from subgrounds.query import Query, Selection, selection_of_path
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field
-from subgrounds.transform import LocalSyntheticField, Transform
+from subgrounds.transform import DEFAULT_TRANSFORMS, LocalSyntheticField, Transform, chain_transforms
 from subgrounds.utils import flatten, identity
 
 
@@ -167,19 +167,6 @@ class FieldPath:
   @property
   def schema(self):
     return self.subgraph.schema
-
-  # @property
-  # def fieldmeta_path(self) -> Path:
-  #   def f(path_ele):
-  #     match path_ele:
-  #       case FieldPath.PathElement(type_=TypeMeta.FieldMeta() as fmeta, args=args):
-  #         return (args, fmeta)
-  #       case FieldPath.PathElement(type_=TypeMeta.SyntheticFieldMeta() as sfmeta):
-  #         return sfmeta
-  #       case _:
-  #         raise TypeError(f"fieldmeta_path: Unexptected type in FieldPath {self}: {path_ele}")
-
-  #   return list(map(f, self.path))
 
   @property
   def longname(self) -> str:
@@ -372,7 +359,7 @@ class Subgraph:
       with open(filename, mode="w") as f:
         json.dump(schema, f)
 
-    return Subgraph(url, mk_schema(schema))
+    return Subgraph(url, mk_schema(schema), DEFAULT_TRANSFORMS)
 
   @staticmethod
   def mk_query(fpaths: List[FieldPath]) -> Query:
@@ -401,22 +388,11 @@ class Subgraph:
 
     self.transforms = [transform, *self.transforms]
 
-  def process_data(self, fpaths: List[FieldPath], data: dict) -> None:
-    for fpath in fpaths:
-      apply_field_path(self.schema, fpath.fieldmeta_path, data)
-
   def query(self, query: Query) -> dict:
-    return client.query(self.url, query.graphql_string())
+    return chain_transforms(self.transforms, query, self.url)
 
   def __getattribute__(self, __name: str) -> Any:
     try:
       return super().__getattribute__(__name)
     except AttributeError:
       return Object(self, self.schema.type_map[__name])
-
-# @dataclass
-# class Subgraph2:
-#   schema: SchemaMeta
-#   transforms: list[Transform]
-
-#   def add_field()
