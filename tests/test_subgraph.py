@@ -391,7 +391,8 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_field_path_3(self):
-    expected = FieldPath(self.subgraph, 
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Pair', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
@@ -399,8 +400,8 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      ]),      
-      TypeMeta.ScalarMeta('String', ''), 
+      ]),
+      TypeMeta.ScalarMeta('String', ''),
       [
         (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
         (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
@@ -412,7 +413,7 @@ class TestFieldPath(unittest.TestCase):
     Filter.test_mode = True
     self.assertEqual(fpath, expected)
 
-  def test_synthetic_field_1(self):
+  def test_synthetic_field_path_1(self):
     sfield = SyntheticField(self.subgraph, identity)
 
     expected = FieldPath(
@@ -425,7 +426,7 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
       ]),
-      TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String')),
+      TypeMeta.ScalarMeta('String', ''),
       [
         (None, TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String'))),
       ]
@@ -437,7 +438,7 @@ class TestFieldPath(unittest.TestCase):
     Filter.test_mode = True
     self.assertEqual(fpath, expected)
 
-  def test_synthetic_field_2(self):
+  def test_synthetic_field_path_2(self):
     sfield = SyntheticField(self.subgraph, identity)
 
     expected = FieldPath(
@@ -448,7 +449,7 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('decimals', '', [], TypeRef.Named('Int')),
       ]),
-      TypeMeta.FieldMeta("frenchName", "", [], TypeRef.Named('String')),
+      TypeMeta.ScalarMeta('String', ''),
       [
         (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
         (None, TypeMeta.FieldMeta("frenchName", "", [], TypeRef.Named('String'))),
@@ -461,7 +462,7 @@ class TestFieldPath(unittest.TestCase):
     Filter.test_mode = True
     self.assertEqual(fpath, expected)
 
-  def test_synthetic_field_3(self):
+  def test_synthetic_field_path_3(self):
     expected = FieldPath(
       self.subgraph,
       TypeMeta.ObjectMeta('Pair', '', fields=[
@@ -473,7 +474,7 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')),
       ]),
-      TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')),
+      TypeMeta.ScalarMeta('String', ''),
       [
         (None, TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')))
       ]
@@ -522,8 +523,7 @@ class TestFieldPath(unittest.TestCase):
           {
             'first': 100,
             'where': {
-              'reserveUSD_lt': 10.0,
-              'token0': 'abcd'
+              'reserveUSD_lt': 10
             },
             'orderBy': 'reserveUSD',
             'orderDirection': 'desc'
@@ -704,12 +704,21 @@ class TestQueryBuilding(unittest.TestCase):
 
   def test_mk_query_1(self):
     expected = Query(selection=[
-      Selection("pairs", arguments=[Argument("first", InputValue.Int(10))], selection=[
-        Selection("id"),
-        Selection("token0", selection=[
-          Selection("symbol")
-        ]),
-      ])
+      Selection(
+        TypeMeta.FieldMeta('pairs', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
+          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
+          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+        ], TypeRef.non_null_list('Pair')),
+        arguments=[Argument("first", InputValue.Int(10))],
+        selection=[
+          Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), selection=[
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')))
+          ])
+        ]
+      )
     ])
 
     query = Subgraph.mk_query([
@@ -723,12 +732,19 @@ class TestQueryBuilding(unittest.TestCase):
 
   def test_mk_query_2(self):
     expected = Query(selection=[
-      Selection("pairs", arguments=[Argument("first", InputValue.Int(10))], selection=[
-        Selection("id"),
-        Selection("token0", selection=[
-          Selection("id")
-        ]),
-      ])
+      Selection(
+        TypeMeta.FieldMeta('pairs', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
+          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
+          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+        ], TypeRef.non_null_list('Pair')),
+        arguments=[Argument("first", InputValue.Int(10))],
+        selection=[
+          Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+          Selection(TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')))
+        ]
+      )
     ])
 
     Pair = self.subgraph.Pair
@@ -745,12 +761,9 @@ class TestQueryBuilding(unittest.TestCase):
 
   def test_mk_query_3(self):
     expected = Query(selection=[
-      Selection("swaps", selection=[
-        Selection("timestamp"),
-        Selection("amount0In"),
-        Selection("amount0Out"),
-        Selection("amount1In"),
-        Selection("amount1Out"),
+      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), selection=[
+        Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+        Selection(TypeMeta.FieldMeta('price', '', [], TypeRef.Named('String')))
       ])
     ])
 

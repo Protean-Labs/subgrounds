@@ -379,7 +379,7 @@ class Subgraph:
     # selections = flatten(map(lambda fpath: selections_of_path(fpath.fieldmeta_path), fpaths))
     query = Query()
     for fpath in fpaths:
-      query.add_selection(fpath.selection)
+      query.add_selections(fpath.selection)
 
     return query
 
@@ -396,7 +396,7 @@ class Subgraph:
       self,
       fmeta,
       sfield.f,
-      [dep.selection for dep in sfield.deps]
+      flatten([dep.selection for dep in sfield.deps])
     )
 
     self.transforms = [transform, *self.transforms]

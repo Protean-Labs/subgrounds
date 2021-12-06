@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Optional, Tuple
 
 from subgrounds.schema import (
@@ -91,8 +91,8 @@ class Selection:
   # name: str
   fmeta: TypeMeta.FieldMeta
   alias: Optional[str] = None
-  arguments: Optional[list[Argument]] = None
-  selection: Optional[list[Selection]] = None
+  arguments: list[Argument] = field(default_factory=list)
+  selection: list[Selection] = field(default_factory=list)
 
   def graphql_string(self, level: int = 0) -> str:
     indent = "  " * level
@@ -315,13 +315,13 @@ def arguments_of_field_args(
 def selection_of_path(
   schema: SchemaMeta,
   fpath: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]
-) -> Optional[Selection]:
+) -> list[Selection]:
   match fpath:
     case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
-      return Selection(
+      return [Selection(
         fmeta,
         arguments=arguments_of_field_args(schema, fmeta, args),
-        selection=[selection_of_path(schema, rest)]
-      )
+        selection=selection_of_path(schema, rest)
+      )]
     case []:
-      return None
+      return []
