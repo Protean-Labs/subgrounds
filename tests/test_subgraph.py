@@ -6,7 +6,8 @@ from subgrounds.subgraph import FieldPath, Filter, Object, Subgraph, SyntheticFi
 from subgrounds.query import Argument, InputValue, Query, Selection
 from subgrounds.utils import identity
 
-from tests.utils import schema, subgraph
+from tests.utils import schema
+
 
 class TestAddType(unittest.TestCase):
   def setUp(self):
@@ -58,7 +59,7 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.SyntheticFieldMeta('reserveCAD', '', identity, [])
+        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String'))
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
@@ -121,10 +122,7 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.SyntheticFieldMeta('reserveCAD', '', operator.mul, [
-          [(None, TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))],
-          1.3
-        ])
+        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String'))
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
@@ -187,17 +185,19 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.SyntheticFieldMeta('reserveCAD', '', operator.mul, [
-          [(None, TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))],
-          1.3
-        ]),
-        TypeMeta.SyntheticFieldMeta('reserveEUR', '', operator.mul, [[
-          TypeMeta.SyntheticFieldMeta('reserveCAD', '', operator.mul, [
-            [(None, TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))],
-            1.3
-          ])],
-          1.5
-        ])
+        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String')),
+        TypeMeta.FieldMeta('reserveEUR', '', [], TypeRef.Named('String')),
+        # TypeMeta.SyntheticFieldMeta('reserveCAD', '', operator.mul, [
+        #   [(None, TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))],
+        #   1.3
+        # ]),
+        # TypeMeta.SyntheticFieldMeta('reserveEUR', '', operator.mul, [[
+        #   TypeMeta.SyntheticFieldMeta('reserveCAD', '', operator.mul, [
+        #     [(None, TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))],
+        #     1.3
+        #   ])],
+        #   1.5
+        # ])
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
@@ -261,37 +261,38 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.SyntheticFieldMeta('tokenString', '', operator.add, [
-          TypeMeta.SyntheticFieldMeta('SyntheticField_4', '', operator.add, [
-            TypeMeta.SyntheticFieldMeta('SyntheticField_3', '', operator.add, [
-              TypeMeta.SyntheticFieldMeta('SyntheticField_2', '', operator.add, [
-                TypeMeta.SyntheticFieldMeta('SyntheticField_1', '', operator.add, [
-                  TypeMeta.SyntheticFieldMeta('SyntheticField_0', '', operator.add, [
-                    [
-                      (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))), 
-                      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')))
-                    ], 
-                    '_'
-                  ]), 
-                  [
-                    (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))), 
-                    (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
-                  ]
-                ]), 
-                '_'
-              ]), 
-              [
-                (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))), 
-                (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')))
-              ]
-            ]), 
-            '_'
-          ]), 
-          [
-            (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))), 
-            (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
-          ]
-        ])
+        TypeMeta.FieldMeta('tokenString', '', [], TypeRef.Named('String')),
+      #   TypeMeta.SyntheticFieldMeta('tokenString', '', operator.add, [
+      #     TypeMeta.SyntheticFieldMeta('SyntheticField_4', '', operator.add, [
+      #       TypeMeta.SyntheticFieldMeta('SyntheticField_3', '', operator.add, [
+      #         TypeMeta.SyntheticFieldMeta('SyntheticField_2', '', operator.add, [
+      #           TypeMeta.SyntheticFieldMeta('SyntheticField_1', '', operator.add, [
+      #             TypeMeta.SyntheticFieldMeta('SyntheticField_0', '', operator.add, [
+      #               [
+      #                 (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))), 
+      #                 (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')))
+      #               ], 
+      #               '_'
+      #             ]), 
+      #             [
+      #               (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))), 
+      #               (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
+      #             ]
+      #           ]), 
+      #           '_'
+      #         ]), 
+      #         [
+      #           (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))), 
+      #           (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')))
+      #         ]
+      #       ]), 
+      #       '_'
+      #     ]), 
+      #     [
+      #       (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))), 
+      #       (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
+      #     ]
+      #   ])
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
@@ -313,6 +314,7 @@ class TestAddType(unittest.TestCase):
     Pair.tokenString = Pair.token0.symbol + "_" + Pair.token0.id + "_" + Pair.token1.symbol + "_" + Pair.token1.id
 
     self.assertEqual(self.subgraph.schema, expected)
+
 
 class TestFieldPath(unittest.TestCase):
   def setUp(self):
@@ -340,7 +342,8 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(Pair, expected)
 
   def test_field_path_1(self):
-    expected = FieldPath(self.subgraph, 
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Pair', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
@@ -356,7 +359,7 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('decimals', '', [], TypeRef.Named('Int')),
       ]),
       [
-        FieldPath.PathElement(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None),
+        (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
       ]
     )
 
@@ -366,7 +369,8 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_field_path_2(self):
-    expected = FieldPath(self.subgraph, 
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Pair', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
@@ -374,10 +378,10 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      ]),      
-      TypeMeta.ScalarMeta('String', ''), 
+      ]),
+      TypeMeta.ScalarMeta('String', ''),
       [
-        FieldPath.PathElement(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None),
+        (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
       ]
     )
 
@@ -398,8 +402,8 @@ class TestFieldPath(unittest.TestCase):
       ]),      
       TypeMeta.ScalarMeta('String', ''), 
       [
-        FieldPath.PathElement(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None),
-        FieldPath.PathElement(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None),
+        (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
+        (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
       ]
     )
 
@@ -411,7 +415,8 @@ class TestFieldPath(unittest.TestCase):
   def test_synthetic_field_1(self):
     sfield = SyntheticField(self.subgraph, identity)
 
-    expected = FieldPath(self.subgraph,
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Pair', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
@@ -419,10 +424,10 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      ]),      
-      TypeMeta.SyntheticFieldMeta('reserveCAD', '', identity, []),
+      ]),
+      TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String')),
       [
-        FieldPath.PathElement(TypeMeta.SyntheticFieldMeta('reserveCAD', '', identity, []), None),
+        (None, TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('String'))),
       ]
     )
 
@@ -435,17 +440,18 @@ class TestFieldPath(unittest.TestCase):
   def test_synthetic_field_2(self):
     sfield = SyntheticField(self.subgraph, identity)
 
-    expected = FieldPath(self.subgraph,
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Token', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('decimals', '', [], TypeRef.Named('Int')),
       ]),
-      TypeMeta.SyntheticFieldMeta("frenchName", "", identity, []), 
+      TypeMeta.FieldMeta("frenchName", "", [], TypeRef.Named('String')),
       [
-        FieldPath.PathElement(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None),
-        FieldPath.PathElement(TypeMeta.SyntheticFieldMeta('frenchName', '', identity, []), None),
+        (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
+        (None, TypeMeta.FieldMeta("frenchName", "", [], TypeRef.Named('String'))),
       ]
     )
 
@@ -456,7 +462,8 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_3(self):
-    expected = FieldPath(self.subgraph,
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Pair', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
         TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
@@ -464,26 +471,11 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.SyntheticFieldMeta('token0Id', '', identity, [
-          [
-            (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))), 
-            (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
-          ]
-        ]),
+        TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')),
       ]),
-      TypeMeta.SyntheticFieldMeta('token0Id', '', identity, [
-        [
-          (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))), 
-          (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
-        ]
-      ]),
+      TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')),
       [
-        FieldPath.PathElement(TypeMeta.SyntheticFieldMeta('token0Id', '', identity, [
-          [
-            (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))), 
-            (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
-          ]
-        ]))
+        (None, TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')))
       ]
     )
 
@@ -506,7 +498,8 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(filter_, expected)
 
   def test_field_path_args_1(self):
-    expected = FieldPath(self.subgraph, 
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Query', '', fields=[
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
@@ -523,21 +516,31 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      ]), 
+      ]),
       [
-        FieldPath.PathElement(
+        (
+          {
+            'first': 100,
+            'where': {
+              'reserveUSD_lt': 10.0,
+              'token0': 'abcd'
+            },
+            'orderBy': 'reserveUSD',
+            'orderDirection': 'desc'
+          },
+
+          # [
+          #   Argument('first', InputValue.Int(100)),
+          #   Argument('where', InputValue.Object({'reserveUSD_lt': InputValue.String('10.0')})),
+          #   Argument('orderBy', InputValue.Enum('reserveUSD')),
+          #   Argument('orderDirection', InputValue.Enum('desc'))
+          # ],
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
           ], TypeRef.non_null_list('Pair')),
-          [
-            Argument('first', InputValue.Int(100)),
-            Argument('where', InputValue.Object({'reserveUSD_lt': InputValue.String('10.0')})),
-            Argument('orderBy', InputValue.Enum('reserveUSD')),
-            Argument('orderDirection', InputValue.Enum('desc'))
-          ]
         ),
       ]
     )
@@ -553,7 +556,8 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_field_path_args_2(self):
-    expected = FieldPath(self.subgraph, 
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Query', '', fields=[
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
@@ -570,20 +574,27 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      ]), 
+      ]),
       [
-        FieldPath.PathElement(
+        (
+          {
+            'first': 100,
+            'where': {
+              'reserveUSD_gt': 100.0,
+              'token0': 'abcd'
+            }
+          },
+          # [
+          #   Argument('first', InputValue.Int(100)),
+          #   Argument('where', InputValue.Object({'reserveUSD_gt': InputValue.String('100.0'), 'token0': InputValue.String("abcd")})),
+          # ],
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair')),
-          [
-            Argument('first', InputValue.Int(100)),
-            Argument('where', InputValue.Object({'reserveUSD_gt': InputValue.String('100.0'), 'token0': InputValue.String("abcd")})),
-          ]
-        ),
+          ], TypeRef.non_null_list('Pair'))
+        )
       ]
     )
 
@@ -599,7 +610,8 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_field_path_args_3(self):
-    expected = FieldPath(self.subgraph, 
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Query', '', fields=[
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
@@ -616,19 +628,23 @@ class TestFieldPath(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      ]), 
+      ]),
       [
-        FieldPath.PathElement(
+        (
+          {
+            'first': 100,
+            'orderBy': 'reserveUSD'
+          },
+          # [
+          #   Argument('first', InputValue.Int(100)),
+          #   Argument('orderBy', InputValue.Enum('reserveUSD'))
+          # ],
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
           ], TypeRef.non_null_list('Pair')),
-          [
-            Argument('first', InputValue.Int(100)),
-            Argument('orderBy', InputValue.Enum('reserveUSD'))
-          ]
         ),
       ]
     )
@@ -642,7 +658,8 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_field_path_extend_1(self):
-    expected = FieldPath(self.subgraph, 
+    expected = FieldPath(
+      self.subgraph,
       TypeMeta.ObjectMeta('Query', '', fields=[
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
@@ -652,19 +669,19 @@ class TestFieldPath(unittest.TestCase):
         ], TypeRef.non_null_list('Pair')),
         TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
       ]),
-      TypeMeta.ScalarMeta('String', ''), 
+      TypeMeta.ScalarMeta('String', ''),
       [
-        FieldPath.PathElement(
+        (
+          None,
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair')),
-          None
+          ], TypeRef.non_null_list('Pair'))
         ),
-        FieldPath.PathElement(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None),
-        FieldPath.PathElement(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None),
+        (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
+        (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
       ]
     )
 
@@ -672,9 +689,10 @@ class TestFieldPath(unittest.TestCase):
     fpath2 = self.subgraph.Pair.token0.symbol
 
     fpath = FieldPath.extend(fpath1, fpath2)
-    
+
     Filter.test_mode = True
     self.assertEqual(fpath, expected)
+
 
 class TestQueryBuilding(unittest.TestCase):
   def setUp(self):

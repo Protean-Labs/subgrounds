@@ -123,6 +123,7 @@ class Selection:
       select = next(filter(lambda select: select.fmeta.name == new_selection.fmeta.name, self.selection))
       for new_select in new_selection.selection:
         select.add_selection(new_select)
+
     except StopIteration:
       self.selection.append(new_selection)
 
@@ -141,18 +142,19 @@ class Query:
     )
     return f"""query {{\n{selection_str}\n}}"""
 
-  def add_selection(self, new_selection):
+  def add_selection(self, new_selection: Selection) -> None:
     if self.selection is None:
       self.selection = []
 
     try:
       select = next(filter(
-        lambda select: select.name == new_selection.name,
+        lambda select: select.fmeta.name == new_selection.fmeta.name,
         self.selection
       ))
 
       for s in new_selection.selection:
         select.add_selection(s)
+
     except StopIteration:
       self.selection.append(new_selection)
 
@@ -283,8 +285,11 @@ def add_object_field(
 def arguments_of_field_args(
   schema: SchemaMeta,
   field: TypeMeta.FieldMeta,
-  args: dict[str, Any]
+  args: Optional[dict[str, Any]]
 ) -> list[Argument]:
+  if args is None:
+    args = {}
+
   def f(arg_meta: TypeMeta.ArgumentMeta) -> Optional[Argument]:
     if arg_meta.name in args:
       return Argument(
@@ -314,9 +319,9 @@ def selection_of_path(
   match fpath:
     case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
       return Selection(
-        fmeta.name,
+        fmeta,
         arguments=arguments_of_field_args(schema, fmeta, args),
-        selection=selection_of_path(schema, rest)
+        selection=[selection_of_path(schema, rest)]
       )
     case []:
       return None

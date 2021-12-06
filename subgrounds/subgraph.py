@@ -8,9 +8,9 @@ import operator
 
 import subgrounds.client as client
 import subgrounds.schema as schema
-from subgrounds.query import Query
-from subgrounds.schema import SchemaMeta, TypeMeta, mk_schema
-from subgrounds.transform import Transform
+from subgrounds.query import Argument, Query, Selection, arguments_of_field_args, selection_of_path
+from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field
+from subgrounds.transform import LocalSyntheticField, Transform
 from subgrounds.utils import flatten, identity
 
 
@@ -50,6 +50,7 @@ class Filter:
   def to_dict(filters: list[Filter]) -> dict[str, Any]:
     return {f.name: f.value for f in filters}
 
+
 @dataclass
 class SyntheticField:
   counter: ClassVar[int] = 0
@@ -64,24 +65,49 @@ class SyntheticField:
     def mk_deps(
       deps: list(FieldPath | SyntheticField),
       f: Callable,
-      acc: list[Tuple[Optional[Callable], list[FieldPath]]] = []
+      acc: list[Tuple[Optional[Callable], int]] = []
     ) -> Tuple[Callable, list[FieldPath]]:
+      """If all dependencies are field paths, then this function does nothing. If the dependencies contain
+      one or more other synthetic fields, as is the case when chaining binary operators, then the synthetic
+      field tree is flattened to a single synthetic field containing all leaf dependencies.
+
+      Args:
+          deps (list): Initial dependencies for synthetic field
+          f (Callable): Function to apply to the values of those dependencies
+          acc (list[Tuple[Optional[Callable], list[FieldPath]]], optional): Accumulator. Defaults to [].
+
+      Returns:
+          Tuple[Callable, list[FieldPath]]: A tuple containing the potentially modified
+          function and dependency list.
+      """
       match deps:
         case []:
           def new_f(*args):
             new_args = []
             counter = 0
             for (f_, deps) in acc:
-              if f_ is None:
-                new_args.append(args[counter])
-                counter += 1
-              else:
-                new_args.append(f_(*args[counter:counter + len(deps)]))
-                counter += len(deps)
+              match (f_, deps):
+                case (None, FieldPath()):
+                  new_args.append(args[counter])
+                  counter += 1
+                case (None, int() | float() | str() | bool() as constant):
+                  new_args.append(constant)
+                case (f_, list() as deps):
+                  new_args.append(f_(*args[counter:counter + len(deps)]))
+                  counter += len(deps)
 
             return f(*new_args)
 
-          new_deps = flatten([args_ for (_, args_) in acc])
+          new_deps = []
+          for (_, deps) in acc:
+            match deps:
+              case FieldPath() as dep:
+                new_deps.append(dep)
+              case int() | float() | str() | bool():
+                pass
+              case list() as deps:
+                new_deps = new_deps + deps
+
           return (new_f, new_deps)
 
         case [SyntheticField(_, f=inner_f, deps=inner_deps), *rest]:
@@ -89,28 +115,19 @@ class SyntheticField:
           return mk_deps(rest, f, acc)
 
         case [FieldPath() as dep, *rest]:
-          acc.append((None, [dep]))
+          acc.append((None, dep))
           return mk_deps(rest, f, acc)
+
+        case [int() | float() | str() | bool() as constant, *rest]:
+          acc.append((None, constant))
+          return mk_deps(rest, f, acc)
+
+        case _ as deps:
+          raise TypeError(f'mk_deps: unexpected argument {deps}')
 
     (f, deps) = mk_deps(deps, f)
     self.f = f
     self.deps = deps
-
-    # def f(dep):
-    #   match dep:
-
-    #     case SyntheticField() as sfield:
-    #       return sfield.meta
-
-    #     case int() | float() | str() as value:
-    #       return value
-
-    # self.meta = TypeMeta.SyntheticFieldMeta(
-    #   name=f'SyntheticField_{SyntheticField.counter}',
-    #   description='', 
-    #   func=self.func,
-    #   dependencies=list(map(f, self.deps))
-    # )
 
     SyntheticField.counter += 1
 
@@ -145,12 +162,7 @@ class FieldPath:
   subgraph: Subgraph
   root_type: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta
   type_: TypeMeta
-  path: List[Tuple[Optional[Dict[str, Any]], TypeMeta.FieldMeta]]
-
-  # @dataclass 
-  # class PathElement:
-  #   type_: TypeMeta.FieldMeta | TypeMeta.SyntheticFieldMeta
-  #   args: Optional[List[Argument]] = None
+  path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]
 
   @property
   def schema(self):
@@ -170,26 +182,30 @@ class FieldPath:
   #   return list(map(f, self.path))
 
   @property
-  def longname(self):
-    return '_'.join(map(lambda ele: ele.type_.name, self.path))
+  def longname(self) -> str:
+    return '_'.join(map(lambda ele: ele[1].name, self.path))
 
   @property
-  def root(self):
-    return self.path[0]
+  def selection(self) -> Selection:
+    return selection_of_path(self.subgraph.schema, self.path)
 
   @property
-  def leaf(self):
-    return self.path[-1]
+  def root(self) -> TypeMeta.FieldMeta:
+    return self.path[0][1]
 
-  def __str__(self):
-    return '.'.join(map(lambda ele: ele.type_.name, self.path))
+  @property
+  def leaf(self) -> TypeMeta.FieldMeta:
+    return self.path[-1][1]
+
+  def __str__(self) -> str:
+    return '.'.join(map(lambda ele: ele[1].name, self.path))
 
   def split_args(self, kwargs: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     query_args = {}
     other_args = {}
     for key, item in kwargs.items():
       try:
-        next(filter(lambda arg: arg.name == key, self.leaf.type_.arguments))
+        next(filter(lambda arg: arg.name == key, self.leaf.arguments))
         query_args[key] = item
       except StopIteration:
         other_args[key] = item
@@ -203,22 +219,20 @@ class FieldPath:
         case ('where', [Filter(), *_] as filters):
           return Filter.to_dict(filters)
         case ('orderBy', FieldPath() as fpath):
-          match fpath.leaf.type_:
+          match fpath.leaf:
             case TypeMeta.FieldMeta() as fmeta:
               return fmeta.name
-            case TypeMeta.SyntheticFieldMeta() as sfmeta:
-              raise Exception(f"Cannot use synthetic field {fpath} as orderBy argument")
             case _:
               raise Exception(f"Cannot use non field {fpath} as orderBy argument")
         case _:
           return raw_arg
 
-    match self.leaf.type_:
-      case TypeMeta.FieldMeta() as field:
-        self.leaf.args = schema.arguments_of_field_args(self.schema, field, {key: fmt_arg(key, val) for key, val in kwargs.items()})
+    match self.leaf:
+      case TypeMeta.FieldMeta():
+        # args = arguments_of_field_args(self.schema, field, {key: fmt_arg(key, val) for key, val in kwargs.items()})
+        args = {key: fmt_arg(key, val) for key, val in kwargs.items()}
+        self.path[-1] = (args, self.path[-1][1])
         return self
-      case TypeMeta.SyntheticFieldMeta():
-        raise TypeError(f"FieldPath {self} is a SyntheticField; no arguments allowed!")
       case _:
         raise TypeError(f"Unexpected type for FieldPath {self}")
 
@@ -228,15 +242,15 @@ class FieldPath:
       return super().__getattribute__(__name)
     except AttributeError:
       match self.type_:
-        case TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() | TypeMeta.SyntheticFieldMeta():
+        case TypeMeta.EnumMeta() | TypeMeta.ScalarMeta():
           raise TypeError(f"FieldPath: field {__name} of path {self} is terminal! cannot select field {__name}")
 
         case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta():
-          field = schema.field_of_object(self.type_, __name)
-          match schema.type_of_field(self.schema, field):
-            case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() | TypeMeta.SyntheticFieldMeta() as type_:
+          field = field_of_object(self.type_, __name)
+          match type_of_field(self.schema, field):
+            case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() as type_:
               path = self.path.copy()
-              path.append(FieldPath.PathElement(field, None))
+              path.append((None, field))
               return FieldPath(self.subgraph, self.root_type, type_, path)
             case _:
               raise TypeError(f"FieldPath: field {__name} is not a valid field for object {self.type_.name} at path {self}")
@@ -246,7 +260,7 @@ class FieldPath:
 
   @staticmethod
   def extend(fpath: FieldPath, ext: FieldPath) -> FieldPath:
-    match fpath.leaf.type_:
+    match fpath.leaf:
       case TypeMeta.FieldMeta() as fmeta:
         match schema.type_of_field(fpath.schema, fmeta):
           case TypeMeta.ObjectMeta(name=name) | TypeMeta.InterfaceMeta(name=name):
@@ -309,6 +323,7 @@ class FieldPath:
   def __abs__(self) -> SyntheticField:
     return SyntheticField(self.subgraph, operator.abs, self)
 
+
 @dataclass
 class Object:
   subgraph: Subgraph
@@ -325,21 +340,20 @@ class Object:
       field = schema.field_of_object(self.object_, __name)
       match schema.type_of_field(self.schema, field):
         case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() as type_:
-          return FieldPath(self.subgraph, self.object_, type_, [field])
+          return FieldPath(self.subgraph, self.object_, type_, [(None, field)])
         case TypeMeta.T as type_:
           raise TypeError(f"Object: Unexpected type {type_.name} when selection {__name} on {self}")
 
   def __setattr__(self, __name: str, __value: Any) -> None:
     match __value:
       case SyntheticField() as sfield:
-        sfield.meta.name = __name
-        schema.add_object_field(self.object_, sfield.meta)
+        self.subgraph.add_synthetic_field(self.object_, __name, sfield)
       case FieldPath() as fpath:
         sfield = SyntheticField(self.schema, identity, fpath)
-        sfield.meta.name = __name
-        schema.add_object_field(self.object_, sfield.meta)
+        self.subgraph.add_synthetic_field(self.object_, __name, sfield)
       case _:
         super().__setattr__(__name, __value)
+
 
 @dataclass
 class Subgraph:
@@ -362,10 +376,30 @@ class Subgraph:
 
   @staticmethod
   def mk_query(fpaths: List[FieldPath]) -> Query:
-    selections = flatten(map(lambda fpath: selections_of_path(fpath.fieldmeta_path), fpaths))
+    # selections = flatten(map(lambda fpath: selections_of_path(fpath.fieldmeta_path), fpaths))
     query = Query()
-    query.add_selections(selections)
+    for fpath in fpaths:
+      query.add_selection(fpath.selection)
+
     return query
+
+  def add_synthetic_field(
+    self,
+    object_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta,
+    name: str,
+    sfield: SyntheticField
+  ) -> None:
+    fmeta = TypeMeta.FieldMeta(name, '', [], TypeRef.Named('String'))
+    object_.fields.append(fmeta)
+
+    transform = LocalSyntheticField(
+      self,
+      fmeta,
+      sfield.f,
+      [dep.selection for dep in sfield.deps]
+    )
+
+    self.transforms = [transform, *self.transforms]
 
   def process_data(self, fpaths: List[FieldPath], data: dict) -> None:
     for fpath in fpaths:
@@ -377,7 +411,7 @@ class Subgraph:
   def __getattribute__(self, __name: str) -> Any:
     try:
       return super().__getattribute__(__name)
-    except:
+    except AttributeError:
       return Object(self, self.schema.type_map[__name])
 
 # @dataclass
