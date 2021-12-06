@@ -1,12 +1,8 @@
 import dash
 from dash import html
-from dash import dcc
-# from dash.dependencies import Input
 
-from datetime import datetime
-
-from subgrounds.components import Indicator, LinePlot
-from subgrounds.subgraph import Subgraph, SyntheticField
+from subgrounds.components import Indicator
+from subgrounds.subgraph import Subgraph
 
 uniswapV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
 
@@ -16,13 +12,6 @@ Swap = uniswapV2.Swap
 
 # This is a synthetic field
 Swap.price1 = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
-
-# This is a synthetic field
-Swap.datetime = SyntheticField(
-  uniswapV2,
-  lambda timestamp: str(datetime.fromtimestamp(timestamp)),
-  Swap.timestamp,
-)
 
 # Dashboard
 app = dash.Dash(__name__)

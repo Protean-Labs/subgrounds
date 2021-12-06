@@ -1,9 +1,16 @@
-from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, input_value_of_argument
+from subgrounds.schema import (
+  TypeMeta,
+  SchemaMeta,
+  TypeRef,
+  # input_value_of_argument
+)
 from subgrounds.subgraph import Subgraph
+
 
 def schema():
   return SchemaMeta(query_type='Query', type_map={
     'Int': TypeMeta.ScalarMeta('Int', ''),
+    'Float': TypeMeta.ScalarMeta('Float', ''),
     'BigInt': TypeMeta.ScalarMeta('BigInt', ''),
     'BigDecimal': TypeMeta.ScalarMeta('BigDecimal', ''),
     'String': TypeMeta.ScalarMeta('String', ''),
@@ -58,9 +65,11 @@ def schema():
     ])
   })
 
+
 def subgraph():
   return Subgraph("", SchemaMeta(query_type='Query', type_map={
     'Int': TypeMeta.ScalarMeta('Int', ''),
+    'Float': TypeMeta.ScalarMeta('Float', ''),
     'BigInt': TypeMeta.ScalarMeta('BigInt', ''),
     'BigDecimal': TypeMeta.ScalarMeta('BigDecimal', ''),
     'String': TypeMeta.ScalarMeta('String', ''),
@@ -116,4 +125,5 @@ def subgraph():
   }))
 
 
-identity = lambda x: x
+def identity(x):
+  return x

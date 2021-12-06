@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 from subgrounds.schema import TypeRef
 from subgrounds.subgraph import Filter, Subgraph, FieldPath
 
+
 def columns(row):
   for key, value in row.items():
     if type(value) == dict:
@@ -16,6 +17,7 @@ def columns(row):
         yield f"{key}_{inner_key}"
     else:
       yield key
+
 
 def values(row):
   for key, value in row.items():
@@ -27,14 +29,15 @@ def values(row):
     else:
       yield (key, value)
 
+
 class EntityTable(dash_table.DataTable):
   def __init__(
-    self, 
+    self,
     entrypoint: FieldPath,
     component_id: str,
     first: int = 10,
-    selection: List[FieldPath] = [], 
-    orderBy: Optional[FieldPath] = None, 
+    selection: List[FieldPath] = [],
+    orderBy: Optional[FieldPath] = None,
     orderDirection: Optional[str] = None,
     where: Optional[List[Filter]] = None,
     **kwargs
@@ -49,7 +52,7 @@ class EntityTable(dash_table.DataTable):
 
     query = Subgraph.mk_query(selection)
     data = entrypoint.subgraph.query(query)[entrypoint.root.type_.name]
-    
+
     # Generate table
     cols = list(columns(data[0]))
     data = [dict(values(row)) for row in data]
@@ -74,7 +77,7 @@ class Component(dcc.Graph):
     query_args, other_args = entrypoint.split_args(kwargs)
     self.entrypoint = entrypoint(**query_args)
 
-    super().__init__(id=f'{entrypoint.leaf.type_.name}-{component_id}', figure=self.make_figure(**other_args))
+    super().__init__(id=f'{entrypoint.leaf.name}-{component_id}', figure=self.make_figure(**other_args))
 
   def make_figure(self, **kwargs):
     raise NotImplementedError(f"{self.name}.figure")
@@ -108,12 +111,12 @@ class BarChart(Component):
 
     query = Subgraph.mk_query(selection)
     data = self.entrypoint.subgraph.query(query)
-    self.entrypoint.subgraph.process_data(selection, data)
 
-    data = [dict(values(row)) for row in data[self.entrypoint.root.type_.name]]
-    
+    data = [dict(values(row)) for row in data[self.entrypoint.root.name]]
+
     xdata = [row[self.x.longname] for row in data]
     return go.Figure(data=[go.Bar(name=y.longname, y=[row[y.longname] for row in data], x=xdata, **kwargs) for y in self.y])
+
 
 class LinePlot(Component):
   def __init__(
@@ -140,12 +143,12 @@ class LinePlot(Component):
 
     query = Subgraph.mk_query(selection)
     data = self.entrypoint.subgraph.query(query)
-    self.entrypoint.subgraph.process_data(selection, data)
 
-    data = [dict(values(row)) for row in data[self.entrypoint.root.type_.name]]
-    
+    data = [dict(values(row)) for row in data[self.entrypoint.root.name]]
+
     xdata = [row[self.x.longname] for row in data]
     return go.Figure(data=[go.Scatter(name=y.longname, y=[row[y.longname] for row in data], x=xdata, **kwargs) for y in self.y])
+
 
 class Indicator(Component):
   def __init__(
@@ -159,30 +162,29 @@ class Indicator(Component):
     super().__init__(entrypoint, component_id, **kwargs)
 
   def make_figure(self, **kwargs):
-    if TypeRef.is_list(self.entrypoint.leaf.type_.type_) or TypeRef.is_list(self.x.leaf.type_.type_):
+    if TypeRef.is_list(self.entrypoint.leaf.type_) or TypeRef.is_list(self.x.leaf.type_):
       selection = [FieldPath.extend(self.entrypoint, self.x)]
 
       query = Subgraph.mk_query(selection)
       data = self.entrypoint.subgraph.query(query)
-      self.entrypoint.subgraph.process_data(selection, data)
-      
-      data = [dict(values(row)) for row in data[self.entrypoint.root.type_.name]]
+
+      data = [dict(values(row)) for row in data[self.entrypoint.root.name]]
       value = [row[self.x.longname] for row in data][0]
     else:
       selection = [FieldPath.extend(self.entrypoint, self.x)]
 
       query = Subgraph.mk_query(selection)
       data = self.entrypoint.subgraph.query(query)
-      self.entrypoint.subgraph.process_data(selection, data)
 
-      value = data[self.entrypoint.root.type_.name][self.x.longname]
+      value = data[self.entrypoint.root.type_][self.x.longname]
 
     return go.Figure(go.Indicator(
       mode='number',
       value=value,
-      number = {'valueformat':'.02f'},
+      number={'valueformat': '.02f'},
       **kwargs
     ))
+
 
 class IndicatorWithChange(Component):
   last = None
@@ -198,23 +200,21 @@ class IndicatorWithChange(Component):
     super().__init__(entrypoint, component_id, **kwargs)
 
   def make_figure(self, **kwargs):
-    if TypeRef.is_list(self.entrypoint.leaf.type_.type_) or TypeRef.is_list(self.x.leaf.type_.type_):
+    if TypeRef.is_list(self.entrypoint.leaf.type_) or TypeRef.is_list(self.x.leaf.type_):
       selection = [FieldPath.extend(self.entrypoint, self.x)]
 
       query = Subgraph.mk_query(selection)
       data = self.entrypoint.subgraph.query(query)
-      self.entrypoint.subgraph.process_data(selection, data)
-      
-      data = [dict(values(row)) for row in data[self.entrypoint.root.type_.name]]
+
+      data = [dict(values(row)) for row in data[self.entrypoint.root.name]]
       value = [row[self.x.longname] for row in data][0]
     else:
       selection = [FieldPath.extend(self.entrypoint, self.x)]
 
       query = Subgraph.mk_query(selection)
       data = self.entrypoint.subgraph.query(query)
-      self.entrypoint.subgraph.process_data(selection, data)
 
-      value = data[self.entrypoint.root.type_.name][self.x.longname]
+      value = data[self.entrypoint.root.name][self.x.longname]
 
     if self.last is None:
       self.last = value
@@ -222,8 +222,8 @@ class IndicatorWithChange(Component):
     fig = go.Figure(go.Indicator(
       mode='number+delta',
       value=value,
-      delta = {'position': "right", "reference": self.last, "valueformat": ".02f"},
-      number = {'valueformat':'.02f'},
+      delta={'position': "right", "reference": self.last, "valueformat": ".02f"},
+      number={'valueformat': '.02f'},
       **kwargs
     ))
 
@@ -231,13 +231,14 @@ class IndicatorWithChange(Component):
 
     return fig
 
+
 # Live update wrapper
 class AutoUpdate(html.Div):
   def __init__(
-    self, 
-    app, 
+    self,
+    app,
     sec_interval: int,
-    id: str, 
+    id: str,
     component: Component
   ) -> None:
     @app.callback(
@@ -249,7 +250,7 @@ class AutoUpdate(html.Div):
     super().__init__([
       dcc.Interval(
         id=id,
-        interval=sec_interval * 1000, # in milliseconds
+        interval=sec_interval * 1000,  # in milliseconds
         n_intervals=0
       ),
       component

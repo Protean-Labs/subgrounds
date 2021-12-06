@@ -1,6 +1,6 @@
 import requests
 
-introspection_query = """
+INTROSPECTION_QUERY = """
   query IntrospectionQuery {
     __schema {
       queryType { name }
@@ -90,27 +90,29 @@ introspection_query = """
   }  
 """
 
-def get_schema(url):
+
+def get_schema(url: str) -> dict:
   resp = requests.post(
     url,
-    json={"query": introspection_query}, 
+    json={"query": INTROSPECTION_QUERY},
     headers={"Content-Type": "application/json"}
   ).json()
 
   try:
     return resp["data"]
-  except:
-    raise Exception(resp["errors"])
+  except KeyError as exn:
+    raise Exception(resp["errors"]) from exn
 
-def query(url, query):
+
+def query(url: str, query_str: str) -> dict:
   # print(f"Query:\n{query}")
   resp = requests.post(
     url,
-    json={"query": query}, 
+    json={"query": query_str}, 
     headers={"Content-Type": "application/json"}
   ).json()
 
   try:
     return resp["data"]
-  except:
-    raise Exception(resp["errors"])
+  except KeyError as exn:
+    raise Exception(resp["errors"]) from exn

@@ -1,12 +1,8 @@
 import dash
 from dash import html
-from dash import dcc
-# from dash.dependencies import Input
 
-from datetime import datetime
-
-from subgrounds.components import AutoUpdate, BarChart, Indicator, IndicatorWithChange
-from subgrounds.subgraph import Subgraph, SyntheticField
+from subgrounds.components import AutoUpdate, BarChart, IndicatorWithChange
+from subgrounds.subgraph import Subgraph
 
 uniswapV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
 aaveV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/aave/protocol-v2")
@@ -127,5 +123,4 @@ app.layout = html.Div([
 ])
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
- 
+  app.run_server(debug=True)

@@ -4,6 +4,7 @@ from dash import html
 from datetime import datetime
 
 from subgrounds.components import LinePlot
+from subgrounds.schema import TypeRef
 from subgrounds.subgraph import Subgraph, SyntheticField
 
 uniswapV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
@@ -19,6 +20,7 @@ Swap.price1 = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.
 Swap.datetime = SyntheticField(
   uniswapV2,
   lambda timestamp: str(datetime.fromtimestamp(timestamp)),
+  TypeRef.Named('String'),
   Swap.timestamp,
 )
 
@@ -45,5 +47,4 @@ app.layout = html.Div(
 )
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
- 
+  app.run_server(debug=True)
