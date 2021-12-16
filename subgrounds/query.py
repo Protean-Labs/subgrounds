@@ -271,6 +271,10 @@ class Document:
   query: Optional[Query]
   fragments: list[Fragment] = field(default_factory=list)
 
+  @property
+  def graphql_string(self):
+    return '\n'.join([self.query.graphql_string, *map(lambda frag: frag.graphql_string, self.fragments)])
+
   @staticmethod
   def mk_single_query(url: str, query: Query) -> Document:
     return Document(url, [query])

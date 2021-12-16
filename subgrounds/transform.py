@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List
 from functools import partial
 
-from subgrounds.query import InputValue, Query, Selection, VariableDefinition
+from subgrounds.query import DataRequest, Document, InputValue, Query, Selection, VariableDefinition
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.utils import flatten
 import subgrounds.client as client
@@ -10,16 +10,16 @@ import subgrounds.client as client
 
 class Transform(ABC):
   @abstractmethod
-  def transform_request(self, req: Query) -> Query:
+  def transform_request(self, req: DataRequest) -> DataRequest:
     pass
 
   @abstractmethod
-  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     pass
 
 
-def transform_request(fmeta: TypeMeta.FieldMeta, replacement: List[Selection], query: Query) -> Query:
-  def transform(select: Selection):
+def transform_request(fmeta: TypeMeta.FieldMeta, replacement: List[Selection], req: DataRequest) -> DataRequest:
+  def transform(select: Selection) -> Selection:
     match select:
       case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == fmeta.name:
         return replacement
@@ -31,7 +31,12 @@ def transform_request(fmeta: TypeMeta.FieldMeta, replacement: List[Selection], q
       case _:
         raise Exception(f"transform_request: unhandled selection {select}")
 
-  return Query(selection=list(map(transform, query.selection)))
+  return DataRequest.transform(
+    req,
+    lambda doc: Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
+  )
+
+  # return Query(selection=list(map(transform, query.selection)))
 
 
 def select_data(select: Selection, data: dict) -> list[Any]:
@@ -44,7 +49,7 @@ def select_data(select: Selection, data: dict) -> list[Any]:
       raise Exception(f"select_data: invalid selection {select} for data {data}")
 
 
-def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: List[Selection], query: Query, data: dict) -> dict:
+def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: List[Selection], req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
   def transform(select: Selection, data: dict) -> None:
     match (select, data):
       case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == fmeta.name and name not in data:
@@ -67,13 +72,14 @@ def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: List[Sel
       case (select, data):
         raise Exception(f"transform_response: invalid selection {select} for data {data}")
 
-  for select in query.selection:
-    transform(select, data)
+  for (doc, data_) in zip(req.documents, data):
+    for select in doc.query.selection:
+      transform(select, data_)
 
   return data
 
 
-def transform_data_type(type_: TypeRef.T, f: Callable, query: Query, data: dict) -> dict:
+def transform_data_type(type_: TypeRef.T, f: Callable, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
   def transform(select: Selection, data: dict) -> None:
     # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
     match (select, data):
@@ -96,20 +102,21 @@ def transform_data_type(type_: TypeRef.T, f: Callable, query: Query, data: dict)
       case (select, data):
         raise Exception(f"transform_data_type: invalid selection {select} for data {data}")
 
-  for select in query.selection:
-    transform(select, data)
+  for (doc, data_) in zip(req.documents, data):
+    for select in doc.query.selection:
+      transform(select, data_)
 
   return data
 
 
-def chain_transforms(transforms: list[Transform], query: Query, url: str) -> dict:
+def chain_transforms(transforms: list[Transform], req: DataRequest) -> dict:
   match transforms:
     case []:
-      return client.query(url, query.graphql_string)
+      return list(map(lambda doc: client.query(doc.url, doc.graphql_string), req.documents))
     case [transform, *rest]:
-      new_query = transform.transform_request(query)
-      data = chain_transforms(rest, new_query, url)
-      return transform.transform_response(query, data)
+      new_req = transform.transform_request(req)
+      data = chain_transforms(rest, new_req)
+      return transform.transform_response(req, data)
 
 
 class TypeTransform(Transform):
@@ -121,7 +128,7 @@ class TypeTransform(Transform):
   def transform_request(self, query: Query) -> Query:
     return query
 
-  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     def transform(select: Selection, data: dict) -> None:
       # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
       match (select, data):
@@ -144,8 +151,9 @@ class TypeTransform(Transform):
         case (select, data):
           raise Exception(f"transform_data_type: invalid selection {select} for data {data}")
 
-    for select in query.selection:
-      transform(select, data)
+    for (doc, data_) in zip(req.documents, data):
+      for select in doc.query.selection:
+        transform(select, data_)
 
     return data
 
@@ -157,7 +165,7 @@ class LocalSyntheticField(Transform):
     self.f = f
     self.args = args
 
-  def transform_request(self, query: Query) -> Query:
+  def transform_request(self, req: DataRequest) -> DataRequest:
     def transform(select: Selection):
       match select:
         case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == self.fmeta.name:
@@ -170,9 +178,13 @@ class LocalSyntheticField(Transform):
         case _:
           raise Exception(f"transform_request: unhandled selection {select}")
 
-    return Query(selection=list(map(transform, query.selection)))
+    return DataRequest.transform(
+      req,
+      lambda doc: Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
+    )
+    # return Query(selection=list(map(transform, query.selection)))
 
-  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     def transform(select: Selection, data: dict) -> None:
       match (select, data):
         case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
@@ -195,8 +207,9 @@ class LocalSyntheticField(Transform):
         case (select, data):
           raise Exception(f"transform_response: invalid selection {select} for data {data}")
 
-    for select in query.selection:
-      transform(select, data)
+    for (doc, data_) in zip(req.documents, data):
+      for select in doc.query.selection:
+        transform(select, data_)
 
     return data
 
@@ -210,7 +223,7 @@ class SplitTransform(Transform):
 
 
 class PaginationTransform(Transform):
-  def transform_request(self, query: Query) -> Query:
+  def transform_request(self, req: DataRequest) -> DataRequest:
     config = {'counter': 0}
 
     def replace_first_with_var(selection: Selection, values: dict[str, int]) -> None:
@@ -233,7 +246,7 @@ class PaginationTransform(Transform):
 
     return query
 
-  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return data
 
 

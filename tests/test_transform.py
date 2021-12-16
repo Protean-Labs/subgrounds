@@ -1,27 +1,37 @@
 import unittest
 
-from subgrounds.query import Argument, InputValue, Query, Selection
+from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.transform import LocalSyntheticField, TypeTransform, chain_transforms, transform_response, transform_data_type, transform_request
 
 
 class TestTransform(unittest.TestCase):
   def test_transform_request1(self):
-    expected = Query(None, [
-      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
-        Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-        Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-        Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-        Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      ])
+    expected = DataRequest(documents=[
+      Document(
+        'abc',
+        Query(None, [
+          Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+            Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+            Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+            Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+            Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+          ])
+        ])
+      )
     ])
 
     fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
-    query = Query(None, [
-      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
-        Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
-      ])
+    req = DataRequest(documents=[
+      Document(
+        'abc',
+        Query(None, [
+          Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+            Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
+          ])
+        ])
+      )
     ])
 
     replacement = [
@@ -31,25 +41,25 @@ class TestTransform(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
-    new_query = transform_request(fmeta, replacement, query)
+    new_query = transform_request(fmeta, replacement, req)
 
     self.assertEqual(new_query, expected)
 
   def test_transform_response1(self):
-    expected = {
+    expected = [{
       'price1': 0.5,
       'amount0In': 0.0,
       'amount0Out': 10.0,
       'amount1In': 20.0,
       'amount1Out': 0.0
-    }
+    }]
 
-    data = {
+    data = [{
       'amount0In': 0.0,
       'amount0Out': 10.0,
       'amount1In': 20.0,
       'amount1Out': 0.0
-    }
+    }]
 
     fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
@@ -63,16 +73,21 @@ class TestTransform(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
-    query = Query(None, [
-      Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None)
+    req = DataRequest(documents=[
+      Document(
+        'abc',
+        Query(None, [
+          Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None)
+        ])
+      )
     ])
 
-    transformed_data = transform_response(fmeta, f, arg_select, query, data)
+    transformed_data = transform_response(fmeta, f, arg_select, req, data)
 
     self.assertEqual(transformed_data, expected)
 
   def test_transform_response2(self):
-    expected = {
+    expected = [{
       'swap': {
         'price1': 0.5,
         'amount0In': 0.0,
@@ -80,16 +95,16 @@ class TestTransform(unittest.TestCase):
         'amount1In': 20.0,
         'amount1Out': 0.0
       }
-    }
+    }]
 
-    data = {
+    data = [{
       'swap': {
         'amount0In': 0.0,
         'amount0Out': 10.0,
         'amount1In': 20.0,
         'amount1Out': 0.0
       }
-    }
+    }]
 
     fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
@@ -103,18 +118,23 @@ class TestTransform(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
-    query = Query(None, [
-      Selection(TypeMeta.FieldMeta('swap', '', [], TypeRef.Named('Swap')), None, None, [
-        Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
-      ])
+    req = DataRequest(documents=[
+      Document(
+        'abc',
+        Query(None, [
+          Selection(TypeMeta.FieldMeta('swap', '', [], TypeRef.Named('Swap')), None, None, [
+            Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
+          ])
+        ])
+      )
     ])
 
-    transformed_data = transform_response(fmeta, f, arg_select, query, data)
+    transformed_data = transform_response(fmeta, f, arg_select, req, data)
 
     self.assertEqual(transformed_data, expected)
 
   def test_transform_response3(self):
-    expected = {
+    expected = [{
       'swaps': [{
         'price1': 0.5,
         'amount0In': 0.0,
@@ -122,16 +142,16 @@ class TestTransform(unittest.TestCase):
         'amount1In': 20.0,
         'amount1Out': 0.0
       }]
-    }
+    }]
 
-    data = {
+    data = [{
       'swaps': [{
         'amount0In': 0.0,
         'amount0Out': 10.0,
         'amount1In': 20.0,
         'amount1Out': 0.0
       }]
-    }
+    }]
 
     def f(in0, out0, in1, out1):
       return abs(in0 - out0) / abs(in1 - out1)
@@ -145,33 +165,38 @@ class TestTransform(unittest.TestCase):
 
     fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
-    query = Query(None, [
-      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
-        Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
-      ])
+    req = DataRequest(documents=[
+      Document(
+        'abc',
+        Query(None, [
+          Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+            Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
+          ])
+        ])
+      )
     ])
 
-    transformed_data = transform_response(fmeta, f, arg_select, query, data)
+    transformed_data = transform_response(fmeta, f, arg_select, req, data)
 
     self.assertEqual(transformed_data, expected)
 
   def test_transform_response4(self):
-    expected = {
+    expected = [{
       'pair': {
         'token0Symbol': 'USDC',
         'token0': {
           'symbol': 'USDC'
         }
       }
-    }
+    }]
 
-    data = {
+    data = [{
       'pair': {
         'token0': {
           'symbol': 'USDC'
         }
       }
-    }
+    }]
 
     fmeta = TypeMeta.FieldMeta('token0Symbol', '', [], TypeRef.non_null('String'))
 
@@ -184,10 +209,15 @@ class TestTransform(unittest.TestCase):
       ])
     ]
 
-    query = Query(None, [
-      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.Named('Pair')), None, None, [
-        Selection(TypeMeta.FieldMeta('token0Symbol', '', [], TypeRef.Named('String')), None, None, None),
-      ])
+    query = DataRequest(documents=[
+      Document(
+        'abc',
+        Query(None, [
+          Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.Named('Pair')), None, None, [
+            Selection(TypeMeta.FieldMeta('token0Symbol', '', [], TypeRef.Named('String')), None, None, None),
+          ])
+        ])
+      )
     ])
 
     transformed_data = transform_response(fmeta, f, arg_select, query, data)
@@ -195,34 +225,39 @@ class TestTransform(unittest.TestCase):
     self.assertEqual(transformed_data, expected)
 
   def test_transform_data_type1(self):
-    expected = {
+    expected = [{
       'swaps': [{
         'amount0In': 0.0,
         'amount0Out': 10.0,
         'amount1In': 20.0,
         'amount1Out': 0.0
       }]
-    }
+    }]
 
-    data = {
+    data = [{
       'swaps': [{
         'amount0In': '0.0',
         'amount0Out': '10.0',
         'amount1In': '20.0',
         'amount1Out': '0.0'
       }]
-    }
+    }]
 
     def f(bigdecimal):
       return float(bigdecimal)
 
-    query = Query(None, [
-      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
-        Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-        Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-        Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-        Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      ])
+    query = DataRequest(documents=[
+      Document(
+        'abc',
+        Query(None, [
+          Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+            Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+            Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+            Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+            Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+          ])
+        ])
+      )
     ])
 
     type_ = TypeRef.Named('BigDecimal')
@@ -234,44 +269,49 @@ class TestTransform(unittest.TestCase):
 
 class TestQueryTransform(unittest.TestCase):
   def test_roundtrip1(self):
-    expected = {
+    expected = [{
       'swaps': [{
         'amount0In': 0.25,
         'amount0Out': 0.0,
         'amount1In': 0.0,
         'amount1Out': 89820.904371079570860909
       }]
-    }
+    }]
 
     transform = TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal))
 
-    query = Query(None, [
-      Selection(
-        TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
-        None,
-        [
-          Argument('first', InputValue.Int(1)),
-          Argument('orderBy', InputValue.Enum('timestamp')),
-          Argument('orderDirection', InputValue.Enum('desc')),
-          Argument('where', InputValue.Object({
-            'timestamp_lt': InputValue.Int(1638554700)
-          }))
-        ],
-        [
-          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-          Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-          Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-          Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-        ]
+    req = DataRequest(documents=[
+      Document(
+        'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
+        Query(None, [
+          Selection(
+            TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+            None,
+            [
+              Argument('first', InputValue.Int(1)),
+              Argument('orderBy', InputValue.Enum('timestamp')),
+              Argument('orderDirection', InputValue.Enum('desc')),
+              Argument('where', InputValue.Object({
+                'timestamp_lt': InputValue.Int(1638554700)
+              }))
+            ],
+            [
+              Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+              Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+              Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+              Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+            ]
+          )
+        ])
       )
     ])
 
-    data = chain_transforms([transform], query, 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
+    data = chain_transforms([transform], req)
 
     self.assertEqual(data, expected)
 
   def test_roundtrip2(self):
-    expected = {
+    expected = [{
       'swaps': [{
         'price0': 359283.61748431827,
         'amount0In': 0.25,
@@ -279,7 +319,7 @@ class TestQueryTransform(unittest.TestCase):
         'amount1In': 0.0,
         'amount1Out': 89820.904371079570860909
       }]
-    }
+    }]
 
     transforms = [
       LocalSyntheticField(
@@ -314,6 +354,10 @@ class TestQueryTransform(unittest.TestCase):
       )
     ])
 
-    data = chain_transforms(transforms, query, 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
+    req = DataRequest(documents=[
+      Document(url='https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', query=query)
+    ])
+
+    data = chain_transforms(transforms, req)
 
     self.assertEqual(data, expected)
