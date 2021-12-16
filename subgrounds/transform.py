@@ -167,7 +167,7 @@ class PaginationTransform(Transform):
     return data
 
 
-DEFAULT_TRANSFORMS = [
+DEFAULT_TRANSFORMS: list[Transform] = [
   TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal)),
   TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint)),
 ]

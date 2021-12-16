@@ -17,8 +17,6 @@ from subgrounds.utils import identity
 
 @dataclass
 class Filter:
-  test_mode: ClassVar[bool] = False
-
   field: TypeMeta.FieldMeta
   op: Filter.Operator
   value: Any
@@ -226,6 +224,9 @@ class FieldPath(FieldOperatorMixin):
   type_: TypeRef.T
   path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]
 
+  # Purely for testing
+  test_mode: ClassVar[bool] = False
+
   @property
   def schema(self):
     return self.subgraph.schema
@@ -342,8 +343,8 @@ class FieldPath(FieldOperatorMixin):
       case _:
         raise TypeError(f"Cannot create filter on FieldPath {fpath}: not a native field!")
 
-  def __eq__(self, value: Any) -> Filter:
-    if Filter.test_mode:
+  def __eq__(self, value: FieldPath | Any) -> Filter:
+    if FieldPath.test_mode:
       # Purely used for testing so that assertEqual works
       return self.subgraph == value.subgraph and self.type_ == value.type_ and self.path == value.path
     else:
@@ -384,7 +385,7 @@ class Object:
         case TypeMeta.T as type_:
           raise TypeError(f"Object: Unexpected type {type_.name} when selection {__name} on {self}")
 
-  def __setattr__(self, __name: str, __value: Any) -> None:
+  def __setattr__(self, __name: str, __value: SyntheticField | FieldPath | Any) -> None:
     match __value:
       case SyntheticField() as sfield:
         self.subgraph.add_synthetic_field(self.object_, __name, sfield)
