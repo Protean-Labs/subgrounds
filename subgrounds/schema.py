@@ -132,10 +132,13 @@ def mk_schema(json):
     match json:
       case {'kind': 'NON_NULL', 'ofType': inner}:
         return TypeRef.NonNull(mk_type_ref(inner))
+
       case {'kind': 'LIST', 'ofType': inner}:
         return TypeRef.List(mk_type_ref(inner))
+
       case {'kind': 'SCALAR' | 'OBJECT' | 'INTERFACE' | 'ENUM' | 'INPUT_OBJECT', 'name': name}:
         return TypeRef.Named(name)
+
       case _ as json:
         raise ParsingError(f"mk_type_ref: {json}")
 
@@ -164,16 +167,22 @@ def mk_schema(json):
     match json:
       case {'kind': 'SCALAR', 'name': name, 'description': desc}:
         return TypeMeta.ScalarMeta(name, description=desc)
+
       case {'kind': 'OBJECT', 'name': name, 'description': desc, 'fields': fields, 'interfaces': intfs}:
         return TypeMeta.ObjectMeta(name, fields=[mk_field_meta(f) for f in fields], interfaces=intfs, description=desc)
+
       case {'kind': 'ENUM', 'name': name, 'description': desc, 'enumValues': enum_values}:
         return TypeMeta.EnumMeta(name, values=[mk_enum_value(val) for val in enum_values], description=desc)
+
       case {'kind': 'INTERFACE', 'name': name, 'description': desc, 'fields': fields}:
         return TypeMeta.InterfaceMeta(name, fields=[mk_field_meta(f) for f in fields], description=desc)
+
       case {'kind': 'UNION', 'name': name, 'description': desc, 'possibleTypes': types}:
         return TypeMeta.UnionMeta(name, types=types, description=desc)
+
       case {'kind': 'INPUT_OBJECT', 'name': name, 'description': desc, 'inputFields': input_feilds}:
         return TypeMeta.InputObjectMeta(name, input_fields=[mk_argument_meta(f) for f in input_feilds], description=desc)
+
       case _ as json:
         raise ParsingError(f"mk_type_meta: {json}")
 

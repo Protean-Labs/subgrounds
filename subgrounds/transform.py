@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List
-from functools import partial
+from functools import partial, reduce
 
-from subgrounds.query import Query, Selection
+from subgrounds.query import InputValue, Query, Selection, VariableDefinition
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.utils import flatten
 import subgrounds.client as client
@@ -105,7 +105,7 @@ def transform_data_type(type_: TypeRef.T, f: Callable, query: Query, data: dict)
 def chain_transforms(transforms: list[Transform], query: Query, url: str) -> dict:
   match transforms:
     case []:
-      return client.query(url, query.graphql_string())
+      return client.query(url, query.graphql_string)
     case [transform, *rest]:
       new_query = transform.transform_selection(query)
       data = chain_transforms(rest, new_query, url)
@@ -137,6 +137,34 @@ class LocalSyntheticField(Transform):
 
   def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
     return transform_data(self.fmeta, self.f, self.args, query, data)
+
+
+class PaginationTransform(Transform):
+  def transform_selection(self, query: Query) -> Query:
+    config = {'counter': 0}
+
+    def replace_first_with_var(selection: Selection, values: dict[str, int]) -> None:
+      try:
+        arg = next(filter(lambda arg: arg.name == 'first', selection.arguments))
+        values[f'first{config["counter"]}'] = arg.value
+        arg.value = InputValue.Variable(name=f'first{config["counter"]}')
+        config['counter'] += 1
+      except StopIteration:
+        pass
+
+      for inner_select in selection.selection:
+        replace_first_with_var(inner_select, values)
+
+    values = {}
+    for selection in query.selection:
+      replace_first_with_var(selection, values)
+      for key, value in values.items():
+        query.variables.append((VariableDefinition(name=key, type_=TypeRef.Named("Int")), value))
+
+    return query
+
+  def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+    return data
 
 
 DEFAULT_TRANSFORMS = [

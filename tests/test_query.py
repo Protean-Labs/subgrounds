@@ -58,7 +58,7 @@ class TestQueryString(unittest.TestCase):
       )
     ])
 
-    self.assertEqual(query.graphql_string(), expected)
+    self.assertEqual(query.graphql_string, expected)
 
   def test_graphql_string_2(self):
     expected = """query {
@@ -92,4 +92,4 @@ class TestQueryString(unittest.TestCase):
       pairs.token1.symbol,
     ])
 
-    self.assertEqual(query.graphql_string(), expected)
+    self.assertEqual(query.graphql_string, expected)
