@@ -12,7 +12,7 @@ import subgrounds.schema as schema
 from subgrounds.query import Query, Selection, arguments_of_field_args, selection_of_path
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
 from subgrounds.transform import DEFAULT_TRANSFORMS, LocalSyntheticField, Transform, chain_transforms
-from subgrounds.utils import flatten, identity
+from subgrounds.utils import identity
 
 
 @dataclass
@@ -106,8 +106,34 @@ def type_ref_of_unary_op(op: str, t: TypeRef.T):
       raise Exception(f'typeref_of_binary_op: f_typeref: unhandled arguments {args}')
 
 
+class FieldOperatorMixin:
+  subgraph: Subgraph
+  type_: TypeRef.T
+
+  def __add__(self, other: Any) -> SyntheticField:
+    return SyntheticField(self.subgraph, operator.add, typeref_of_binary_op('add', self.type_, other), self, other)
+
+  def __sub__(self, other: Any) -> SyntheticField:
+    return SyntheticField(self.subgraph, operator.sub, typeref_of_binary_op('sub', self.type_, other), self, other)
+
+  def __mul__(self, other: Any) -> SyntheticField:
+    return SyntheticField(self.subgraph, operator.mul, typeref_of_binary_op('mul', self.type_, other), self, other)
+
+  def __truediv__(self, other: Any) -> SyntheticField:
+    return SyntheticField(self.subgraph, operator.truediv, typeref_of_binary_op('div', self.type_, other), self, other)
+
+  def __pow__(self, other: Any) -> SyntheticField:
+    return SyntheticField(self.subgraph, operator.pow, typeref_of_binary_op('pow', self.type_, other), self, other)
+
+  def __neg__(self) -> SyntheticField:
+    return SyntheticField(self.subgraph, operator.neg, type_ref_of_unary_op('neg', self.type_), self)
+
+  def __abs__(self) -> SyntheticField:
+    return SyntheticField(self.subgraph, operator.abs, type_ref_of_unary_op('abs', self.type_), self)
+
+
 @dataclass
-class SyntheticField:
+class SyntheticField(FieldOperatorMixin):
   counter: ClassVar[int] = 0
 
   subgraph: Subgraph
@@ -192,30 +218,9 @@ class SyntheticField:
   def schema(self):
     return self.subgraph.schema
 
-  def __add__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.add, typeref_of_binary_op('add', self.type_, other), self, other)
-
-  def __sub__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.sub, typeref_of_binary_op('sub', self.type_, other), self, other)
-
-  def __mul__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.mul, typeref_of_binary_op('mul', self.type_, other), self, other)
-
-  def __truediv__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.truediv, typeref_of_binary_op('div', self.type_, other), self, other)
-
-  def __pow__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.pow, typeref_of_binary_op('pow', self.type_, other), self, other)
-
-  def __neg__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.neg, type_ref_of_unary_op('neg', self.type_), self)
-
-  def __abs__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.abs, type_ref_of_unary_op('abs', self.type_), self)
-
 
 @dataclass
-class FieldPath:
+class FieldPath(FieldOperatorMixin):
   subgraph: Subgraph
   root_type: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta
   type_: TypeRef.T
@@ -355,28 +360,6 @@ class FieldPath:
 
   def __gte__(self, value: Any) -> Filter:
     return FieldPath.mk_filter(self, Filter.Operator.GTE, value)
-
-  # SyntheticField operations
-  def __add__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.add, typeref_of_binary_op('add', self.type_, other), self, other)
-
-  def __sub__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.sub, typeref_of_binary_op('sub', self.type_, other), self, other)
-
-  def __mul__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.mul, typeref_of_binary_op('mul', self.type_, other), self, other)
-
-  def __truediv__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.truediv, typeref_of_binary_op('div', self.type_, other), self, other)
-
-  def __pow__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.pow, typeref_of_binary_op('pow', self.type_, other), self, other)
-
-  def __neg__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.neg, type_ref_of_unary_op('neg', self.type_), self)
-
-  def __abs__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.abs, type_ref_of_unary_op('abs', self.type_), self)
 
 
 @dataclass
