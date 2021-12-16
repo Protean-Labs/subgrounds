@@ -144,24 +144,28 @@ class Selection:
         )
         return f"{indent}{self.fmeta.name}{self.args_graphql_string} {{\n{inner_str}\n{indent}}}"
 
-  def add_selection(self, new_selection: Selection) -> None:
-    if self.selection is None:
-      self.selection = []
-
-    try:
-      select = next(filter(lambda select: select.fmeta.name == new_selection.fmeta.name, self.selection))
-      for new_select in new_selection.selection:
-        select.add_selection(new_select)
-
-    except StopIteration:
-      self.selection.append(new_selection)
-
-  def add_selections(self, new_selections):
-    for s in new_selections:
-      self.add_selection(s)
+  @staticmethod
+  def add_selections(select: Selection, new_selections: list[Selection]) -> Selection:
+    return Selection(
+      fmeta=select.fmeta,
+      alias=select.alias,
+      selection=union(
+        select.selection,
+        new_selections,
+        key=lambda select: select.fmeta.name,
+        combine=Selection.combine
+      )
+    )
 
   @staticmethod
-  def merge(select: Selection, other: Selection) -> Selection:
+  def add_selection(select: Selection, new_selection: Selection) -> Selection:
+    return Selection.add_selections(select, [new_selection])
+
+  @staticmethod
+  def combine(select: Selection, other: Selection) -> Selection:
+    if select.fmeta != other.fmeta:
+      raise Exception(f"Selection.combine: {select.fmeta} != {other.fmeta}")
+
     return Selection(
       fmeta=select.fmeta,
       alias=select.alias,
@@ -170,7 +174,7 @@ class Selection:
         select.selection,
         other.selection,
         key=lambda select: select.fmeta.name,
-        combine=lambda tup: Selection.merge(tup[0], tup[1])
+        combine=Selection.combine
       )
     )
 
@@ -191,35 +195,31 @@ class Query:
     )
     return f"""query {{\n{selection_str}\n}}"""
 
-  def add_selection(self, new_selection: Selection) -> None:
-    if self.selection is None:
-      self.selection = []
-
-    try:
-      select = next(filter(
-        lambda select: select.fmeta.name == new_selection.fmeta.name,
-        self.selection
-      ))
-
-      for s in new_selection.selection:
-        select.add_selection(s)
-
-    except StopIteration:
-      self.selection.append(new_selection)
-
-  def add_selections(self, new_selections):
-    for s in new_selections:
-      self.add_selection(s)
+  @staticmethod
+  def add_selections(query: Query, new_selections: list[Selection]) -> Query:
+    return Query(
+      name=query.name,
+      selection=union(
+        query.selection,
+        new_selections,
+        key=lambda select: select.fmeta.name,
+        combine=Selection.combine
+      )
+    )
 
   @staticmethod
-  def merge(query: Query, other: Query) -> Query:
+  def add_selection(query: Query, new_selection: Selection) -> Query:
+    return Query.add_selections(query, [new_selection])
+
+  @staticmethod
+  def combine(query: Query, other: Query) -> Query:
     return Query(
       name=query.name,
       selection=union(
         query.selection,
         other.selection,
         key=lambda select: select.fmeta.name,
-        combine=lambda tup: Selection.merge(tup[0], tup[1])
+        combine=Selection.combine
       )
     )
 
@@ -253,7 +253,7 @@ class Fragment:
     return f"""fragment {self.name} on {TypeRef.root_type_name(self.type_)} {{\n{selection_str}\n}}"""
 
   @staticmethod
-  def merge(frag: Fragment, other: Fragment) -> Fragment:
+  def combine(frag: Fragment, other: Fragment) -> Fragment:
     pass
 
   @staticmethod
@@ -276,15 +276,15 @@ class Document:
     return Document(url, [query])
 
   @staticmethod
-  def merge(doc: Document, other: Document) -> Document:
+  def combine(doc: Document, other: Document) -> Document:
     return Document(
       url=doc.url,
-      query=doc.query.merge(other.query),
+      query=doc.query.combine(other.query),
       fragments=union(
         doc.fragments,
         other.fragments,
         key=lambda frag: frag.name,
-        combine=lambda tup: Fragment.merge(tup[0], tup[1])
+        combine=Fragment.combine
       )
     )
 
@@ -306,13 +306,13 @@ class DataRequest:
   documents: list[Document] = field(default_factory=list)
 
   @staticmethod
-  def merge(req: DataRequest, other: DataRequest) -> None:
+  def combine(req: DataRequest, other: DataRequest) -> None:
     return DataRequest(
       documents=union(
         req.documents,
         other.documents,
         key=lambda doc: doc.url,
-        combine=lambda tup: Document.merge(tup[0], tup[1])
+        combine=Document.combine
       )
     )
 

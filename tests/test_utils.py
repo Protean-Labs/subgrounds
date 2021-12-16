@@ -1,3 +1,4 @@
+import operator
 import unittest
 from dataclasses import dataclass
 
@@ -34,7 +35,7 @@ class TestSet(unittest.TestCase):
   def test_intersection_2(self):
     l1 = [1, 2, 3]
     l2 = [3, 4, 5]
-    self.assertEqual(intersection(l1, l2, combine=lambda tup: tup[0] + tup[1]), [6])
+    self.assertEqual(intersection(l1, l2, combine=operator.add), [6])
 
   def test_intersection_3(self):
     l1 = [1, 2]
@@ -50,7 +51,7 @@ class TestSet(unittest.TestCase):
     l1 = [X(1, 'hello'), X(2, 'bob'), X(6, 'world!')]
     l2 = [X(5, 'abcd'), X(6, 'message')]
 
-    self.assertEqual(intersection(l1, l2, key=lambda x: x.id, combine=lambda tup: X(tup[0].id, f'{tup[0].txt} {tup[1].txt}')), [X(6, 'world! message')])
+    self.assertEqual(intersection(l1, l2, key=lambda x: x.id, combine=lambda x, y: X(x.id, f'{x.txt} {y.txt}')), [X(6, 'world! message')])
 
   def test_union_1(self):
     l1 = [1, 2, 3]
@@ -60,7 +61,7 @@ class TestSet(unittest.TestCase):
   def test_union_2(self):
     l1 = [1, 2, 3]
     l2 = [3, 4, 5]
-    self.assertEqual(union(l1, l2, combine=lambda tup: tup[0] + tup[1]), [1, 2, 6, 4, 5])
+    self.assertEqual(union(l1, l2, combine=operator.add), [1, 2, 6, 4, 5])
 
   def test_union_3(self):
     @dataclass
@@ -78,4 +79,4 @@ class TestSet(unittest.TestCase):
       X(5, 'abcd')
     ]
 
-    self.assertEqual(union(l1, l2, key=lambda x: x.id, combine=lambda tup: X(tup[0].id, f'{tup[0].txt} {tup[1].txt}')), expected)
+    self.assertEqual(union(l1, l2, key=lambda x: x.id, combine=lambda x, y: X(x.id, f'{x.txt} {y.txt}')), expected)

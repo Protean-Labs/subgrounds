@@ -26,7 +26,7 @@ def intersection(
   l1: list[T],
   l2: list[T],
   key: Callable[[T], Any] = identity,
-  combine: Callable[[Tuple[T, T]], T] = fst
+  combine: Callable[[T, T], T] = lambda x, _: x
 ) -> list[T]:
   l1_keys, l2_keys = list(map(key, l1)), list(map(key, l2))
   l2_in_l1 = list(filter(lambda x: key(x) in l1_keys, l2))
@@ -34,7 +34,7 @@ def intersection(
   l2_in_l1.sort(key=key)
   l1_in_l2.sort(key=key)
 
-  return list(map(combine, zip(l1_in_l2, l2_in_l1)))
+  return list(map(lambda tup: combine(tup[0], tup[1]), zip(l1_in_l2, l2_in_l1)))
 
 
 def rel_complement(
@@ -58,6 +58,6 @@ def union(
   l1: list[T],
   l2: list[T],
   key: Callable[[T], Any] = identity,
-  combine: Callable[[Tuple[T, T]], T] = fst
+  combine: Callable[[T, T], T] = lambda x, _: x
 ) -> list[T]:
   return rel_complement(l1, l2, key) + intersection(l1, l2, key, combine) + rel_complement(l2, l1, key)

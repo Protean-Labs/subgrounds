@@ -2,13 +2,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any, Callable, ClassVar, Dict, List, Optional, Tuple
+from functools import reduce
 import os
 import json
 import operator
 
 import subgrounds.client as client
 import subgrounds.schema as schema
-from subgrounds.query import Query, Selection, selection_of_path
+from subgrounds.query import Query, Selection, arguments_of_field_args, selection_of_path
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
 from subgrounds.transform import DEFAULT_TRANSFORMS, LocalSyntheticField, Transform, chain_transforms
 from subgrounds.utils import flatten, identity
@@ -229,10 +230,6 @@ class FieldPath:
     return '_'.join(map(lambda ele: ele[1].name, self.path))
 
   @property
-  def selection(self) -> Selection:
-    return selection_of_path(self.subgraph.schema, self.path)
-
-  @property
   def root(self) -> TypeMeta.FieldMeta:
     return self.path[0][1]
 
@@ -254,6 +251,21 @@ class FieldPath:
         other_args[key] = item
 
     return query_args, other_args
+
+  @staticmethod
+  def selection(fpath: FieldPath) -> Selection:
+    def f(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> list[Selection]:
+      match path:
+        case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
+          return [Selection(
+            fmeta,
+            arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
+            selection=selection_of_path(fpath.subgraph.schema, rest)
+          )]
+        case []:
+          return []
+
+    return f(fpath.path)[0]
 
   # When setting arguments
   def __call__(self, **kwargs: Any) -> Any:
@@ -421,12 +433,7 @@ class Subgraph:
 
   @staticmethod
   def mk_query(fpaths: List[FieldPath]) -> Query:
-    # selections = flatten(map(lambda fpath: selections_of_path(fpath.fieldmeta_path), fpaths))
-    query = Query()
-    for fpath in fpaths:
-      query.add_selections(fpath.selection)
-
-    return query
+    return reduce(Query.add_selection, map(FieldPath.selection, fpaths), Query())
 
   def add_synthetic_field(
     self,
@@ -441,7 +448,7 @@ class Subgraph:
       self,
       fmeta,
       sfield.f,
-      flatten([dep.selection for dep in sfield.deps])
+      [dep.selection for dep in sfield.deps]
     )
 
     self.transforms = [transform, *self.transforms]
