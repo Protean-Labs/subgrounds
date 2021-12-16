@@ -2,11 +2,11 @@ import unittest
 
 from subgrounds.query import Argument, InputValue, Query, Selection
 from subgrounds.schema import TypeMeta, TypeRef
-from subgrounds.transform import LocalSyntheticField, TypeTransform, chain_transforms, transform_data, transform_data_type, transform_selection
+from subgrounds.transform import LocalSyntheticField, TypeTransform, chain_transforms, transform_response, transform_data_type, transform_request
 
 
 class TestTransform(unittest.TestCase):
-  def test_transform_selection1(self):
+  def test_transform_request1(self):
     expected = Query(None, [
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
         Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
@@ -31,11 +31,11 @@ class TestTransform(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
     ]
 
-    new_query = transform_selection(fmeta, replacement, query)
+    new_query = transform_request(fmeta, replacement, query)
 
     self.assertEqual(new_query, expected)
 
-  def test_transform_data1(self):
+  def test_transform_response1(self):
     expected = {
       'price1': 0.5,
       'amount0In': 0.0,
@@ -67,11 +67,11 @@ class TestTransform(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None)
     ])
 
-    transformed_data = transform_data(fmeta, f, arg_select, query, data)
+    transformed_data = transform_response(fmeta, f, arg_select, query, data)
 
     self.assertEqual(transformed_data, expected)
 
-  def test_transform_data2(self):
+  def test_transform_response2(self):
     expected = {
       'swap': {
         'price1': 0.5,
@@ -109,11 +109,11 @@ class TestTransform(unittest.TestCase):
       ])
     ])
 
-    transformed_data = transform_data(fmeta, f, arg_select, query, data)
+    transformed_data = transform_response(fmeta, f, arg_select, query, data)
 
     self.assertEqual(transformed_data, expected)
 
-  def test_transform_data3(self):
+  def test_transform_response3(self):
     expected = {
       'swaps': [{
         'price1': 0.5,
@@ -151,11 +151,11 @@ class TestTransform(unittest.TestCase):
       ])
     ])
 
-    transformed_data = transform_data(fmeta, f, arg_select, query, data)
+    transformed_data = transform_response(fmeta, f, arg_select, query, data)
 
     self.assertEqual(transformed_data, expected)
 
-  def test_transform_data4(self):
+  def test_transform_response4(self):
     expected = {
       'pair': {
         'token0Symbol': 'USDC',
@@ -190,7 +190,7 @@ class TestTransform(unittest.TestCase):
       ])
     ])
 
-    transformed_data = transform_data(fmeta, f, arg_select, query, data)
+    transformed_data = transform_response(fmeta, f, arg_select, query, data)
 
     self.assertEqual(transformed_data, expected)
 

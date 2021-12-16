@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List
-from functools import partial, reduce
+from functools import partial
 
 from subgrounds.query import InputValue, Query, Selection, VariableDefinition
 from subgrounds.schema import TypeMeta, TypeRef
@@ -10,15 +10,15 @@ import subgrounds.client as client
 
 class Transform(ABC):
   @abstractmethod
-  def transform_selection(self, query: Query) -> Query:
+  def transform_request(self, req: Query) -> Query:
     pass
 
   @abstractmethod
-  def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
     pass
 
 
-def transform_selection(fmeta: TypeMeta.FieldMeta, replacement: List[Selection], query: Query) -> Query:
+def transform_request(fmeta: TypeMeta.FieldMeta, replacement: List[Selection], query: Query) -> Query:
   def transform(select: Selection):
     match select:
       case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == fmeta.name:
@@ -29,7 +29,7 @@ def transform_selection(fmeta: TypeMeta.FieldMeta, replacement: List[Selection],
         new_inner_select = flatten(list(map(transform, inner_select)))
         return Selection(select_fmeta, alias, args, new_inner_select)
       case _:
-        raise Exception(f"transform_selection: unhandled selection {select}")
+        raise Exception(f"transform_request: unhandled selection {select}")
 
   return Query(selection=list(map(transform, query.selection)))
 
@@ -44,7 +44,7 @@ def select_data(select: Selection, data: dict) -> list[Any]:
       raise Exception(f"select_data: invalid selection {select} for data {data}")
 
 
-def transform_data(fmeta: TypeMeta.FieldMeta, func: Callable, args: List[Selection], query: Query, data: dict) -> dict:
+def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: List[Selection], query: Query, data: dict) -> dict:
   def transform(select: Selection, data: dict) -> None:
     match (select, data):
       case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == fmeta.name and name not in data:
@@ -62,10 +62,10 @@ def transform_data(fmeta: TypeMeta.FieldMeta, func: Callable, args: List[Selecti
             for select in inner_select:
               transform(select, elt)
           case _:
-            raise Exception(f"transform_data: data for selection {select} is neither list or dict {data[name]}")
+            raise Exception(f"transform_response: data for selection {select} is neither list or dict {data[name]}")
 
       case (select, data):
-        raise Exception(f"transform_data: invalid selection {select} for data {data}")
+        raise Exception(f"transform_response: invalid selection {select} for data {data}")
 
   for select in query.selection:
     transform(select, data)
@@ -107,9 +107,9 @@ def chain_transforms(transforms: list[Transform], query: Query, url: str) -> dic
     case []:
       return client.query(url, query.graphql_string)
     case [transform, *rest]:
-      new_query = transform.transform_selection(query)
+      new_query = transform.transform_request(query)
       data = chain_transforms(rest, new_query, url)
-      return transform.transform_data(query, data)
+      return transform.transform_response(query, data)
 
 
 class TypeTransform(Transform):
@@ -118,11 +118,36 @@ class TypeTransform(Transform):
     self.f = f
     super().__init__()
 
-  def transform_selection(self, query: Query) -> Query:
+  def transform_request(self, query: Query) -> Query:
     return query
 
-  def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
-    return transform_data_type(self.type_, self.f, query, data)
+  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+    def transform(select: Selection, data: dict) -> None:
+      # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
+      match (select, data):
+        case (Selection(TypeMeta.FieldMeta(name, _, _, ftype), _, _, [] | None), dict() as data) if TypeRef.root_type_name(self.type_) == TypeRef.root_type_name(ftype):
+          data[name] = self.f(data[name])
+        case (Selection(_, _, _, [] | None), dict()):
+          pass
+        case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data):
+          match data[name]:
+            case list() as elts:
+              for elt in elts:
+                for select in inner_select:
+                  transform(select, elt)
+            case dict() as elt:
+              for select in inner_select:
+                transform(select, elt)
+            case _:
+              raise Exception(f"transform_data_type: data for selection {select} is neither list or dict {data[name]}")
+
+        case (select, data):
+          raise Exception(f"transform_data_type: invalid selection {select} for data {data}")
+
+    for select in query.selection:
+      transform(select, data)
+
+    return data
 
 
 class LocalSyntheticField(Transform):
@@ -132,15 +157,60 @@ class LocalSyntheticField(Transform):
     self.f = f
     self.args = args
 
-  def transform_selection(self, query: Query) -> Query:
-    return transform_selection(self.fmeta, self.args, query)
+  def transform_request(self, query: Query) -> Query:
+    def transform(select: Selection):
+      match select:
+        case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == self.fmeta.name:
+          return self.args
+        case Selection(_, _, _, [] | None):
+          return [select]
+        case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
+          new_inner_select = flatten(list(map(transform, inner_select)))
+          return Selection(select_fmeta, alias, args, new_inner_select)
+        case _:
+          raise Exception(f"transform_request: unhandled selection {select}")
 
-  def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
-    return transform_data(self.fmeta, self.f, self.args, query, data)
+    return Query(selection=list(map(transform, query.selection)))
+
+  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+    def transform(select: Selection, data: dict) -> None:
+      match (select, data):
+        case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
+          arg_values = flatten(list(map(partial(select_data, data=data), self.args)))
+          data[name] = self.f(*arg_values)
+        case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data):
+          pass
+        case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data) if name in data:
+          match data[name]:
+            case list() as elts:
+              for elt in elts:
+                for select in inner_select:
+                  transform(select, elt)
+            case dict() as elt:
+              for select in inner_select:
+                transform(select, elt)
+            case _:
+              raise Exception(f"transform_response: data for selection {select} is neither list or dict {data[name]}")
+
+        case (select, data):
+          raise Exception(f"transform_response: invalid selection {select} for data {data}")
+
+    for select in query.selection:
+      transform(select, data)
+
+    return data
+
+
+class SplitTransform(Transform):
+  def transform_request(self, query: Query) -> Query:
+    return query
+
+  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+    return super().transform_response(query, data)
 
 
 class PaginationTransform(Transform):
-  def transform_selection(self, query: Query) -> Query:
+  def transform_request(self, query: Query) -> Query:
     config = {'counter': 0}
 
     def replace_first_with_var(selection: Selection, values: dict[str, int]) -> None:
@@ -163,7 +233,7 @@ class PaginationTransform(Transform):
 
     return query
 
-  def transform_data(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
+  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
