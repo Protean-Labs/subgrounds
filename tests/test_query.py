@@ -93,3 +93,291 @@ class TestQueryString(unittest.TestCase):
     ])
 
     self.assertEqual(query.graphql_string, expected)
+
+
+class TestSelectionModification(unittest.TestCase):
+  def test_add_selection_1(self):
+    expected = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    og_selection = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    new_selection = Selection.add_selection(
+      og_selection,
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], [])
+    )
+
+    self.assertEqual(new_selection, expected)
+
+  def test_add_selection_2(self):
+    expected = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    og_selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    new_selection = Selection.add_selection(
+      og_selection,
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    )
+
+    self.assertEqual(new_selection, expected)
+
+  def test_add_selections_1(self):
+    expected = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
+    ])
+
+    og_selection = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    new_selection = Selection.add_selections(
+      og_selection,
+      [
+        Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+        Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
+      ]
+    )
+
+    self.assertEqual(new_selection, expected)
+
+  def test_remove_selection_1(self):
+    expected = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    og_selection = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
+    ])
+
+    new_selection = Selection.remove_selection(
+      og_selection,
+      Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
+    )
+
+    self.assertEqual(new_selection, expected)
+
+  def test_remove_selection_2(self):
+    expected = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    og_selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    new_selection = Selection.remove_selection(
+      og_selection,
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    )
+
+    self.assertEqual(new_selection, expected)
+
+
+class TestQueryModification(unittest.TestCase):
+  def test_add_selection_1(self):
+    expected = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+          Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+        ])
+      ],
+      []
+    )
+
+    og_query = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+        ])
+      ],
+      []
+    )
+
+    new_query = Query.add_selection(
+      og_query,
+      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+        Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], [])
+      ])
+    )
+
+    self.assertEqual(new_query, expected)
+
+  def test_add_selection_2(self):
+    expected = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ],
+      []
+    )
+
+    og_query = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ],
+      []
+    )
+
+    new_query = Query.add_selection(
+      og_query,
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+          Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ])
+    )
+
+    self.assertEqual(new_query, expected)
+
+  def test_add_selections_1(self):
+    expected = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+          Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+          Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
+        ])
+      ],
+      []
+    )
+
+    og_query = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+        ])
+      ],
+      []
+    )
+
+    new_query = Query.add_selections(
+      og_query,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+          Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
+        ])
+      ]
+    )
+
+    self.assertEqual(new_query, expected)
+
+  def test_remove_selection_1(self):
+    expected = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+          Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+        ])
+      ],
+      []
+    )
+
+    og_query = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+          Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+          Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
+        ])
+      ],
+      []
+    )
+
+    new_query = Query.remove_selection(
+      og_query,
+      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+        Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
+      ])
+    )
+
+    self.assertEqual(new_query, expected)
+
+  def test_remove_selection_2(self):
+    expected = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ],
+      []
+    )
+
+    og_query = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ],
+      []
+    )
+
+    new_query = Query.remove_selection(
+      og_query,
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+          Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ])
+    )
+
+    self.assertEqual(new_query, expected)

@@ -9,7 +9,7 @@ from subgrounds.schema import (
   TypeRef,
   typeref_of_input_field
 )
-from subgrounds.utils import identity, union
+from subgrounds.utils import filter_none, identity, intersection, rel_complement, union
 
 
 # ================================================================
@@ -162,6 +162,30 @@ class Selection:
     return Selection.add_selections(select, [new_selection])
 
   @staticmethod
+  def remove_selections(select: Selection, selections_to_remove: list[Selection]) -> Selection:
+    def combine(select: Selection, selection_to_remove: Selection) -> Optional[Selection]:
+      if selection_to_remove.selection == []:
+        return None
+      else:
+        return Selection.remove_selections(select, selection_to_remove.selection)
+
+    return Selection(
+      fmeta=select.fmeta,
+      alias=select.alias,
+      arguments=select.arguments,
+      selection=filter_none(union(
+        select.selection,
+        selections_to_remove,
+        key=lambda s: s.fmeta.name,
+        combine=combine
+      ))
+    )
+
+  @staticmethod
+  def remove_selection(select: Selection, selection_to_remove: Selection) -> Selection:
+    return Selection.remove_selections(select, [selection_to_remove])
+
+  @staticmethod
   def combine(select: Selection, other: Selection) -> Selection:
     if select.fmeta != other.fmeta:
       raise Exception(f"Selection.combine: {select.fmeta} != {other.fmeta}")
@@ -170,12 +194,12 @@ class Selection:
       fmeta=select.fmeta,
       alias=select.alias,
       arguments=select.arguments,
-      selection=union(
+      selection=filter_none(union(
         select.selection,
         other.selection,
         key=lambda select: select.fmeta.name,
         combine=Selection.combine
-      )
+      ))
     )
 
 
@@ -210,6 +234,29 @@ class Query:
   @staticmethod
   def add_selection(query: Query, new_selection: Selection) -> Query:
     return Query.add_selections(query, [new_selection])
+
+  @staticmethod
+  def remove_selections(query: Query, selections_to_remove: list[Selection]) -> Query:
+    def combine(select: Selection, selection_to_remove: Selection) -> Optional[Selection]:
+      if selection_to_remove.selection == []:
+        return None
+      else:
+        return Selection.remove_selections(select, selection_to_remove.selection)
+
+    return Query(
+      name=query.name,
+      selection=filter_none(union(
+        query.selection,
+        selections_to_remove,
+        key=lambda s: s.fmeta.name,
+        combine=combine
+      )),
+      variables=query.variables
+    )
+
+  @staticmethod
+  def remove_selection(query: Query, selection_to_remove: Selection) -> Query:
+    return Query.remove_selections(query, [selection_to_remove])
 
   @staticmethod
   def combine(query: Query, other: Query) -> Query:

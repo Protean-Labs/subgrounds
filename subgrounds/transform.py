@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable
 from functools import partial
 
 from subgrounds.query import DataRequest, Document, InputValue, Query, Selection, VariableDefinition
@@ -11,14 +11,14 @@ import subgrounds.client as client
 class Transform(ABC):
   @abstractmethod
   def transform_request(self, req: DataRequest) -> DataRequest:
-    pass
+    return req
 
   @abstractmethod
   def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    pass
+    return data
 
 
-def transform_request(fmeta: TypeMeta.FieldMeta, replacement: List[Selection], req: DataRequest) -> DataRequest:
+def transform_request(fmeta: TypeMeta.FieldMeta, replacement: list[Selection], req: DataRequest) -> DataRequest:
   def transform(select: Selection) -> Selection:
     match select:
       case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == fmeta.name:
@@ -49,7 +49,7 @@ def select_data(select: Selection, data: dict) -> list[Any]:
       raise Exception(f"select_data: invalid selection {select} for data {data}")
 
 
-def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: List[Selection], req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: list[Selection], req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
   def transform(select: Selection, data: dict) -> None:
     match (select, data):
       case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == fmeta.name and name not in data:
@@ -159,14 +159,14 @@ class TypeTransform(Transform):
 
 
 class LocalSyntheticField(Transform):
-  def __init__(self, subgraph, fmeta: TypeMeta.FieldMeta, f: Callable, args: List[Selection]) -> None:
+  def __init__(self, subgraph, fmeta: TypeMeta.FieldMeta, f: Callable, args: list[Selection]) -> None:
     self.subgraph = subgraph
     self.fmeta = fmeta
     self.f = f
     self.args = args
 
   def transform_request(self, req: DataRequest) -> DataRequest:
-    def transform(select: Selection):
+    def transform(select: Selection) -> Selection:
       match select:
         case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == self.fmeta.name:
           return self.args
@@ -182,7 +182,6 @@ class LocalSyntheticField(Transform):
       req,
       lambda doc: Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
     )
-    # return Query(selection=list(map(transform, query.selection)))
 
   def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     def transform(select: Selection, data: dict) -> None:
@@ -215,39 +214,42 @@ class LocalSyntheticField(Transform):
 
 
 class SplitTransform(Transform):
-  def transform_request(self, query: Query) -> Query:
-    return query
+  def __init__(self, selection: Selection) -> None:
+    self.selection = selection
 
-  def transform_response(self, query: Query, data: Dict[str, Any]) -> Dict[str, Any]:
-    return super().transform_response(query, data)
-
-
-class PaginationTransform(Transform):
   def transform_request(self, req: DataRequest) -> DataRequest:
-    config = {'counter': 0}
-
-    def replace_first_with_var(selection: Selection, values: dict[str, int]) -> None:
-      try:
-        arg = next(filter(lambda arg: arg.name == 'first', selection.arguments))
-        values[f'first{config["counter"]}'] = arg.value
-        arg.value = InputValue.Variable(name=f'first{config["counter"]}')
-        config['counter'] += 1
-      except StopIteration:
-        pass
-
-      for inner_select in selection.selection:
-        replace_first_with_var(inner_select, values)
-
-    values = {}
-    for selection in query.selection:
-      replace_first_with_var(selection, values)
-      for key, value in values.items():
-        query.variables.append((VariableDefinition(name=key, type_=TypeRef.Named("Int")), value))
-
-    return query
+    return req
 
   def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return data
+    return super().transform_response(req, data)
+
+
+# class PaginationTransform(Transform):
+#   def transform_request(self, req: DataRequest) -> DataRequest:
+#     config = {'counter': 0}
+
+#     def replace_first_with_var(selection: Selection, values: dict[str, int]) -> None:
+#       try:
+#         arg = next(filter(lambda arg: arg.name == 'first', selection.arguments))
+#         values[f'first{config["counter"]}'] = arg.value
+#         arg.value = InputValue.Variable(name=f'first{config["counter"]}')
+#         config['counter'] += 1
+#       except StopIteration:
+#         pass
+
+#       for inner_select in selection.selection:
+#         replace_first_with_var(inner_select, values)
+
+#     values = {}
+#     for selection in query.selection:
+#       replace_first_with_var(selection, values)
+#       for key, value in values.items():
+#         query.variables.append((VariableDefinition(name=key, type_=TypeRef.Named("Int")), value))
+
+#     return query
+
+#   def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+#     return data
 
 
 DEFAULT_TRANSFORMS: list[Transform] = [

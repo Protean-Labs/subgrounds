@@ -1,5 +1,5 @@
 from itertools import filterfalse
-from typing import Any, Callable, Tuple, TypeVar
+from typing import Any, Callable, Optional, Tuple, TypeVar
 
 
 def flatten(t):
@@ -61,3 +61,7 @@ def union(
   combine: Callable[[T, T], T] = lambda x, _: x
 ) -> list[T]:
   return rel_complement(l1, l2, key) + intersection(l1, l2, key, combine) + rel_complement(l2, l1, key)
+
+
+def filter_none(l: list[Optional[T]]) -> list[T]:
+  return list(filter(None, l))
