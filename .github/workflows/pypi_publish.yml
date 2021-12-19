@@ -31,8 +31,14 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest pipenv
-        pipenv install
+        python -m pip install flake8 pytest 
+    - name: Install Python, pipenv and Pipfile packages
+      uses: palewire/install-python-pipenv-pipfile@v2
+      with:
+        # “The version of Python to use”
+        python-version: ${{ matrix.python-version }}
+        
+        
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -44,7 +50,7 @@ jobs:
         pytest
     
   deploy:
-
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
