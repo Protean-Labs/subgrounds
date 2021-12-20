@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional, Tuple
+from pipe import *
 
 from subgrounds.schema import (
   TypeMeta,
@@ -202,6 +203,38 @@ class Selection:
       ))
     )
 
+  @staticmethod
+  def contains(select: Selection, other: Selection) -> bool:
+    if (select.fmeta == other.fmeta and rel_complement(other.selection, select.selection, key=lambda s: s.fmeta.name) == []):
+      return (
+        other.selection
+        | map(lambda s: Selection.contains(next(filter(lambda s_: s.fmeta.name == s_.fmeta.name, select.selection)), s))
+        | all(identity)
+      )
+    else:
+      return False
+
+  @staticmethod
+  def select(select: Selection, other: Selection) -> Selection:
+    if other.selection == []:
+      return select
+    else:
+      return Selection(
+        fmeta=select.fmeta,
+        alias=select.alias,
+        arguments=select.arguments,
+        selection=list(
+          other.selection
+          | map(lambda s: next(
+            select.selection 
+            | where(lambda s_: s_.fmeta.name == s.fmeta.name)
+            | map(lambda s_: Selection.select(s_, s))
+            | take(1)
+            )
+          )
+        )
+      )
+
 
 @dataclass(frozen=True)
 class Query:
@@ -280,6 +313,30 @@ class Query:
       name=query.name,
       selection=list(map(selection_f, query.selection)),
       variables=list(map(variable_f, query.variables))
+    )
+
+  @staticmethod
+  def contains(query: Query, other: Selection) -> bool:
+    return (
+      query.selection
+      | any(lambda select: Selection.contains(select, other))
+    )
+
+  @staticmethod
+  def select(query: Query, other: Selection) -> Query:
+    return Query(
+      name=query.name,
+      selection=list(
+        other.selection
+        | map(lambda s: next(
+          query.selection
+          | where(lambda s_: s_.fmeta.name == s.fmeta.name)
+          | map(lambda s_: Selection.select(s_, s))
+          | take(1)
+          )
+        )
+      ),
+      variables=query.variables
     )
 
 

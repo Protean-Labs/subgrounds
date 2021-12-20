@@ -95,7 +95,7 @@ class TestQueryString(unittest.TestCase):
     self.assertEqual(query.graphql_string, expected)
 
 
-class TestSelectionModification(unittest.TestCase):
+class TestSelectionFunctions(unittest.TestCase):
   def test_add_selection_1(self):
     expected = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
       Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
@@ -203,8 +203,89 @@ class TestSelectionModification(unittest.TestCase):
 
     self.assertEqual(new_selection, expected)
 
+  def test_remove_selection_3(self):
+    expected = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [])
 
-class TestQueryModification(unittest.TestCase):
+    og_selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    new_selection = Selection.remove_selection(
+      og_selection,
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [])
+    )
+
+    self.assertEqual(new_selection, expected)
+
+  def test_contains_1(self):
+    selection = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    s2 = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    self.assertEqual(Selection.contains(selection, s2), True)
+
+  def test_contains_2(self):
+    selection = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    s2 = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    self.assertEqual(Selection.contains(selection, s2), False)
+
+  def test_select_1(self):
+    expected = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    selection = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    s2 = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    self.assertEqual(Selection.select(selection, s2), expected)
+
+  def test_select_2(self):
+    expected = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    s2 = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [])
+    ])
+
+    self.assertEqual(Selection.select(selection, s2), expected)
+
+
+class TestQueryFunctions(unittest.TestCase):
   def test_add_selection_1(self):
     expected = Query(
       None,
@@ -381,3 +462,78 @@ class TestQueryModification(unittest.TestCase):
     )
 
     self.assertEqual(new_query, expected)
+
+  def test_select_1(self):
+    expected = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+        ])
+      ],
+      []
+    )
+
+    selection = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+          Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+        ])
+      ],
+      []
+    )
+
+    s2 = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+          Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+        ])
+      ],
+      []
+    )
+
+    self.assertEqual(Query.select(selection, s2), expected)
+
+  def test_select_2(self):
+    expected = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ],
+      []
+    )
+
+    selection = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ],
+      []
+    )
+
+    s2 = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [])
+        ])
+      ],
+      []
+    )
+
+    self.assertEqual(Query.select(selection, s2), expected)

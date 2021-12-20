@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable
+from typing import Any, Callable, Tuple
 from functools import partial
 
-from subgrounds.query import DataRequest, Document, InputValue, Query, Selection, VariableDefinition
+from subgrounds.query import DataRequest, Document, Query, Selection
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.utils import flatten
 import subgrounds.client as client
@@ -213,16 +213,34 @@ class LocalSyntheticField(Transform):
     return data
 
 
+# TODO: Test split transform
 class SplitTransform(Transform):
   def __init__(self, selection: Selection) -> None:
     self.selection = selection
 
   def transform_request(self, req: DataRequest) -> DataRequest:
-    return req
+    def split(doc: Document) -> list[Document]:
+      if Query.contains(doc.query, self.selection):
+        return [
+          Document(doc.url, Query.remove_selection(doc.query, self.selection), doc.fragments),
+          Document(doc.url, Query.select(doc.query, self.selection), doc.fragments)
+        ]
+      else:
+        return [doc]
+
+    return DataRequest(
+      documents=flatten(map(split, req.documents))
+    )
 
   def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return super().transform_response(req, data)
+    def transform(docs: list[Document], data: list[dict[str, Any]], acc: list[dict[str, Any]]) -> list[dict[str, Any]]:
+      match (docs, data):
+        case ([doc, *docs_rest], [d1, d2, *data_rest]) if Query.contains(doc.query, self.selection):
+          return transform(docs_rest, data_rest, [*acc, client.merge_list(d1, d2)])
+        case ([], []):
+          return acc
 
+    return transform(req.documents, data, [])
 
 # class PaginationTransform(Transform):
 #   def transform_request(self, req: DataRequest) -> DataRequest:
