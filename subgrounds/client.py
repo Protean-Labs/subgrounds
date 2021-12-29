@@ -119,7 +119,7 @@ def query(url: str, query_str: str, variables: dict[str, Any] = {}) -> dict[str,
     raise Exception(resp['errors']) from exn
 
 
-def merge_list(d1: dict, d2: dict) -> dict[str, Any]:
+def merge_data(d1: dict, d2: dict) -> dict[str, Any]:
   match (d1, d2):
     case (list(), list()):
       return d1 + d2
@@ -127,7 +127,7 @@ def merge_list(d1: dict, d2: dict) -> dict[str, Any]:
     case (dict(), dict()):
       data = {}
       for key in d1:
-        data[key] = merge_list(d1[key], d2[key])
+        data[key] = merge_data(d1[key], d2[key])
       return data
 
     case (val1, _):
@@ -136,7 +136,7 @@ def merge_list(d1: dict, d2: dict) -> dict[str, Any]:
 
 def repeat(url: str, query_str: str, variables: list[dict[str, Any]]) -> dict[str, Any]:
   return reduce(
-    merge_list,
+    merge_data,
     [query(url, query_str, vars) for vars in variables]
   )
 

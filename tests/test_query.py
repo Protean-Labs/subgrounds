@@ -537,3 +537,61 @@ class TestQueryFunctions(unittest.TestCase):
     )
 
     self.assertEqual(Query.select(selection, s2), expected)
+
+  def test_contains_1(self):
+    query = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ],
+      []
+    )
+
+    q = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [])
+        ])
+      ],
+      []
+    )
+
+    self.assertEqual(Query.contains(query, q), True)
+
+  def test_contains_2(self):
+    query = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ],
+      []
+    )
+
+    q = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ],
+      []
+    )
+
+    self.assertEqual(Query.contains(query, q), True)
+    

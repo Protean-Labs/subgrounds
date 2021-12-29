@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Tuple
+from typing import Any, Callable
 from functools import partial
 
 from subgrounds.query import DataRequest, Document, Query, Selection
@@ -215,15 +215,15 @@ class LocalSyntheticField(Transform):
 
 # TODO: Test split transform
 class SplitTransform(Transform):
-  def __init__(self, selection: Selection) -> None:
-    self.selection = selection
+  def __init__(self, query: Query) -> None:
+    self.query = query
 
   def transform_request(self, req: DataRequest) -> DataRequest:
     def split(doc: Document) -> list[Document]:
-      if Query.contains(doc.query, self.selection):
+      if Query.contains(doc.query, self.query):
         return [
-          Document(doc.url, Query.remove_selection(doc.query, self.selection), doc.fragments),
-          Document(doc.url, Query.select(doc.query, self.selection), doc.fragments)
+          Document(doc.url, Query.remove(doc.query, self.query), doc.fragments),
+          Document(doc.url, Query.select(doc.query, self.query), doc.fragments)
         ]
       else:
         return [doc]
@@ -232,15 +232,17 @@ class SplitTransform(Transform):
       documents=flatten(map(split, req.documents))
     )
 
+  # TODO: Fix transform_response
   def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     def transform(docs: list[Document], data: list[dict[str, Any]], acc: list[dict[str, Any]]) -> list[dict[str, Any]]:
       match (docs, data):
-        case ([doc, *docs_rest], [d1, d2, *data_rest]) if Query.contains(doc.query, self.selection):
-          return transform(docs_rest, data_rest, [*acc, client.merge_list(d1, d2)])
+        case ([doc, *docs_rest], [d1, d2, *data_rest]) if Query.contains(doc.query, self.query):
+          return transform(docs_rest, data_rest, [*acc, client.merge_data(d1, d2)])
         case ([], []):
           return acc
 
     return transform(req.documents, data, [])
+
 
 # class PaginationTransform(Transform):
 #   def transform_request(self, req: DataRequest) -> DataRequest:

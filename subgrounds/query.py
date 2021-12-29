@@ -1,8 +1,9 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from functools import partial, reduce
 from typing import Any, Callable, Optional, Tuple
-from pipe import *
+from pipe import map, where, take
 
 from subgrounds.schema import (
   TypeMeta,
@@ -206,10 +207,9 @@ class Selection:
   @staticmethod
   def contains(select: Selection, other: Selection) -> bool:
     if (select.fmeta == other.fmeta and rel_complement(other.selection, select.selection, key=lambda s: s.fmeta.name) == []):
-      return (
+      return all(
         other.selection
         | map(lambda s: Selection.contains(next(filter(lambda s_: s.fmeta.name == s_.fmeta.name, select.selection)), s))
-        | all(identity)
       )
     else:
       return False
@@ -226,14 +226,18 @@ class Selection:
         selection=list(
           other.selection
           | map(lambda s: next(
-            select.selection 
+            select.selection
             | where(lambda s_: s_.fmeta.name == s.fmeta.name)
             | map(lambda s_: Selection.select(s_, s))
             | take(1)
-            )
-          )
+          ))
         )
       )
+
+  # TODO: Function to recover an approximate selection from a JSON data object
+  @staticmethod
+  def of_json(data: dict) -> Selection:
+    pass
 
 
 @dataclass(frozen=True)
@@ -247,6 +251,11 @@ class Query:
 
   @property
   def graphql_string(self) -> str:
+    """ Returns a string containing a GraphQL query matching the current query
+
+    Returns:
+      str: The string containing the GraphQL query
+    """
     selection_str = "\n".join(
       [select.graphql_string(level=1) for select in self.selection]
     )
@@ -254,6 +263,16 @@ class Query:
 
   @staticmethod
   def add_selections(query: Query, new_selections: list[Selection]) -> Query:
+    """ Returns a new Query containing all selections in 'query' along with
+    the new selections in `new_selections`
+
+    Args:
+      query (Query): The query to which new selections are to be added
+      new_selections (list[Selection]): The new selections to be added to the query
+
+    Returns:
+      Query: A new `Query` objects containing all selections
+    """
     return Query(
       name=query.name,
       selection=union(
@@ -266,10 +285,33 @@ class Query:
 
   @staticmethod
   def add_selection(query: Query, new_selection: Selection) -> Query:
+    """ Same as `add_selections`, but for a single `new_selection`.
+
+    Args:
+      query (Query): The query to which new selections are to be added
+      new_selection (Selection): The new selection to be added to the query
+
+    Returns:
+      Query: A new `Query` objects containing all selections
+    """
     return Query.add_selections(query, [new_selection])
 
   @staticmethod
   def remove_selections(query: Query, selections_to_remove: list[Selection]) -> Query:
+    """ Returns a new `Query` object containing all selections in `query` minus the selections
+    sepcified in `selections_to_remove`.
+
+    Note: Selections in `selections_to_remove` do not need to be "full" selections (i.e.: a selections all the way to
+    leaves of the GraphQL schema).
+
+    Args:
+      query (Query): The query to which selections have to be removed
+      selections_to_remove (list[Selection]): The selections to remove from the query
+
+    Returns:
+      Query: A new `Query` object containing the original query selections without the
+      selections in `selections_to_remove`
+    """
     def combine(select: Selection, selection_to_remove: Selection) -> Optional[Selection]:
       if selection_to_remove.selection == []:
         return None
@@ -289,10 +331,68 @@ class Query:
 
   @staticmethod
   def remove_selection(query: Query, selection_to_remove: Selection) -> Query:
+    """ Same as `remove_selections` but for a single selection
+
+    Note: `selection_to_remove` does not need to be a "full" selection (i.e.: a selection all the way to
+    leaves of the GraphQL schema).
+
+    Example:
+    ```python
+    expected = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [])
+
+    og_selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    selection_to_remove = Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [])
+
+    new_selection = Selection.remove_selection(og_selection, selection_to_remove)
+    self.assertEqual(new_selection, expected)
+    ```
+
+    Args:
+        query (Query): The query to which a selection has to be removed
+        selection_to_remove (Selection): The selection to remove from the query
+
+    Returns:
+      Query: A new `Query` object containing the original query selections without the
+      selection `selection_to_remove`
+    """
     return Query.remove_selections(query, [selection_to_remove])
 
   @staticmethod
+  def remove(query: Query, other: Query) -> Query:
+    """ Same as `remove_selections` but takes another `Query` object as argument
+    instead of a list of selections
+
+    Note: `other` does not need to include "full" selections (i.e.: selections all the way to
+    leaves of the GraphQL schema).
+
+    Args:
+        query (Query): The query for which selections are to be removed
+        other (Query): A query containing selections that will be removed from `query`
+
+    Returns:
+      Query: A new `Query` object containing the original query selections without the
+      selections in `other`
+    """
+    return reduce(Query.remove_selection, other.selection, query)
+
+  @staticmethod
   def combine(query: Query, other: Query) -> Query:
+    """ Returns a new `Query` object containing the selections of both `query` and `other`
+
+    Args:
+      query (Query): A `Query` object
+      other (Query): Another `Query` object
+
+    Returns:
+      Query: A new `Query` object containing the selections of both `query` and `other`
+    """
     return Query(
       name=query.name,
       selection=union(
@@ -311,19 +411,54 @@ class Query:
   ) -> Query:
     return Query(
       name=query.name,
-      selection=list(map(selection_f, query.selection)),
-      variables=list(map(variable_f, query.variables))
+      selection=list(query.selection | map(selection_f)),
+      variables=list(query.variables | map(variable_f))
     )
 
   @staticmethod
-  def contains(query: Query, other: Selection) -> bool:
-    return (
+  def contains_selection(query: Query, selection: Selection) -> bool:
+    """ Returns True i.f.f. the `selection` is present in `query`
+
+    Args:
+      query (Query): A query object
+      selection (Selection): The selection to be found (or not) in `query`
+
+    Returns:
+      bool: True if the `selection` is present in `query`, otherwise False
+    """
+    return any(
       query.selection
-      | any(lambda select: Selection.contains(select, other))
+      | map(lambda select: Selection.contains(select, selection))
     )
 
   @staticmethod
-  def select(query: Query, other: Selection) -> Query:
+  def contains(query: Query, other: Query) -> bool:
+    """ Returns True i.f.f. all selections in `other` are contained in `query`. In other words,
+    returns true i.f.f. `other` is a subset of `query`.
+
+    Note: `other` does not need to include "full" selections (i.e.: selections all the way to
+    leaves of the GraphQL schema).
+
+    Args:
+      query (Query): The query that is to be checked
+      other (Query): The query that has to be in `query`
+
+    Returns:
+      bool: True i.f.f. all selections in `other` are contained in `query`, otherwise False
+    """
+    return all(other.selection | map(partial(Query.contains_selection, query)))
+
+  @staticmethod
+  def select(query: Query, other: Query) -> Query:
+    """ Returns a new Query
+
+    Args:
+        query (Query): [description]
+        other (Query): [description]
+
+    Returns:
+        Query: [description]
+    """
     return Query(
       name=query.name,
       selection=list(
@@ -333,8 +468,7 @@ class Query:
           | where(lambda s_: s_.fmeta.name == s.fmeta.name)
           | map(lambda s_: Selection.select(s_, s))
           | take(1)
-          )
-        )
+        ))
       ),
       variables=query.variables
     )
@@ -365,7 +499,7 @@ class Fragment:
     return Fragment(
       name=frag.name,
       type_=frag.type_,
-      selection=list(map(f, frag.selection))
+      selection=list(frag.selection | map(f))
     )
 
 
@@ -377,7 +511,7 @@ class Document:
 
   @property
   def graphql_string(self):
-    return '\n'.join([self.query.graphql_string, *map(lambda frag: frag.graphql_string, self.fragments)])
+    return '\n'.join([self.query.graphql_string, *list(self.fragments | map(lambda frag: frag.graphql_string))])
 
   @staticmethod
   def mk_single_query(url: str, query: Query) -> Document:
@@ -405,7 +539,7 @@ class Document:
     return Document(
       url=doc.url,
       query=query_f(doc.query),
-      fragments=list(map(fragment_f, doc.fragments))
+      fragments=list(doc.fragments | map(fragment_f))
     )
 
 
@@ -427,7 +561,7 @@ class DataRequest:
   @staticmethod
   def transform(req: DataRequest, f: Callable[[Document], Document]) -> DataRequest:
     return DataRequest(
-      documents=list(map(f, req.documents))
+      documents=list(req.documents | map(f))
     )
 
 

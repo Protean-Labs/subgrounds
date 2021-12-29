@@ -214,11 +214,10 @@ def mk_schema(json):
     case _ as json:
       raise ParsingError(f"mk_schema: {json}")
 
+
 # ================================================================
 # Utility functions
 # ================================================================
-
-
 def field_of_object(meta: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta, fname: str) -> TypeMeta.FieldMeta:
   match meta:
     case TypeMeta.ObjectMeta(fields=fields) | TypeMeta.InterfaceMeta(fields=fields):

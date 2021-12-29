@@ -2,7 +2,8 @@ import unittest
 
 from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection
 from subgrounds.schema import TypeMeta, TypeRef
-from subgrounds.transform import LocalSyntheticField, TypeTransform, chain_transforms, transform_response, transform_data_type, transform_request
+from subgrounds.transform import LocalSyntheticField, SplitTransform, TypeTransform, chain_transforms, transform_response, transform_data_type, transform_request
+import subgrounds.client as client
 
 
 class TestTransform(unittest.TestCase):
@@ -361,3 +362,141 @@ class TestQueryTransform(unittest.TestCase):
     data = chain_transforms(transforms, req)
 
     self.assertEqual(data, expected)
+
+  def test_merge_data_1(self):
+    expected = [
+      {
+        'pair': {
+          'token0': {
+            'id': '0x123',
+            'name': 'ABC Token',
+            'symbol': 'ABC'
+          }
+        }
+      }
+    ]
+
+    data1 = [
+      {
+        'pair': {
+          'token0': {
+            'id': '0x123',
+            'name': 'ABC Token',
+            'symbol': 'ABC'
+          }
+        }
+      }
+    ]
+
+    data2 = [
+      {
+        'pair': {
+          'token0': {
+            'id': '0x123'
+          }
+        }
+      }
+    ]
+
+    self.assertEqual(client.merge_data(data1, data2), expected)
+
+  def test_split_transform_1(self):
+    expected = DataRequest([
+      Document('abc', Query(None, [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ])),
+      Document('abc', Query(None, [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ]))
+    ])
+
+    req = DataRequest([
+      Document('abc', Query(None, [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ]))
+    ])
+
+    transform = SplitTransform(
+      Query(None, [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ])
+    )
+
+    self.assertEqual(transform.transform_request(req), expected)
+
+  def test_split_transform_2(self):
+    expected = [
+      {
+        'pair': {
+          'token0': {
+            'id': '0x123',
+            'name': 'ABC Token',
+            'symbol': 'ABC'
+          }
+        }
+      }
+    ]
+
+    data = [
+      {
+        'pair': {
+          'token0': {
+            'id': '0x123'
+          }
+        }
+      },
+      {
+        'pair': {
+          'token0': {
+            'id': '0x123',
+            'name': 'ABC Token',
+            'symbol': 'ABC'
+          }
+        }
+      }
+    ]
+
+    req = DataRequest([
+      Document('abc', Query(None, [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ]))
+    ])
+
+    transform = SplitTransform(
+      Query(None, [
+        Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+          Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+            Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+            Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+          ])
+        ])
+      ])
+    )
+
+    self.assertEqual(transform.transform_response(req, data), expected)
