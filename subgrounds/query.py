@@ -11,7 +11,8 @@ from subgrounds.schema import (
   TypeRef,
   typeref_of_input_field
 )
-from subgrounds.utils import filter_none, identity, intersection, rel_complement, union
+from subgrounds.utils import filter_none, identity, rel_complement, union
+import subgrounds.client as client
 
 
 # ================================================================
@@ -247,7 +248,7 @@ class Query:
 
   # Variables as query arguments, not the values of those variables
   # NOTE: Temporarily add the values with the definitions
-  variables: list[Tuple[VariableDefinition, Any]] = field(default_factory=list)
+  variables: list[VariableDefinition] = field(default_factory=list)
 
   @property
   def graphql_string(self) -> str:
@@ -259,7 +260,13 @@ class Query:
     selection_str = "\n".join(
       [select.graphql_string(level=1) for select in self.selection]
     )
-    return f"""query {{\n{selection_str}\n}}"""
+
+    if len(self.variables) > 0:
+      args_str = f'({", ".join([vardef.graphql_string for vardef in self.variables])})'
+    else:
+      args_str = ""
+
+    return f"""query{args_str} {{\n{selection_str}\n}}"""
 
   @staticmethod
   def add_selections(query: Query, new_selections: list[Selection]) -> Query:
@@ -509,6 +516,10 @@ class Document:
   query: Optional[Query]
   fragments: list[Fragment] = field(default_factory=list)
 
+  # A list of variable assignments. For non-repeating queries
+  # the list would be of length 1 (i.e.: only one set of query variable assignments)
+  variables: list[dict[str, Any]] = field(default_factory=list)
+
   @property
   def graphql_string(self):
     return '\n'.join([self.query.graphql_string, *list(self.fragments | map(lambda frag: frag.graphql_string))])
@@ -565,6 +576,19 @@ class DataRequest:
     )
 
 
+def execute(request: DataRequest) -> list:
+  def f(doc: Document) -> dict:
+    match doc.variables:
+      case []:
+        return client.query(doc.url, doc.graphql_string)
+      case [args]:
+        return client.query(doc.url, doc.graphql_string, args)
+      case args_list:
+        return client.repeat(doc.url, doc.graphql_string, args_list)
+
+  return list(request.documents | map(f))
+
+  
 # ================================================================
 # Utility functions
 # ================================================================

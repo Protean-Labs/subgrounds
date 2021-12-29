@@ -125,10 +125,11 @@ def merge_data(d1: dict, d2: dict) -> dict[str, Any]:
       return d1 + d2
 
     case (dict(), dict()):
-      data = {}
-      for key in d1:
-        data[key] = merge_data(d1[key], d2[key])
-      return data
+      # data = {}
+      # for key in d1:
+      #   data[key] = merge_data(d1[key], d2[key])
+      # return data
+      return [d1, d2]
 
     case (val1, _):
       return val1

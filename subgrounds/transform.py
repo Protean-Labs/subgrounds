@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Callable
 from functools import partial
 
-from subgrounds.query import DataRequest, Document, Query, Selection
+from subgrounds.query import DataRequest, Document, Query, Selection, execute
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.utils import flatten
 import subgrounds.client as client
@@ -112,7 +112,8 @@ def transform_data_type(type_: TypeRef.T, f: Callable, req: DataRequest, data: l
 def chain_transforms(transforms: list[Transform], req: DataRequest) -> dict:
   match transforms:
     case []:
-      return list(map(lambda doc: client.query(doc.url, doc.graphql_string), req.documents))
+      return execute(req)
+      # return list(map(lambda doc: client.query(doc.url, doc.graphql_string), req.documents))
     case [transform, *rest]:
       new_req = transform.transform_request(req)
       data = chain_transforms(rest, new_req)

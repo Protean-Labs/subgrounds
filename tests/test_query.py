@@ -1,6 +1,6 @@
 import unittest
 
-from subgrounds.query import Argument, Query, Selection, InputValue
+from subgrounds.query import Argument, DataRequest, Document, Query, Selection, InputValue, VariableDefinition, execute
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.subgraph import Subgraph, SyntheticField
 
@@ -93,6 +93,76 @@ class TestQueryString(unittest.TestCase):
     ])
 
     self.assertEqual(query.graphql_string, expected)
+
+  def test_graphql_string_3(self):
+    expected = """query($tokenId: String!) {
+  token(id: $tokenId) {
+    id
+    name
+    symbol
+  }
+}"""
+
+    query = Query(
+      None,
+      [
+        Selection(TypeMeta.FieldMeta('token', '', [], TypeRef.non_null_list('Token')), None, [Argument('id', InputValue.Variable('tokenId'))], [
+          Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+          Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+          Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ],
+      [
+        VariableDefinition('tokenId', TypeRef.non_null('String'))
+      ]
+    )
+
+    self.assertEqual(query.graphql_string, expected)
+
+class TestExecution(unittest.TestCase):
+  def test_execute_1(self):
+    expected = [[
+      {
+        'token': {
+          'id': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          'name': 'USD//C',
+          'symbol': 'USDC'
+        }
+      },
+      {
+        'token': {
+          'id': '0x6b175474e89094c44da98b954eedeac495271d0f',
+          'name': 'Dai Stablecoin',
+          'symbol': 'DAI'
+        }
+      }
+    ]]
+
+    req = DataRequest(documents=[
+      Document(
+        'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
+        Query(None, [
+          Selection(
+            TypeMeta.FieldMeta('token', '', [], TypeRef.non_null_list('Token')),
+            None,
+            [
+              Argument('id', InputValue.Variable('tokenId')),
+            ],
+            [
+              Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+              Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+              Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+            ]
+          )
+        ], [VariableDefinition('tokenId', TypeRef.non_null('String'))]),
+        variables=[
+          {'tokenId': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'},
+          {'tokenId': '0x6b175474e89094c44da98b954eedeac495271d0f'}
+        ]
+      )
+    ])
+
+    self.assertEqual(execute(req), expected)
 
 
 class TestSelectionFunctions(unittest.TestCase):
