@@ -136,8 +136,20 @@ def merge_data(d1: dict, d2: dict) -> dict[str, Any]:
 
 
 def repeat(url: str, query_str: str, variables: list[dict[str, Any]]) -> dict[str, Any]:
+  def merge(data1, data2):
+    match (data1, data2):
+      case (list(), list()):
+        return data1 + data2
+      case (dict(), dict()):
+        data = {}
+        for key in data1:
+          data[key] = merge_data(data1[key], data2[key])
+        return data
+      case (val1, _):
+        return val1
+
   return reduce(
-    merge_data,
+    merge,
     [query(url, query_str, vars) for vars in variables]
   )
 

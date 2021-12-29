@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable
+from typing import Any, Callable, Tuple
 from functools import partial
 
-from subgrounds.query import DataRequest, Document, Query, Selection, execute
+from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition, execute, pagination_args
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.utils import flatten
 import subgrounds.client as client
@@ -245,32 +245,84 @@ class SplitTransform(Transform):
     return transform(req.documents, data, [])
 
 
-# class PaginationTransform(Transform):
-#   def transform_request(self, req: DataRequest) -> DataRequest:
-#     config = {'counter': 0}
+class PaginationTransform(Transform):
+  def __init__(self, page_size) -> None:
+    self.page_size = page_size
 
-#     def replace_first_with_var(selection: Selection, values: dict[str, int]) -> None:
-#       try:
-#         arg = next(filter(lambda arg: arg.name == 'first', selection.arguments))
-#         values[f'first{config["counter"]}'] = arg.value
-#         arg.value = InputValue.Variable(name=f'first{config["counter"]}')
-#         config['counter'] += 1
-#       except StopIteration:
-#         pass
+  def requires_pagination(self, doc: Document) -> bool:
+    return (
+      Query.contains_argument(doc.query, 'first')
+      and Query.get_argument(doc.query, 'first').value.is_number
+      and Query.get_argument(doc.query, 'first').value.value > self.page_size
+      and not Query.contains_argument(doc.query, 'skip')
+    )
 
-#       for inner_select in selection.selection:
-#         replace_first_with_var(inner_select, values)
+  def transform_request(self, req: DataRequest) -> DataRequest:
+    """
+    for doc in req.documents:
+      if doc.query.selection contains 'first' argument
+        and 'first' argument is a value larger than page_size
+        and no 'skip' argument
+      then
+        return Document(
+          Query(
+            name=doc.query.name
+            selection=[
+              replace 'first' value with 'first' and 'skip' variables for selection in doc.query.selection
+            ],
+            variables: [
+              VariableDefinition('first', 'Int!'),
+              VariableDefinition('skip', 'Int!')
+            ]
+          ),
+          variables = [
+            {'first': page_size, 'skip': 0 * page_size},
+            {'first': page_size, 'skip': 1 * page_size},
+            {'first': page_size, 'skip': 2 * page_size},
+            {'first': page_size, 'skip': 3 * page_size},
+            ...
+          ]
+        )
+      else
+        return doc
+    """
 
-#     values = {}
-#     for selection in query.selection:
-#       replace_first_with_var(selection, values)
-#       for key, value in values.items():
-#         query.variables.append((VariableDefinition(name=key, type_=TypeRef.Named("Int")), value))
+    def transform_doc_with_first_argument(doc: Document) -> Document:
+      args = pagination_args(self.page_size, Query.get_argument(doc.query, 'first').value.value)
+      query_new_args = Query.substitute_arg(doc.query, 'first', [
+        Argument('first', InputValue.Variable('first')),
+        Argument('skip', InputValue.Variable('skip'))
+      ])
 
-#     return query
+      return Document(
+        url=doc.url,
+        query=Query(
+          name=query_new_args.name,
+          selection=query_new_args.selection,
+          variables=[
+            VariableDefinition('first', TypeRef.non_null('Int')),
+            VariableDefinition('skip', TypeRef.non_null('Int'))
+          ]
+        ),
+        fragments=doc.fragments,
+        variables=args if len(doc.variables) == 0 else [{**args, **doc.variables[0]} for args in args]
+      )
 
-#   def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-#     return data
+    def transform_doc(doc: Document) -> Document:
+      if (
+        Query.contains_argument(doc.query, 'first')
+        and Query.get_argument(doc.query, 'first').value.is_number
+        and Query.get_argument(doc.query, 'first').value.value > self.page_size
+        and not Query.contains_argument(doc.query, 'skip')
+      ):
+        return transform_doc_with_first_argument(doc)
+      else:
+        return doc
+
+    return DataRequest.transform(req, transform_doc)
+
+  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return data
 
 
 DEFAULT_TRANSFORMS: list[Transform] = [

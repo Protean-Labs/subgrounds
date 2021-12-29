@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial, reduce
 from typing import Any, Callable, Optional, Tuple
-from pipe import map, where, take
+from pipe import map, traverse, where, take
+import math
 
 from subgrounds.schema import (
   TypeMeta,
@@ -26,6 +27,14 @@ class InputValue:
     def graphql_string(self) -> str:
       pass
 
+    @property
+    def is_variable(self) -> bool:
+      return False
+
+    @property
+    def is_number(self) -> bool:
+      return False
+
   @dataclass(frozen=True)
   class Null(T):
     @property
@@ -40,6 +49,10 @@ class InputValue:
     def graphql_string(self) -> str:
       return str(self.value)
 
+    @property
+    def is_number(self) -> bool:
+      return True
+
   @dataclass(frozen=True)
   class Float(T):
     value: float
@@ -47,6 +60,10 @@ class InputValue:
     @property
     def graphql_string(self) -> str:
       return str(self.value)
+
+    @property
+    def is_number(self) -> bool:
+      return True
 
   @dataclass(frozen=True)
   class String(T):
@@ -79,6 +96,10 @@ class InputValue:
     @property
     def graphql_string(self) -> str:
       return f'${self.name}'
+
+    @property
+    def is_variable(self) -> bool:
+      return True
 
   @dataclass(frozen=True)
   class List(T):
@@ -214,6 +235,36 @@ class Selection:
       )
     else:
       return False
+
+  @staticmethod
+  def contains_argument(select: Selection, arg_name: str) -> bool:
+    try:
+      next(filter(lambda arg: arg.name == arg_name, select.arguments))
+      return True
+    except StopIteration:
+      return any(select.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
+
+  @staticmethod
+  def get_argument(select: Selection, arg_name: str) -> Optional[Argument]:
+    try:
+      return next(filter(lambda arg: arg.name == arg_name, select.arguments))
+    except StopIteration:
+      return next(select.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
+
+  @staticmethod
+  def substitute_arg(select: Selection, arg_name: str, replacement: Argument | list[Argument]) -> Selection:
+    return Selection(
+      fmeta=select.fmeta,
+      arguments=list(
+        select.arguments
+        | map(lambda arg: replacement if arg.name == arg_name else arg)
+        | traverse
+      ),
+      selection=list(
+        select.selection
+        | map(partial(Selection.substitute_arg, arg_name=arg_name, replacement=replacement))
+      )
+    )
 
   @staticmethod
   def select(select: Selection, other: Selection) -> Selection:
@@ -413,7 +464,7 @@ class Query:
   @staticmethod
   def transform(
     query: Query,
-    variable_f: Callable[[Tuple[VariableDefinition, Any]], Tuple[VariableDefinition, Any]] = identity,
+    variable_f: Callable[[VariableDefinition], VariableDefinition] = identity,
     selection_f: Callable[[Selection], Selection] = identity
   ) -> Query:
     return Query(
@@ -436,6 +487,25 @@ class Query:
     return any(
       query.selection
       | map(lambda select: Selection.contains(select, selection))
+    )
+
+  @staticmethod
+  def contains_argument(query: Query, arg_name: str) -> bool:
+    return any(query.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
+
+  @staticmethod
+  def get_argument(query: Selection, arg_name: str) -> Optional[Argument]:
+    return next(query.selection | map(partial(Selection.get_argument, arg_name=arg_name)))
+
+  @staticmethod
+  def substitute_arg(query: Query, arg_name: str, replacement: Argument | list[Argument]) -> Query:
+    return Query(
+      name=query.name,
+      selection=list(
+        query.selection
+        | map(partial(Selection.substitute_arg, arg_name=arg_name, replacement=replacement))
+      ),
+      variables=query.variables
     )
 
   @staticmethod
@@ -751,3 +821,13 @@ def selection_of_path(
       )]
     case []:
       return []
+
+
+def pagination_args(page_size: int, num_entities: int) -> list[dict[str, int]]:
+  num_pages = math.ceil(num_entities / page_size)
+  
+  return [
+    {'first': num_entities % page_size, 'skip': i * page_size} if (i == num_pages - 1 and num_entities % page_size != 0)
+    else {'first': page_size, 'skip': i * page_size}
+    for i in range(0, num_pages)
+  ]

@@ -9,7 +9,7 @@ import operator
 
 import subgrounds.client as client
 import subgrounds.schema as schema
-from subgrounds.query import Query, Selection, arguments_of_field_args, selection_of_path
+from subgrounds.query import DataRequest, Query, Selection, arguments_of_field_args, selection_of_path
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
 from subgrounds.transform import DEFAULT_TRANSFORMS, LocalSyntheticField, Transform, chain_transforms
 from subgrounds.utils import identity
@@ -437,8 +437,8 @@ class Subgraph:
 
     self.transforms = [transform, *self.transforms]
 
-  def query(self, query: Query) -> dict:
-    return chain_transforms(self.transforms, query, self.url)
+  def query(self, req: DataRequest) -> list[dict]:
+    return chain_transforms(self.transforms, req)
 
   def __getattribute__(self, __name: str) -> Any:
     try:

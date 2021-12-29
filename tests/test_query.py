@@ -119,6 +119,7 @@ class TestQueryString(unittest.TestCase):
 
     self.assertEqual(query.graphql_string, expected)
 
+
 class TestExecution(unittest.TestCase):
   def test_execute_1(self):
     expected = [[
