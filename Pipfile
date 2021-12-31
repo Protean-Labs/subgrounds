@@ -12,6 +12,9 @@ dash = "*"
 nose2 = "*"
 flake8 = "*"
 pylint = "*"
+setuptools = "*"
+build = "*"
+twine = "*"
 
 [dev-packages]
 
