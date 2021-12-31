@@ -17,6 +17,6 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License"
     ],
     package_dir={"": "subgrounds"},
-    packages=setuptools.find_packages(where="subgrounds"),
+    packages=setuptools.find_packages(exclude=["tests", "examples"]),
     python_requires=">=3.10",
 )
