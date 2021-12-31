@@ -2,8 +2,8 @@
 A framework for integrating The Graph data with dash components
 
 ## Installation
-Clone this repository. Then run the following in the repository root:
-`pipenv install`
+Subgrounds is available on PyPi. To install it, run the following:
+`pip install subgrounds`.
 
 ## Usage
 Generate the subgraph object

@@ -1,5 +1,4 @@
 ## Running the examples
-Since `subgrounds` is not yet available as a PyPi package, to run an example dash app, copy the example's Python file to the root directory of the project and run:
+Install subgrounds with your favorite Python dependency manager. E.g.: `pip install subgrounds`.
 
-
-`pipenv run python <example.py>`
+Run the examples, e.g.: `python bar_chart.py`
