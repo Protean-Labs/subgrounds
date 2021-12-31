@@ -25,14 +25,29 @@ class InputValue:
     @property
     @abstractmethod
     def graphql_string(self) -> str:
+      """ Returns a GraphQL string representation of the input value
+
+      Returns:
+        str: The GraphQL string representation of the input value
+      """
       pass
 
     @property
     def is_variable(self) -> bool:
+      """ Returns True i.f.f. the input value is of type Variable
+
+      Returns:
+        bool: True i.f.f. the input value is of type Variable, otherwise False
+      """
       return False
 
     @property
     def is_number(self) -> bool:
+      """ Returns True i.f.f. the input value is of type Float or Int
+
+      Returns:
+        bool: True i.f.f. the input value is of type Float or Int, otherwise False
+      """
       return False
 
   @dataclass(frozen=True)
@@ -144,6 +159,14 @@ class Argument:
 
 @dataclass(frozen=True)
 class Selection:
+  """ 
+
+  Raises:
+    Exception: [description]
+
+  Returns:
+    [type]: [description]
+  """
   fmeta: TypeMeta.FieldMeta
   alias: Optional[str] = None
   arguments: list[Argument] = field(default_factory=list)

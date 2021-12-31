@@ -137,7 +137,7 @@ class SyntheticField(FieldOperatorMixin):
   subgraph: Subgraph
   f: Callable
   type_: TypeRef.T
-  deps: list[FieldPath | SyntheticField]
+  deps: list[FieldPath]
 
   def __init__(self, subgraph: Subgraph, f: Callable, type_: TypeRef.T, *deps: list[FieldPath | SyntheticField]) -> None:
     self.subgraph = subgraph
@@ -433,7 +433,7 @@ class Subgraph:
       self,
       fmeta,
       sfield.f,
-      [dep.selection for dep in sfield.deps]
+      [FieldPath.selection(dep) for dep in sfield.deps]
     )
 
     self.transforms = [transform, *self.transforms]
