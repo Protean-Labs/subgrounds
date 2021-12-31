@@ -9,7 +9,7 @@ import operator
 
 import subgrounds.client as client
 import subgrounds.schema as schema
-from subgrounds.query import DataRequest, Query, Selection, arguments_of_field_args, selection_of_path
+from subgrounds.query import DataRequest, Document, Query, Selection, arguments_of_field_args, selection_of_path
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
 from subgrounds.transform import DEFAULT_TRANSFORMS, LocalSyntheticField, Transform, chain_transforms
 from subgrounds.utils import identity
@@ -415,9 +415,10 @@ class Subgraph:
 
     return Subgraph(url, mk_schema(schema), DEFAULT_TRANSFORMS)
 
-  @staticmethod
-  def mk_query(fpaths: List[FieldPath]) -> Query:
-    return reduce(Query.add_selection, map(FieldPath.selection, fpaths), Query())
+  def mk_request(self, fpaths: List[FieldPath]) -> DataRequest:
+    return DataRequest([
+      Document(self.url, reduce(Query.add_selection, map(FieldPath.selection, fpaths), Query()))
+    ])
 
   def add_synthetic_field(
     self,
@@ -437,7 +438,7 @@ class Subgraph:
 
     self.transforms = [transform, *self.transforms]
 
-  def query(self, req: DataRequest) -> list[dict]:
+  def query(self, req: DataRequest) -> list[list[dict]]:
     return chain_transforms(self.transforms, req)
 
   def __getattribute__(self, __name: str) -> Any:
