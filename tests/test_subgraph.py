@@ -2,7 +2,7 @@ import unittest
 
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef
 from subgrounds.subgraph import FieldPath, Filter, Object, Subgraph, SyntheticField
-from subgrounds.query import Argument, InputValue, Query, Selection
+from subgrounds.query import Argument, DataRequest, InputValue, Query, Selection
 from subgrounds.utils import identity
 
 from tests.utils import schema
@@ -638,8 +638,8 @@ class TestQueryBuilding(unittest.TestCase):
   def tearDown(self) -> None:
     SyntheticField.counter = 0
 
-  def test_mk_query_1(self):
-    expected = Query(selection=[
+  def test_mk_request_1(self):
+    expected = DataRequest.single_query("", Query(selection=[
       Selection(
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
@@ -655,9 +655,9 @@ class TestQueryBuilding(unittest.TestCase):
           ])
         ]
       )
-    ])
+    ]))
 
-    query = Subgraph.mk_query([
+    query = self.subgraph.mk_request([
       self.subgraph.Query.pairs(first=10).id,
       self.subgraph.Query.pairs.token0.symbol
     ])
@@ -666,8 +666,8 @@ class TestQueryBuilding(unittest.TestCase):
     self.maxDiff = None
     self.assertEqual(query, expected)
 
-  def test_mk_query_2(self):
-    expected = Query(selection=[
+  def test_mk_request_2(self):
+    expected = DataRequest.single_query("", Query(selection=[
       Selection(
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
@@ -681,12 +681,12 @@ class TestQueryBuilding(unittest.TestCase):
           Selection(TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')))
         ]
       )
-    ])
+    ]))
 
     Pair = self.subgraph.Pair
     Pair.token0Id = Pair.token0.id
 
-    query = Subgraph.mk_query([
+    query = self.subgraph.mk_request([
       self.subgraph.Query.pairs(first=10).id,
       self.subgraph.Query.pairs.token0Id
     ])
@@ -695,18 +695,18 @@ class TestQueryBuilding(unittest.TestCase):
     self.maxDiff = None
     self.assertEqual(query, expected)
 
-  def test_mk_query_3(self):
-    expected = Query(selection=[
+  def test_mk_request_3(self):
+    expected = DataRequest.single_query("", Query(selection=[
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), selection=[
         Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
         Selection(TypeMeta.FieldMeta('price', '', [], TypeRef.Named('Float')))
       ])
-    ])
+    ]))
 
     Swap = self.subgraph.Swap
     Swap.price = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
 
-    query = Subgraph.mk_query([
+    query = self.subgraph.mk_request([
       self.subgraph.Query.swaps.timestamp,
       self.subgraph.Query.swaps.price
     ])

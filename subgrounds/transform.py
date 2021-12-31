@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Tuple
 from functools import partial
+from pipe import *
 
 from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition, execute, pagination_args
 from subgrounds.schema import TypeMeta, TypeRef
-from subgrounds.utils import flatten
+from subgrounds.utils import flatten, union
 import subgrounds.client as client
 
 
@@ -26,7 +27,7 @@ def transform_request(fmeta: TypeMeta.FieldMeta, replacement: list[Selection], r
       case Selection(_, _, _, [] | None):
         return [select]
       case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
-        new_inner_select = flatten(list(map(transform, inner_select)))
+        new_inner_select = list(inner_select | map(transform) | traverse)
         return Selection(select_fmeta, alias, args, new_inner_select)
       case _:
         raise Exception(f"transform_request: unhandled selection {select}")
@@ -44,7 +45,7 @@ def select_data(select: Selection, data: dict) -> list[Any]:
     case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name in data:
       return [data[name]]
     case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data) if name in data:
-      return flatten(list(map(partial(select_data, data=data[name]), inner_select)))
+      return list(inner_select | map(partial(select_data, data=data[name])) | traverse)
     case (select, data):
       raise Exception(f"select_data: invalid selection {select} for data {data}")
 
@@ -53,7 +54,7 @@ def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: list[Sel
   def transform(select: Selection, data: dict) -> None:
     match (select, data):
       case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == fmeta.name and name not in data:
-        arg_values = flatten(list(map(partial(select_data, data=data), args)))
+        arg_values = list(args | map(partial(select_data, data=data)) | traverse)
         data[name] = func(*arg_values)
       case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data):
         pass
@@ -174,7 +175,7 @@ class LocalSyntheticField(Transform):
         case Selection(_, _, _, [] | None):
           return [select]
         case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
-          new_inner_select = flatten(list(map(transform, inner_select)))
+          new_inner_select = flatten(list(inner_select | map(transform)))
           return Selection(select_fmeta, alias, args, new_inner_select)
         case _:
           raise Exception(f"transform_request: unhandled selection {select}")
@@ -188,7 +189,7 @@ class LocalSyntheticField(Transform):
     def transform(select: Selection, data: dict) -> None:
       match (select, data):
         case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
-          arg_values = flatten(list(map(partial(select_data, data=data), self.args)))
+          arg_values = flatten(list(self.args | map(partial(select_data, data=data))))
           data[name] = self.f(*arg_values)
         case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data):
           pass
@@ -230,15 +231,35 @@ class SplitTransform(Transform):
         return [doc]
 
     return DataRequest(
-      documents=flatten(map(split, req.documents))
+      documents=list(req.documents | map(split) | traverse)
     )
 
   # TODO: Fix transform_response
   def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def merge_data(data1: dict | list | Any, data2: dict | list | Any) -> dict:
+      match (data1, data2):
+        case (dict(), dict()):
+          return dict(union(
+            list(data1.items()),
+            list(data2.items()),
+            key=lambda item: item[0],
+            combine=lambda item1, item2: (item1[0], merge_data(item1[1], item2[1]))
+          ))
+        
+        case (list(), list()):
+          return list(
+            zip(data1, data2)
+            | map(lambda tup: merge_data(tup[0], tup[1]))
+          )
+
+        case (value, _):
+          return value
+
+
     def transform(docs: list[Document], data: list[dict[str, Any]], acc: list[dict[str, Any]]) -> list[dict[str, Any]]:
       match (docs, data):
         case ([doc, *docs_rest], [d1, d2, *data_rest]) if Query.contains(doc.query, self.query):
-          return transform(docs_rest, data_rest, [*acc, client.merge_data(d1, d2)])
+          return transform(docs_rest, data_rest, [*acc, merge_data(d1, d2)])
         case ([], []):
           return acc
 

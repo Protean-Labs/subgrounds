@@ -668,6 +668,16 @@ class DataRequest:
       documents=list(req.documents | map(f))
     )
 
+  @staticmethod
+  def single_query(url: str, query: Query) -> DataRequest:
+    return DataRequest([
+      Document(url, query)
+    ])
+
+  @staticmethod
+  def single_document(doc: Document) -> DataRequest:
+    return DataRequest([doc])
+
 
 def execute(request: DataRequest) -> list:
   def f(doc: Document) -> dict:

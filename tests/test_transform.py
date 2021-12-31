@@ -364,42 +364,42 @@ class TestQueryTransform(unittest.TestCase):
 
     self.assertEqual(data, expected)
 
-  def test_merge_data_1(self):
-    expected = [
-      {
-        'pair': {
-          'token0': {
-            'id': '0x123',
-            'name': 'ABC Token',
-            'symbol': 'ABC'
-          }
-        }
-      }
-    ]
+  # def test_merge_data_1(self):
+  #   expected = [
+  #     {
+  #       'pair': {
+  #         'token0': {
+  #           'id': '0x123',
+  #           'name': 'ABC Token',
+  #           'symbol': 'ABC'
+  #         }
+  #       }
+  #     }
+  #   ]
 
-    data1 = [
-      {
-        'pair': {
-          'token0': {
-            'id': '0x123',
-            'name': 'ABC Token',
-            'symbol': 'ABC'
-          }
-        }
-      }
-    ]
+  #   data1 = [
+  #     {
+  #       'pair': {
+  #         'token0': {
+  #           'id': '0x123',
+  #           'name': 'ABC Token',
+  #           'symbol': 'ABC'
+  #         }
+  #       }
+  #     }
+  #   ]
 
-    data2 = [
-      {
-        'pair': {
-          'token0': {
-            'id': '0x123'
-          }
-        }
-      }
-    ]
+  #   data2 = [
+  #     {
+  #       'pair': {
+  #         'token0': {
+  #           'id': '0x123'
+  #         }
+  #       }
+  #     }
+  #   ]
 
-    self.assertEqual(client.merge_data(data1, data2), expected)
+  #   self.assertEqual(client.merge_data(data1, data2), expected)
 
   def test_split_transform_1(self):
     expected = DataRequest([

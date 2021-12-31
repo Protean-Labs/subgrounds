@@ -84,7 +84,7 @@ class TestQueryString(unittest.TestCase):
       orderDirection='desc'
     )
 
-    query = self.subgraph.mk_query([
+    req = self.subgraph.mk_request([
       pairs.id,
       pairs.token0.name,
       pairs.token0.symbol,
@@ -92,7 +92,7 @@ class TestQueryString(unittest.TestCase):
       pairs.token1.symbol,
     ])
 
-    self.assertEqual(query.graphql_string, expected)
+    self.assertEqual(req.documents[0].query.graphql_string, expected)
 
   def test_graphql_string_3(self):
     expected = """query($tokenId: String!) {
@@ -122,22 +122,22 @@ class TestQueryString(unittest.TestCase):
 
 class TestExecution(unittest.TestCase):
   def test_execute_1(self):
-    expected = [[
+    expected = [
       {
-        'token': {
-          'id': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-          'name': 'USD//C',
-          'symbol': 'USDC'
-        }
-      },
-      {
-        'token': {
-          'id': '0x6b175474e89094c44da98b954eedeac495271d0f',
-          'name': 'Dai Stablecoin',
-          'symbol': 'DAI'
-        }
+        'token': [
+          {
+            'id': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+            'name': 'USD//C',
+            'symbol': 'USDC'
+          },
+          {
+            'id': '0x6b175474e89094c44da98b954eedeac495271d0f',
+            'name': 'Dai Stablecoin',
+            'symbol': 'DAI'
+          }
+        ]
       }
-    ]]
+    ]
 
     req = DataRequest(documents=[
       Document(
