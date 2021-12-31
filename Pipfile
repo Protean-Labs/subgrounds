@@ -15,6 +15,7 @@ pylint = "*"
 setuptools = "*"
 build = "*"
 twine = "*"
+pipe = "*"
 
 [dev-packages]
 

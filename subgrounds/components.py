@@ -50,8 +50,8 @@ class EntityTable(dash_table.DataTable):
     )
     selection = [FieldPath.extend(entrypoint, s) for s in selection]
 
-    query = Subgraph.mk_query(selection)
-    data = entrypoint.subgraph.query(query)[entrypoint.root.type_.name]
+    query = entrypoint.subgraph.mk_request(selection)
+    data = entrypoint.subgraph.query(query)[0][entrypoint.root.name]
 
     # Generate table
     cols = list(columns(data[0]))
@@ -109,8 +109,8 @@ class BarChart(Component):
   def make_figure(self, **kwargs):
     selection = [FieldPath.extend(self.entrypoint, s) for s in self.selection]
 
-    query = Subgraph.mk_query(selection)
-    data = self.entrypoint.subgraph.query(query)
+    req = self.entrypoint.subgraph.mk_request(selection)
+    data = self.entrypoint.subgraph.query(req)[0]
 
     data = [dict(values(row)) for row in data[self.entrypoint.root.name]]
 
@@ -141,8 +141,8 @@ class LinePlot(Component):
   def make_figure(self, **kwargs):
     selection = [FieldPath.extend(self.entrypoint, s) for s in self.selection]
 
-    query = Subgraph.mk_query(selection)
-    data = self.entrypoint.subgraph.query(query)
+    req = self.entrypoint.subgraph.mk_request(selection)
+    data = self.entrypoint.subgraph.query(req)[0]
 
     data = [dict(values(row)) for row in data[self.entrypoint.root.name]]
 
@@ -165,16 +165,16 @@ class Indicator(Component):
     if TypeRef.is_list(self.entrypoint.leaf.type_) or TypeRef.is_list(self.x.leaf.type_):
       selection = [FieldPath.extend(self.entrypoint, self.x)]
 
-      query = Subgraph.mk_query(selection)
-      data = self.entrypoint.subgraph.query(query)
+      req = self.entrypoint.subgraph.mk_request(selection)
+      data = self.entrypoint.subgraph.query(req)[0]
 
       data = [dict(values(row)) for row in data[self.entrypoint.root.name]]
       value = [row[self.x.longname] for row in data][0]
     else:
       selection = [FieldPath.extend(self.entrypoint, self.x)]
 
-      query = Subgraph.mk_query(selection)
-      data = self.entrypoint.subgraph.query(query)
+      req = self.entrypoint.subgraph.mk_request(selection)
+      data = self.entrypoint.subgraph.query(req)[0]
 
       value = data[self.entrypoint.root.type_][self.x.longname]
 
@@ -203,16 +203,16 @@ class IndicatorWithChange(Component):
     if TypeRef.is_list(self.entrypoint.leaf.type_) or TypeRef.is_list(self.x.leaf.type_):
       selection = [FieldPath.extend(self.entrypoint, self.x)]
 
-      query = Subgraph.mk_query(selection)
-      data = self.entrypoint.subgraph.query(query)
+      req = self.entrypoint.subgraph.mk_request(selection)
+      data = self.entrypoint.subgraph.query(req)[0]
 
       data = [dict(values(row)) for row in data[self.entrypoint.root.name]]
       value = [row[self.x.longname] for row in data][0]
     else:
       selection = [FieldPath.extend(self.entrypoint, self.x)]
 
-      query = Subgraph.mk_query(selection)
-      data = self.entrypoint.subgraph.query(query)
+      req = self.entrypoint.subgraph.mk_request(selection)
+      data = self.entrypoint.subgraph.query(req)[0]
 
       value = data[self.entrypoint.root.name][self.x.longname]
 
