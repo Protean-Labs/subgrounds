@@ -1,6 +1,9 @@
 # Subgrounds
 A framework for integrating The Graph data with dash components
 
+## WARNING
+Subgrounds is still in the very early stages of development. APIs can and will change (now is the time to make suggestions!). Some features are still incomplete. Documentation is sparse (but getting better). Expect the Subgrounds API to change frequently.
+
 ## Installation
 Subgrounds is available on PyPi. To install it, run the following:
 `pip install subgrounds`.
