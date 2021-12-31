@@ -1,10 +1,8 @@
-from math import exp
 import unittest
 
 from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.transform import LocalSyntheticField, PaginationTransform, SplitTransform, TypeTransform, chain_transforms, transform_response, transform_data_type, transform_request
-import subgrounds.client as client
 
 
 class TestTransform(unittest.TestCase):
