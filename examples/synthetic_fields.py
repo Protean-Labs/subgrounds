@@ -32,7 +32,6 @@ app.layout = html.Div(
     html.Div([
       LinePlot(
         Query.swaps,
-        component_id='price',
         orderBy=Swap.timestamp,
         orderDirection="desc",
         first=500,
@@ -40,7 +39,9 @@ app.layout = html.Div(
           Swap.pair == "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"
         ],
         x=Swap.datetime,
-        y=Swap.price1
+        y=Swap.price1,
+
+        component_id='price'
       )
     ])
   ])

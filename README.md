@@ -37,7 +37,9 @@ app.layout = html.Div(
         orderDirection="desc",
         first=100,
         x=Borrow.reserve.symbol,
-        y=Borrow.amount
+        y=Borrow.amount,
+
+        component_id='bar-chart'  # Component id used by Dash
       )
     ])
   ])
@@ -58,7 +60,7 @@ Generate the subgraph and define the synthetic fields
 ```python
 uniswapV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
 
-# Define the query object
+# Not necessary, but nice for brevity
 Query = uniswapV2.Query
 Swap = uniswapV2.Swap
 
@@ -67,14 +69,15 @@ Swap.price1 = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.
 
 # Synthetic field datetime is simply the timestamp of the swap formatted to ISO8601
 Swap.datetime = SyntheticField(
-  uniswapV2,
-  lambda timestamp: str(datetime.fromtimestamp(timestamp)),
-  Swap.timestamp
+  uniswapV2,                                                # The subgraph object on which a synthetic field is created
+  lambda timestamp: str(datetime.fromtimestamp(timestamp)), # The arbitrary transformation function that computes the synthetic field's value
+  TypeRef.Named('String'),                                  # The GraphQL type of the synthetic field
+  Swap.timestamp,                                           # The input(s) to the transformation function
 )
 ```
 
 Once synthetic fields are defined, they can be used in subgrounds graphical components just like regular fields. In this example, we are generating a line plot that plots the price of token1 in terms of token0 (the synthetic field `price1`) and the time of the swap for the last 100 swaps of the pair `0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc`.
-This pair address corresponds to the USDC-WETH pair, where USDC is token0 and WETH is token1. Therefore, price1 should be the price of WETH in USDC).
+This pair address corresponds to the USDC-WETH pair, where USDC is token0 and WETH is token1. Therefore, price1 should be the price of WETH in USDC.
 
 ```python
 app = dash.Dash(__name__)
@@ -85,7 +88,7 @@ app.layout = html.Div(
     html.Div(id='step-display'),
     html.Div([
       LinePlot(
-        Query.swaps, 
+        Query.swaps,
         orderBy=Swap.timestamp,
         orderDirection="desc",
         first=100,
@@ -93,7 +96,9 @@ app.layout = html.Div(
           Swap.pair == "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"
         ],
         x=Swap.datetime,
-        y=Swap.price1
+        y=Swap.price1,
+
+        component_id='price'
       )
     ])
   ])
@@ -103,7 +108,7 @@ app.layout = html.Div(
 This code generates the following dash component:
 ![Alt text](/img/synthetic-field-example.png?raw=true)
 
-Notice that the `where` argument of the component uses native python predicates to set the query arguments. behind the scenes, 
+Notice that the `where` argument of the component uses native python predicates to set the query arguments. Behind the scenes, 
 ```python
 where=[
   Swap.pair == "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"

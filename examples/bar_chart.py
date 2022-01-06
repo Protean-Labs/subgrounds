@@ -21,12 +21,13 @@ app.layout = html.Div(
     html.Div([
       BarChart(
         Query.repays,
-        component_id='bar-chart',
         orderBy=Repay.timestamp,
         orderDirection="desc",
         first=100,
         x=Repay.reserve.symbol,
-        y=Repay.amount
+        y=Repay.amount,
+
+        component_id='bar-chart'
       )
     ])
   ])
