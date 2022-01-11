@@ -1,5 +1,5 @@
 from __future__ import annotations
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -11,17 +11,34 @@ class TypeRef:
   class T(ABC):
     pass
 
+    @property
+    @abstractmethod
+    def name(self) -> str:
+      raise NotImplementedError
+
   @dataclass
   class Named(T):
-    name: str
+    name_: str
+
+    @property
+    def name(self) -> str:
+      return self.name_
 
   @dataclass
   class NonNull(T):
     inner: TypeRef.T
 
+    @property
+    def name(self) -> str:
+      return self.inner.name
+
   @dataclass
   class List(T):
     inner: TypeRef.T
+
+    @property
+    def name(self) -> str:
+      return self.inner.name
 
   @staticmethod
   def root_type_name(type_: TypeRef.T) -> str:
@@ -72,6 +89,10 @@ class TypeMeta:
     name: str
     description: str
 
+    @property
+    def is_object(self) -> bool:
+      return False
+
   @dataclass
   class ArgumentMeta(T):
     type_: TypeRef.T
@@ -91,6 +112,10 @@ class TypeMeta:
     fields: list[TypeMeta.FieldMeta]
     interfaces: list[str] = field(default_factory=list)
 
+    @property
+    def is_object(self) -> bool:
+      return True
+
   @dataclass
   class EnumValueMeta(T):
     pass
@@ -102,6 +127,10 @@ class TypeMeta:
   @dataclass
   class InterfaceMeta(T):
     fields: list[TypeMeta.FieldMeta]
+
+    @property
+    def is_object(self) -> bool:
+      return False
 
   @dataclass
   class UnionMeta(T):

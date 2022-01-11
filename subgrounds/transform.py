@@ -6,7 +6,6 @@ from pipe import *
 from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition, execute, pagination_args
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.utils import flatten, union
-import subgrounds.client as client
 
 
 class Transform(ABC):
