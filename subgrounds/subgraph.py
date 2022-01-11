@@ -153,13 +153,13 @@ class SyntheticField(FieldOperatorMixin):
       field tree is flattened to a single synthetic field containing all leaf dependencies.
 
       Args:
-          deps (list): Initial dependencies for synthetic field
-          f (Callable): Function to apply to the values of those dependencies
-          acc (list[Tuple[Optional[Callable], list[FieldPath]]], optional): Accumulator. Defaults to [].
+        deps (list): Initial dependencies for synthetic field
+        f (Callable): Function to apply to the values of those dependencies
+        acc (list[Tuple[Optional[Callable], list[FieldPath]]], optional): Accumulator. Defaults to [].
 
       Returns:
-          Tuple[Callable, list[FieldPath]]: A tuple containing the potentially modified
-          function and dependency list.
+        Tuple[Callable, list[FieldPath]]: A tuple containing the potentially modified
+        function and dependency list.
       """
       match deps:
         case []:
@@ -318,7 +318,7 @@ class FieldPath(FieldOperatorMixin):
     ```
 
     Returns:
-        FieldPath | list[FieldPath]: The updated field path if selection is not set, or a list of FieldPaths when selection is set
+      FieldPath | list[FieldPath]: The updated field path if selection is not set, or a list of FieldPaths when selection is set
     """
     selection = kwargs.pop('selection', [])
     return FieldPath.set_arguments(self, kwargs, selection)
@@ -329,16 +329,16 @@ class FieldPath(FieldOperatorMixin):
     selection on the field named `name`.
 
     Args:
-        fpath (FieldPath): The FieldPath on which to perform the selection/extension
-        name (str): The name of the field to expand on the leaf of `fpath`
+      fpath (FieldPath): The FieldPath on which to perform the selection/extension
+      name (str): The name of the field to expand on the leaf of `fpath`
 
     Raises:
-        TypeError: [description]
-        TypeError: [description]
-        TypeError: [description]
+      TypeError: [description]
+      TypeError: [description]
+      TypeError: [description]
 
     Returns:
-        FieldPath: A new FieldPath containing `fpath` extended with the field named `name`
+      FieldPath: A new FieldPath containing `fpath` extended with the field named `name`
     """
     match type_of_typeref(fpath.schema, fpath.type_):
       # If the FieldPath fpath
@@ -372,16 +372,16 @@ class FieldPath(FieldOperatorMixin):
     """ Extends the FieldPath `fpath` with the FieldPath `ext`. `ext` must start where the `fpath` ends.
 
     Args:
-        fpath (FieldPath): The FieldPath to extend
-        ext (FieldPath): The FieldPath representing the extension
+      fpath (FieldPath): The FieldPath to extend
+      ext (FieldPath): The FieldPath representing the extension
 
     Raises:
-        TypeError: [description]
-        TypeError: [description]
-        TypeError: [description]
+      TypeError: [description]
+      TypeError: [description]
+      TypeError: [description]
 
     Returns:
-        FieldPath: A new FieldPath containing the initial FieldPath `fpath` extended with `ext`
+      FieldPath: A new FieldPath containing the initial FieldPath `fpath` extended with `ext`
     """
     match fpath.leaf:
       case TypeMeta.FieldMeta() as fmeta:

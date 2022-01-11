@@ -639,7 +639,9 @@ class TestQueryBuilding(unittest.TestCase):
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
-        arguments=[Argument("first", InputValue.Int(10))],
+        arguments=[
+          Argument("first", InputValue.Int(10))
+        ],
         selection=[
           Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
           Selection(TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')))
