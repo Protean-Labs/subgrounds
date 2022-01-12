@@ -3,7 +3,7 @@ from subgrounds.query import Argument, DataRequest, Document, InputValue, Query,
 from subgrounds.schema import TypeMeta, TypeRef
 
 from subgrounds.subgraph import FieldPath, Subgraph
-from subgrounds.subgrounds import mk_request
+from subgrounds.subgrounds import App
 
 from tests.utils import schema
 
@@ -220,10 +220,12 @@ class TestQueryString(unittest.TestCase):
         )
       ])
     )
-    
+
+    app = App()
+
     pairs = self.subgraph1.Query.pairs(first=10)
 
-    req = mk_request([
+    req = app.mk_request([
       pairs.id,
       pairs.reserveUSD
     ])
@@ -282,7 +284,9 @@ class TestQueryString(unittest.TestCase):
     self.subgraph2.Query.pairs(first=10).id,
     self.subgraph2.Query.pairs.token0Id
 
-    req = mk_request([
+    app = App()
+
+    req = app.mk_request([
       pairs.id,
       pairs.reserveUSD,
       self.subgraph2.Query.pairs(first=10).id,

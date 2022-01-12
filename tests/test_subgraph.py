@@ -3,6 +3,7 @@ import unittest
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef
 from subgrounds.subgraph import FieldPath, Filter, Object, Subgraph, SyntheticField
 from subgrounds.query import Argument, DataRequest, InputValue, Query, Selection
+from subgrounds.subgrounds import App
 from subgrounds.utils import identity
 
 from tests.utils import schema
@@ -621,7 +622,9 @@ class TestQueryBuilding(unittest.TestCase):
       )
     ]))
 
-    query = self.subgraph.mk_request([
+    app = App()
+
+    query = app.mk_request([
       self.subgraph.Query.pairs(first=10).id,
       self.subgraph.Query.pairs.token0.symbol
     ])
@@ -649,10 +652,12 @@ class TestQueryBuilding(unittest.TestCase):
       )
     ]))
 
+    app = App()
+
     Pair = self.subgraph.Pair
     Pair.token0Id = Pair.token0.id
 
-    query = self.subgraph.mk_request([
+    query = app.mk_request([
       self.subgraph.Query.pairs(first=10).id,
       self.subgraph.Query.pairs.token0Id
     ])
@@ -669,10 +674,12 @@ class TestQueryBuilding(unittest.TestCase):
       ])
     ]))
 
+    app = App()
+
     Swap = self.subgraph.Swap
     Swap.price = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
 
-    query = self.subgraph.mk_request([
+    query = app.mk_request([
       self.subgraph.Query.swaps.timestamp,
       self.subgraph.Query.swaps.price
     ])

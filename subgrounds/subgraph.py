@@ -12,7 +12,7 @@ import subgrounds.client as client
 import subgrounds.schema as schema
 from subgrounds.query import DataRequest, Document, Query, Selection, arguments_of_field_args, selection_of_path
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
-from subgrounds.transform import DEFAULT_TRANSFORMS, LocalSyntheticField, Transform, chain_transforms
+from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, LocalSyntheticField, DocumentTransform
 from subgrounds.utils import identity
 
 
@@ -497,7 +497,7 @@ class Object:
 class Subgraph:
   url: str
   schema: SchemaMeta
-  transforms: list[Transform] = field(default_factory=list)
+  transforms: list[DocumentTransform] = field(default_factory=list)
 
   @staticmethod
   def of_url(url: str) -> None:
@@ -510,12 +510,12 @@ class Subgraph:
       with open(filename, mode="w") as f:
         json.dump(schema, f)
 
-    return Subgraph(url, mk_schema(schema), DEFAULT_TRANSFORMS)
+    return Subgraph(url, mk_schema(schema), DEFAULT_GLOBAL_TRANSFORMS)
 
-  def mk_request(self, fpaths: list[FieldPath]) -> DataRequest:
-    return DataRequest([
-      Document(self.url, reduce(Query.add_selection, list(fpaths | map(FieldPath.selection)), Query()))
-    ])
+  # def mk_request(self, fpaths: list[FieldPath]) -> DataRequest:
+  #   return DataRequest([
+  #     Document(self.url, reduce(Query.add_selection, list(fpaths | map(FieldPath.selection)), Query()))
+  #   ])
 
   def add_synthetic_field(
     self,
@@ -535,8 +535,8 @@ class Subgraph:
 
     self.transforms = [transform, *self.transforms]
 
-  def query(self, req: DataRequest) -> list[list[dict]]:
-    return chain_transforms(self.transforms, req)
+  # def query(self, req: DataRequest) -> list[list[dict]]:
+  #   return chain_transforms(self.transforms, req)
 
   def __getattribute__(self, __name: str) -> Any:
     try:

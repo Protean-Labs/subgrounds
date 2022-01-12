@@ -8,16 +8,6 @@ from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.utils import flatten, union
 
 
-class Transform(ABC):
-  @abstractmethod
-  def transform_request(self, req: DataRequest) -> DataRequest:
-    return req
-
-  @abstractmethod
-  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return data
-
-
 def transform_request(fmeta: TypeMeta.FieldMeta, replacement: list[Selection], req: DataRequest) -> DataRequest:
   def transform(select: Selection) -> Selection:
     match select:
@@ -109,27 +99,47 @@ def transform_data_type(type_: TypeRef.T, f: Callable, req: DataRequest, data: l
   return data
 
 
-def chain_transforms(transforms: list[Transform], req: DataRequest) -> dict:
-  match transforms:
-    case []:
-      return execute(req)
-      # return list(map(lambda doc: client.query(doc.url, doc.graphql_string), req.documents))
-    case [transform, *rest]:
-      new_req = transform.transform_request(req)
-      data = chain_transforms(rest, new_req)
-      return transform.transform_response(req, data)
+# def chain_transforms(transforms: list[Transform], req: DataRequest) -> dict:
+#   match transforms:
+#     case []:
+#       return execute(req)
+#       # return list(map(lambda doc: client.query(doc.url, doc.graphql_string), req.documents))
+#     case [transform, *rest]:
+#       new_req = transform.transform_request(req)
+#       data = chain_transforms(rest, new_req)
+#       return transform.transform_response(req, data)
 
 
-class TypeTransform(Transform):
+class RequestTransform(ABC):
+  @abstractmethod
+  def transform_request(self, req: DataRequest) -> DataRequest:
+    return req
+
+  @abstractmethod
+  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return data
+
+
+class DocumentTransform(ABC):
+  @abstractmethod
+  def transform_document(self, req: Document) -> Document:
+    return req
+
+  @abstractmethod
+  def transform_response(self, req: Document, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return data
+
+
+class TypeTransform(DocumentTransform):
   def __init__(self, type_, f) -> None:
     self.type_ = type_
     self.f = f
     super().__init__()
 
-  def transform_request(self, query: Query) -> Query:
+  def transform_document(self, query: Query) -> Query:
     return query
 
-  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+  def transform_response(self, doc: Document, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     def transform(select: Selection, data: dict) -> None:
       # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
       match (select, data):
@@ -152,21 +162,20 @@ class TypeTransform(Transform):
         case (select, data):
           raise Exception(f"transform_data_type: invalid selection {select} for data {data}")
 
-    for (doc, data_) in zip(req.documents, data):
-      for select in doc.query.selection:
-        transform(select, data_)
+    for select in doc.query.selection:
+      transform(select, data)
 
     return data
 
 
-class LocalSyntheticField(Transform):
+class LocalSyntheticField(DocumentTransform):
   def __init__(self, subgraph, fmeta: TypeMeta.FieldMeta, f: Callable, args: list[Selection]) -> None:
     self.subgraph = subgraph
     self.fmeta = fmeta
     self.f = f
     self.args = args
 
-  def transform_request(self, req: DataRequest) -> DataRequest:
+  def transform_document(self, doc: Document) -> Document:
     def transform(select: Selection) -> Selection:
       match select:
         case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == self.fmeta.name:
@@ -179,12 +188,9 @@ class LocalSyntheticField(Transform):
         case _:
           raise Exception(f"transform_request: unhandled selection {select}")
 
-    return DataRequest.transform(
-      req,
-      lambda doc: Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
-    )
+    return Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
 
-  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+  def transform_response(self, doc: Document, data: dict[str, Any]) -> list[dict[str, Any]]:
     def transform(select: Selection, data: dict) -> None:
       match (select, data):
         case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
@@ -207,15 +213,14 @@ class LocalSyntheticField(Transform):
         case (select, data):
           raise Exception(f"transform_response: invalid selection {select} for data {data}")
 
-    for (doc, data_) in zip(req.documents, data):
-      for select in doc.query.selection:
-        transform(select, data_)
+    for select in doc.query.selection:
+      transform(select, data)
 
     return data
 
 
 # TODO: Test split transform
-class SplitTransform(Transform):
+class SplitTransform(RequestTransform):
   def __init__(self, query: Query) -> None:
     self.query = query
 
@@ -265,7 +270,7 @@ class SplitTransform(Transform):
     return transform(req.documents, data, [])
 
 
-class PaginationTransform(Transform):
+class PaginationTransform(RequestTransform):
   def __init__(self, page_size) -> None:
     self.page_size = page_size
 
@@ -345,7 +350,11 @@ class PaginationTransform(Transform):
     return data
 
 
-DEFAULT_TRANSFORMS: list[Transform] = [
+DEFAULT_GLOBAL_TRANSFORMS: list[RequestTransform] = [
+  PaginationTransform(page_size=200)
+]
+
+DEFAULT_SUBGRAPH_TRANSFORMS: list[DocumentTransform] = [
   TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal)),
   TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint)),
 ]

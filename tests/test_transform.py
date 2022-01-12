@@ -2,7 +2,10 @@ import unittest
 
 from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition
 from subgrounds.schema import TypeMeta, TypeRef
-from subgrounds.transform import LocalSyntheticField, PaginationTransform, SplitTransform, TypeTransform, chain_transforms, transform_response, transform_data_type, transform_request
+from subgrounds.subgraph import Subgraph
+from subgrounds.subgrounds import App
+from subgrounds.transform import LocalSyntheticField, PaginationTransform, SplitTransform, TypeTransform, transform_response, transform_data_type, transform_request
+from tests.utils import schema
 
 
 class TestTransform(unittest.TestCase):
@@ -268,6 +271,10 @@ class TestTransform(unittest.TestCase):
 
 
 class TestQueryTransform(unittest.TestCase):
+  def setUp(self):
+    self.schema = schema()
+    self.subgraph = Subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', self.schema)
+
   def test_roundtrip1(self):
     expected = [{
       'swaps': [{
@@ -306,7 +313,12 @@ class TestQueryTransform(unittest.TestCase):
       )
     ])
 
-    data = chain_transforms([transform], req)
+    self.subgraph.transforms = [transform]
+    app = App(
+      global_transforms=[],
+      subgraphs={'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2': self.subgraph}
+    )
+    data = app.execute(req)
 
     self.assertEqual(data, expected)
 
@@ -321,7 +333,7 @@ class TestQueryTransform(unittest.TestCase):
       }]
     }]
 
-    transforms = [
+    subgraph_transforms = [
       LocalSyntheticField(
         None,
         TypeMeta.FieldMeta('price0', '', [], TypeRef.non_null('Float')),
@@ -358,46 +370,14 @@ class TestQueryTransform(unittest.TestCase):
       Document(url='https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', query=query)
     ])
 
-    data = chain_transforms(transforms, req)
+    self.subgraph.transforms = subgraph_transforms
+    app = App(
+      global_transforms=[],
+      subgraphs={'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2': self.subgraph}
+    )
+    data = app.execute(req)
 
     self.assertEqual(data, expected)
-
-  # def test_merge_data_1(self):
-  #   expected = [
-  #     {
-  #       'pair': {
-  #         'token0': {
-  #           'id': '0x123',
-  #           'name': 'ABC Token',
-  #           'symbol': 'ABC'
-  #         }
-  #       }
-  #     }
-  #   ]
-
-  #   data1 = [
-  #     {
-  #       'pair': {
-  #         'token0': {
-  #           'id': '0x123',
-  #           'name': 'ABC Token',
-  #           'symbol': 'ABC'
-  #         }
-  #       }
-  #     }
-  #   ]
-
-  #   data2 = [
-  #     {
-  #       'pair': {
-  #         'token0': {
-  #           'id': '0x123'
-  #         }
-  #       }
-  #     }
-  #   ]
-
-  #   self.assertEqual(client.merge_data(data1, data2), expected)
 
   def test_split_transform_1(self):
     expected = DataRequest([
@@ -598,5 +578,10 @@ class TestQueryTransform(unittest.TestCase):
       )
     ])
 
-    data = chain_transforms([PaginationTransform(page_size=10)], req)
+    app = App(
+      global_transforms=[PaginationTransform(page_size=10)],
+      subgraphs={'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2': self.subgraph}
+    )
+    data = app.execute(req)
+    # data = chain_transforms([], req)
     self.assertEqual(data, expected)
