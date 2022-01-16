@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
-from functools import partial, reduce
-from pipe import *
+from functools import reduce
+from pipe import map, groupby
 import os
 import json
 
@@ -12,7 +12,7 @@ import subgrounds.client as client
 
 
 @dataclass
-class App:
+class Subgrounds:
   global_transforms: list[RequestTransform] = field(default_factory=lambda: DEFAULT_GLOBAL_TRANSFORMS)
   subgraphs: dict[str, Subgraph] = field(default_factory=dict)
 

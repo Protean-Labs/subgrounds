@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable
 from functools import partial
-from pipe import *
+from pipe import map, traverse
 
 from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition, execute, pagination_args
 from subgrounds.schema import TypeMeta, TypeRef
@@ -183,7 +183,7 @@ class LocalSyntheticField(DocumentTransform):
         case Selection(_, _, _, [] | None):
           return [select]
         case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
-          new_inner_select = flatten(list(inner_select | map(transform)))
+          new_inner_select = list(inner_select | map(transform) | traverse)
           return Selection(select_fmeta, alias, args, new_inner_select)
         case _:
           raise Exception(f"transform_request: unhandled selection {select}")
@@ -314,6 +314,7 @@ class PaginationTransform(RequestTransform):
 
     def transform_doc_with_first_argument(doc: Document) -> Document:
       args = pagination_args(self.page_size, Query.get_argument(doc.query, 'first').value.value)
+
       query_new_args = Query.substitute_arg(doc.query, 'first', [
         Argument('first', InputValue.Variable('first')),
         Argument('skip', InputValue.Variable('skip'))

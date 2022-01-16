@@ -643,7 +643,8 @@ class Document:
     return Document(
       url=doc.url,
       query=query_f(doc.query),
-      fragments=list(doc.fragments | map(fragment_f))
+      fragments=list(doc.fragments | map(fragment_f)),
+      variables=doc.variables
     )
 
 

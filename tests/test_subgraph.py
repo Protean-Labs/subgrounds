@@ -3,7 +3,7 @@ import unittest
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef
 from subgrounds.subgraph import FieldPath, Filter, Object, Subgraph, SyntheticField
 from subgrounds.query import Argument, DataRequest, InputValue, Query, Selection
-from subgrounds.subgrounds import App
+from subgrounds.subgrounds import Subgrounds
 from subgrounds.utils import identity
 
 from tests.utils import schema
@@ -18,7 +18,7 @@ class TestAddType(unittest.TestCase):
     SyntheticField.counter = 0
 
   def test_add_synthetic_field_1(self):
-    sfield = SyntheticField(self.subgraph, identity, TypeRef.Named('Float'))
+    sfield = SyntheticField(identity, TypeRef.Named('Float'))
 
     expected = SchemaMeta(query_type='Query', type_map={
       'Int': TypeMeta.ScalarMeta('Int', ''),
@@ -371,7 +371,7 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_1(self):
-    sfield = SyntheticField(self.subgraph, identity, TypeRef.Named('Float'))
+    sfield = SyntheticField(identity, TypeRef.Named('Float'))
 
     expected = FieldPath(
       self.subgraph,
@@ -396,7 +396,7 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_2(self):
-    sfield = SyntheticField(self.subgraph, identity, TypeRef.Named('String'))
+    sfield = SyntheticField(identity, TypeRef.Named('String'))
 
     expected = FieldPath(
       self.subgraph,
@@ -622,7 +622,7 @@ class TestQueryBuilding(unittest.TestCase):
       )
     ]))
 
-    app = App()
+    app = Subgrounds()
 
     query = app.mk_request([
       self.subgraph.Query.pairs(first=10).id,
@@ -652,7 +652,7 @@ class TestQueryBuilding(unittest.TestCase):
       )
     ]))
 
-    app = App()
+    app = Subgrounds()
 
     Pair = self.subgraph.Pair
     Pair.token0Id = Pair.token0.id
@@ -674,7 +674,7 @@ class TestQueryBuilding(unittest.TestCase):
       ])
     ]))
 
-    app = App()
+    app = Subgrounds()
 
     Swap = self.subgraph.Swap
     Swap.price = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
@@ -682,6 +682,28 @@ class TestQueryBuilding(unittest.TestCase):
     query = app.mk_request([
       self.subgraph.Query.swaps.timestamp,
       self.subgraph.Query.swaps.price
+    ])
+
+    FieldPath.test_mode = True
+    self.maxDiff = None
+    self.assertEqual(query, expected)
+
+  def test_mk_request_4(self):
+    expected = DataRequest.single_query("", Query(selection=[
+      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), selection=[
+        Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+        Selection(TypeMeta.FieldMeta('my_value', '', [], TypeRef.Named('Float')))
+      ])
+    ]))
+
+    app = Subgrounds()
+
+    Swap = self.subgraph.Swap
+    Swap.my_value = Swap.amount0In / 10 ** Swap.amount0Out
+
+    query = app.mk_request([
+      self.subgraph.Query.swaps.timestamp,
+      self.subgraph.Query.swaps.my_value
     ])
 
     FieldPath.test_mode = True
@@ -705,7 +727,6 @@ class TestSyntheticField(unittest.TestCase):
     ]
 
     sfield = SyntheticField(
-      self.subgraph,
       lambda x: x * 10,
       TypeRef.Named('Int'),
       Swap.amount0In
@@ -734,7 +755,6 @@ class TestSyntheticField(unittest.TestCase):
       Swap.amount0In,
       Swap.amount0Out,
       Swap.amount1In,
-      # Swap.amount1Out
     ]
 
     sfield: SyntheticField = Swap.amount0In - Swap.amount0Out + Swap.amount1In
@@ -755,4 +775,17 @@ class TestSyntheticField(unittest.TestCase):
     sfield: SyntheticField = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
 
     self.assertEqual(sfield.f(10, 0, 0, 20), 0.5)
+    self.assertEqual(sfield.deps, expected_deps)
+
+  def test_synthetic_field_6(self):
+    Swap = self.subgraph.Swap
+
+    expected_deps = [
+      Swap.amount0In,
+      Swap.amount0Out,
+    ]
+
+    sfield: SyntheticField = Swap.amount0In / 10 ** Swap.amount0Out
+
+    self.assertEqual(sfield.f(100, 2), 1)
     self.assertEqual(sfield.deps, expected_deps)

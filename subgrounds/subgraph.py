@@ -6,11 +6,11 @@ from functools import partial, reduce
 import os
 import json
 import operator
-from pipe import *
+from pipe import map
 
 import subgrounds.client as client
 import subgrounds.schema as schema
-from subgrounds.query import DataRequest, Document, Query, Selection, arguments_of_field_args, selection_of_path
+from subgrounds.query import Selection, arguments_of_field_args, selection_of_path
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, LocalSyntheticField, DocumentTransform
 from subgrounds.utils import identity
@@ -57,11 +57,11 @@ def typeref_of_binary_op(op: str, t1: TypeRef.T, t2: int | float | str | bool | 
       case ('add', 'String' | 'Bytes', 'String' | 'Bytes'):
         return TypeRef.Named('String')
 
-      case ('add' | 'sub' | 'mul' | 'div', 'BigInt' | 'Int', 'BigInt' | 'Int'):
+      case ('add' | 'sub' | 'mul' | 'div' | 'pow' | 'mod', 'BigInt' | 'Int', 'BigInt' | 'Int'):
         return TypeRef.Named('Int')
-      case ('add' | 'sub' | 'mul' | 'div', 'BigInt' | 'Int', 'BigDecimal' | 'Float'):
+      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int', 'BigDecimal' | 'Float'):
         return TypeRef.Named('Float')
-      case ('add' | 'sub' | 'mul' | 'div', 'BigDecimal' | 'Float', 'BigInt' | 'Int' | 'BigDecimal' | 'Float'):
+      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigDecimal' | 'Float', 'BigInt' | 'Int' | 'BigDecimal' | 'Float'):
         return TypeRef.Named('Float')
 
       case _ as args:
@@ -72,7 +72,7 @@ def typeref_of_binary_op(op: str, t1: TypeRef.T, t2: int | float | str | bool | 
       case ('add', 'String' | 'Bytes', str()):
         return TypeRef.Named('String')
 
-      case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int', int()):
+      case ('add' | 'sub' | 'mul' | 'div' | 'pow' | 'mod', 'BigInt' | 'Int', int()):
         return TypeRef.Named('Int')
       case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int', float()):
         return TypeRef.Named('Float')
@@ -110,38 +110,66 @@ class FieldOperatorMixin:
   type_: TypeRef.T
 
   def __add__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.add, typeref_of_binary_op('add', self.type_, other), self, other)
+    return SyntheticField(operator.add, typeref_of_binary_op('add', self.type_, other), self, other)
+
+  def __radd__(self, other: Any) -> SyntheticField:
+    return SyntheticField(lambda x, y: operator.add(y, x), typeref_of_binary_op('add', self.type_, other), self, other)
 
   def __sub__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.sub, typeref_of_binary_op('sub', self.type_, other), self, other)
+    return SyntheticField(operator.sub, typeref_of_binary_op('sub', self.type_, other), self, other)
+
+  def __rsub__(self, other: Any) -> SyntheticField:
+    return SyntheticField(lambda x, y: operator.sub(y, x), typeref_of_binary_op('sub', self.type_, other), self, other)
 
   def __mul__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.mul, typeref_of_binary_op('mul', self.type_, other), self, other)
+    return SyntheticField(operator.mul, typeref_of_binary_op('mul', self.type_, other), self, other)
+
+  def __rmul__(self, other: Any) -> SyntheticField:
+    return SyntheticField(lambda x, y: operator.mul(y, x), typeref_of_binary_op('mul', self.type_, other), self, other)
 
   def __truediv__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.truediv, typeref_of_binary_op('div', self.type_, other), self, other)
+    return SyntheticField(operator.truediv, typeref_of_binary_op('div', self.type_, other), self, other)
 
-  def __pow__(self, other: Any) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.pow, typeref_of_binary_op('pow', self.type_, other), self, other)
+  def __rtruediv__(self, other: Any) -> SyntheticField:
+    return SyntheticField(lambda x, y: operator.truediv(y, x), typeref_of_binary_op('div', self.type_, other), self, other)
+
+  def __floordiv__(self, other: Any) -> SyntheticField:
+    return SyntheticField(operator.floordiv, typeref_of_binary_op('div', self.type_, other), self, other)
+
+  def __rfloordiv__(self, other: Any) -> SyntheticField:
+    return SyntheticField(lambda x, y: operator.floordiv(y, x), typeref_of_binary_op('div', self.type_, other), self, other)
+
+  def __pow__(self, rhs: Any) -> SyntheticField:
+    return SyntheticField(operator.pow, typeref_of_binary_op('pow', self.type_, rhs), self, rhs)
+
+  def __rpow__(self, lhs: Any) -> SyntheticField:
+    return SyntheticField(lambda x, y: operator.pow(y, x), typeref_of_binary_op('pow', self.type_, lhs), self, lhs)
+
+  def __mod__(self, rhs: Any) -> SyntheticField:
+    return SyntheticField(operator.mod, typeref_of_binary_op('mod', self.type_, rhs), self, rhs)
+
+  def __rmod__(self, lhs: Any) -> SyntheticField:
+    return SyntheticField(lambda x, y: operator.mod(y, x), typeref_of_binary_op('mod', self.type_, lhs), self, lhs)
 
   def __neg__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.neg, type_ref_of_unary_op('neg', self.type_), self)
+    return SyntheticField(operator.neg, type_ref_of_unary_op('neg', self.type_), self)
 
   def __abs__(self) -> SyntheticField:
-    return SyntheticField(self.subgraph, operator.abs, type_ref_of_unary_op('abs', self.type_), self)
+    return SyntheticField(operator.abs, type_ref_of_unary_op('abs', self.type_), self)
 
 
 @dataclass
 class SyntheticField(FieldOperatorMixin):
   counter: ClassVar[int] = 0
 
-  subgraph: Subgraph
+  # subgraph: Subgraph
   f: Callable
   type_: TypeRef.T
   deps: list[FieldPath]
 
-  def __init__(self, subgraph: Subgraph, f: Callable, type_: TypeRef.T, *deps: list[FieldPath | SyntheticField]) -> None:
-    self.subgraph = subgraph
+  # def __init__(self, subgraph: Subgraph, f: Callable, type_: TypeRef.T, *deps: list[FieldPath | SyntheticField]) -> None:
+  def __init__(self, f: Callable, type_: TypeRef.T, *deps: list[FieldPath | SyntheticField]) -> None:
+    # self.subgraph = subgraph
 
     def mk_deps(
       deps: list(FieldPath | SyntheticField),
@@ -191,7 +219,7 @@ class SyntheticField(FieldOperatorMixin):
 
           return (new_f, new_deps)
 
-        case [SyntheticField(_, f=inner_f, deps=inner_deps), *rest]:
+        case [SyntheticField(f=inner_f, deps=inner_deps), *rest]:
           acc.append((inner_f, inner_deps))
           return mk_deps(rest, f, acc)
 
@@ -213,9 +241,9 @@ class SyntheticField(FieldOperatorMixin):
 
     SyntheticField.counter += 1
 
-  @property
-  def schema(self):
-    return self.subgraph.schema
+  # @property
+  # def schema(self):
+  #   return self.subgraph.schema
 
 
 @dataclass
@@ -233,16 +261,36 @@ class FieldPath(FieldOperatorMixin):
     return self.subgraph.schema
 
   @property
-  def longname(self) -> str:
-    return '_'.join(map(lambda ele: ele[1].name, self.path))
-
-  @property
   def root(self) -> TypeMeta.FieldMeta:
     return self.path[0][1]
 
   @property
   def leaf(self) -> TypeMeta.FieldMeta:
     return self.path[-1][1]
+
+  @property
+  def data_path(self) -> list[str]:
+    return list(self.path | map(lambda ele: ele[1].name))
+
+  @property
+  def longname(self) -> str:
+    return '_'.join(self.data_path)
+
+  def extract_data(self, data: dict) -> list[Any] | Any:
+    def f(data_path: list[str], data: dict | list | Any):
+      match data_path:
+        case []:
+          return data
+        case [name, *rest]:
+          match data:
+            case dict():
+              return f(rest, data[name])
+            case list():
+              return list(data | map(lambda row: f(rest, row[name])))
+            case _:
+              raise Exception(f"extract_data: unexpected state! path = {data_path}, data = {data}")
+
+    return f(self.data_path, data)
 
   def split_args(self, kwargs: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     query_args = {}
@@ -467,7 +515,7 @@ class Object:
 
   @staticmethod
   def add_field(obj: Object, name: str, fpath: FieldPath) -> None:
-    sfield = SyntheticField(obj.schema, identity, fpath.type_, fpath)
+    sfield = SyntheticField(identity, fpath.type_, fpath)
     obj.subgraph.add_synthetic_field(obj.object_, name, sfield)
 
   @staticmethod
@@ -512,11 +560,6 @@ class Subgraph:
 
     return Subgraph(url, mk_schema(schema), DEFAULT_GLOBAL_TRANSFORMS)
 
-  # def mk_request(self, fpaths: list[FieldPath]) -> DataRequest:
-  #   return DataRequest([
-  #     Document(self.url, reduce(Query.add_selection, list(fpaths | map(FieldPath.selection)), Query()))
-  #   ])
-
   def add_synthetic_field(
     self,
     object_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta,
@@ -534,9 +577,6 @@ class Subgraph:
     )
 
     self.transforms = [transform, *self.transforms]
-
-  # def query(self, req: DataRequest) -> list[list[dict]]:
-  #   return chain_transforms(self.transforms, req)
 
   def __getattribute__(self, __name: str) -> Any:
     try:

@@ -3,7 +3,7 @@ import unittest
 from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.subgraph import Subgraph
-from subgrounds.subgrounds import App
+from subgrounds.subgrounds import Subgrounds
 from subgrounds.transform import LocalSyntheticField, PaginationTransform, SplitTransform, TypeTransform, transform_response, transform_data_type, transform_request
 from tests.utils import schema
 
@@ -314,7 +314,7 @@ class TestQueryTransform(unittest.TestCase):
     ])
 
     self.subgraph.transforms = [transform]
-    app = App(
+    app = Subgrounds(
       global_transforms=[],
       subgraphs={'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2': self.subgraph}
     )
@@ -371,11 +371,96 @@ class TestQueryTransform(unittest.TestCase):
     ])
 
     self.subgraph.transforms = subgraph_transforms
-    app = App(
+    app = Subgrounds(
       global_transforms=[],
       subgraphs={'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2': self.subgraph}
     )
     data = app.execute(req)
+
+    self.assertEqual(data, expected)
+
+  def test_roundtrip_3(self):
+    expected = [{
+      'borrows': [
+        {
+          'amount': 52627231563,
+          'reserve': {
+            'decimals': 6
+          },
+          'adjusted_amount': 52627.231563
+        },
+        {
+          'amount': 9000000000,
+          'reserve': {
+            'decimals': 6
+          },
+          'adjusted_amount': 9000.0
+        },
+      ]
+    }]
+
+    sg = Subgrounds()
+    aaveV2 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/aave/protocol-v2')
+    aaveV2.Borrow.adjusted_amount = aaveV2.Borrow.amount / 10 ** aaveV2.Borrow.reserve.decimals
+
+    borrows = aaveV2.Query.borrows(
+      orderBy=aaveV2.Borrow.timestamp,
+      orderDirection='desc',
+      first=2,
+      where=[
+        aaveV2.Borrow.timestamp < 1642020500
+      ]
+    )
+
+    req = sg.mk_request([
+      borrows.adjusted_amount
+    ])
+
+    data = sg.execute(req)
+
+    self.assertEqual(data, expected)
+
+  def test_roundtrip_4(self):
+    expected = [{
+      'borrows': [
+        {
+          'amount': 52627231563,
+          'reserve': {
+            'decimals': 6,
+            'symbol': 'USDC'
+          },
+          'adjusted_amount': 52627.231563
+        },
+        {
+          'amount': 9000000000,
+          'reserve': {
+            'decimals': 6,
+            'symbol': 'USDC'
+          },
+          'adjusted_amount': 9000.0
+        },
+      ]
+    }]
+
+    sg = Subgrounds()
+    aaveV2 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/aave/protocol-v2')
+    aaveV2.Borrow.adjusted_amount = aaveV2.Borrow.amount / 10 ** aaveV2.Borrow.reserve.decimals
+
+    borrows = aaveV2.Query.borrows(
+      orderBy=aaveV2.Borrow.timestamp,
+      orderDirection='desc',
+      first=2,
+      where=[
+        aaveV2.Borrow.timestamp < 1642020500
+      ]
+    )
+
+    req = sg.mk_request([
+      borrows.reserve.symbol,
+      borrows.adjusted_amount
+    ])
+
+    data = sg.execute(req)
 
     self.assertEqual(data, expected)
 
@@ -578,7 +663,7 @@ class TestQueryTransform(unittest.TestCase):
       )
     ])
 
-    app = App(
+    app = Subgrounds(
       global_transforms=[PaginationTransform(page_size=10)],
       subgraphs={'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2': self.subgraph}
     )

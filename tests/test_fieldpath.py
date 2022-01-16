@@ -3,7 +3,7 @@ from subgrounds.query import Argument, DataRequest, Document, InputValue, Query,
 from subgrounds.schema import TypeMeta, TypeRef
 
 from subgrounds.subgraph import FieldPath, Subgraph
-from subgrounds.subgrounds import App
+from subgrounds.subgrounds import Subgrounds
 
 from tests.utils import schema
 
@@ -221,7 +221,7 @@ class TestQueryString(unittest.TestCase):
       ])
     )
 
-    app = App()
+    app = Subgrounds()
 
     pairs = self.subgraph1.Query.pairs(first=10)
 
@@ -235,7 +235,7 @@ class TestQueryString(unittest.TestCase):
   def test_mk_request_2(self):
     expected = DataRequest(documents=[
       Document(
-        'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v1', 
+        'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v1',
         Query(selection=[
           Selection(
             TypeMeta.FieldMeta('pairs', '', [
@@ -255,7 +255,7 @@ class TestQueryString(unittest.TestCase):
         ])
       ),
       Document(
-        'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', 
+        'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
         Query(selection=[
           Selection(
             TypeMeta.FieldMeta('pairs', '', [
@@ -273,7 +273,7 @@ class TestQueryString(unittest.TestCase):
             ]
           )
         ])
-      ),
+      )
     ])
     
     pairs = self.subgraph1.Query.pairs(first=10)
@@ -284,7 +284,7 @@ class TestQueryString(unittest.TestCase):
     self.subgraph2.Query.pairs(first=10).id,
     self.subgraph2.Query.pairs.token0Id
 
-    app = App()
+    app = Subgrounds()
 
     req = app.mk_request([
       pairs.id,
@@ -294,3 +294,31 @@ class TestQueryString(unittest.TestCase):
     ])
 
     self.assertEqual(req, expected)
+
+
+class TestData(unittest.TestCase):
+  def setUp(self):
+    self.sg = Subgrounds()
+    self.subgraph = self.sg.load_subgraph('https://api.thegraph.com/subgraphs/name/aave/protocol-v2')
+
+  def test_extract_data_1(self):
+    expected = [1, 2, 3, 4]
+
+    repays = self.subgraph.Query.repays(
+      orderBy=self.subgraph.Repay.timestamp,
+      orderDirection='desc',
+      first=100
+    )
+
+    fpath = repays.amount
+
+    data = {
+      'repays': [
+        {'amount': 1},
+        {'amount': 2},
+        {'amount': 3},
+        {'amount': 4}
+      ]
+    }
+
+    self.assertEqual(fpath.extract_data(data), expected)
