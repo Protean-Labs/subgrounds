@@ -176,7 +176,7 @@ class LocalSyntheticField(DocumentTransform):
     self.args = args
 
   def transform_document(self, doc: Document) -> Document:
-    def transform(select: Selection) -> Selection:
+    def transform(select: Selection) -> Selection | list[Selection]:
       match select:
         case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == self.fmeta.name:
           return self.args
@@ -186,7 +186,7 @@ class LocalSyntheticField(DocumentTransform):
           new_inner_select = list(inner_select | map(transform) | traverse)
           return Selection(select_fmeta, alias, args, new_inner_select)
         case _:
-          raise Exception(f"transform_request: unhandled selection {select}")
+          raise Exception(f"transform_document: unhandled selection {select}")
 
     return Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
 

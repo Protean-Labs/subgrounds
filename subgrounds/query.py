@@ -492,8 +492,8 @@ class Query:
   ) -> Query:
     return Query(
       name=query.name,
-      selection=list(query.selection | map(selection_f)),
-      variables=list(query.variables | map(variable_f))
+      selection=list(query.selection | map(selection_f) | traverse),
+      variables=list(query.variables | map(variable_f) | traverse)
     )
 
   @staticmethod
