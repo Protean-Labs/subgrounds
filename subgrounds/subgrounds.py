@@ -1,8 +1,11 @@
 from dataclasses import dataclass, field
 from functools import reduce
-from pipe import map, groupby
+from re import L
+from typing import Any
+from pipe import map, groupby, traverse, where
 import os
 import json
+import pandas as pd
 
 from subgrounds.query import DataRequest, Document, Query
 from subgrounds.schema import mk_schema
@@ -69,3 +72,68 @@ class Subgrounds:
           return transform.transform_response(req, data)
     
     return transform_req(self.global_transforms, req)
+
+
+def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:
+  """ Formats the dictionary `data` into a pandas DataFrame using some
+  heuristics when no clear "flattening" scheme is present.
+  """
+
+  def dict_contains_list(data: dict) -> bool:
+    for _, value in data.items():
+      match value:
+        case list():
+          return True
+        case dict():
+          return dict_contains_list(value)
+        case _:
+          pass
+    
+    return False
+  
+  def columns(data, prefix: str = '') -> list[str]:
+    match data:
+      case dict():
+        return list(
+          list(data.keys())
+          | map(lambda key: columns(data[key], f'{prefix}_{key}' if prefix != '' else key))
+          | traverse
+        )
+      case list():
+        return columns(data[0], prefix)
+      case _:
+        return prefix
+
+  def rows(data, prefix: str = '', partial_row: dict = {}) -> list[str]:
+    def merge(data: dict, item: dict | list[dict]) -> dict | list[dict]:
+      match item:
+        case dict():
+          return data | item
+        case list():
+          return list(item | map(lambda item: merge(data, item)))
+
+    match data:
+      case dict():
+        row_items = list(
+          list(data.keys())
+          | map(lambda key: rows(data[key], f'{prefix}_{key}' if prefix != '' else key, partial_row))
+        )
+
+        return reduce(merge, row_items, partial_row)
+
+      case list():
+        return list(data | map(lambda row: rows(row, prefix, partial_row)))
+      case value:
+        return {prefix: value}
+
+  def flatten(data: list):
+    match data[0]:
+      case dict():
+        return data
+      case list():
+        return reduce(lambda l1, l2: l1 + flatten(l2), data, [])
+
+  if len(data) == 1:
+    return pd.DataFrame(columns=columns(data), data=flatten(rows(data)))
+  else:
+    return list(data | map(lambda data: pd.DataFrame(columns=columns(data), data=flatten(rows(data)))))
