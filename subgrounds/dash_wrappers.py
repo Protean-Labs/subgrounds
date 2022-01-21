@@ -5,6 +5,7 @@ from pipe import traverse, where, map
 
 from dash import dcc
 from dash import html
+from dash import dash_table
 from dash.dependencies import Input, Output
 
 from subgrounds.plotly_wrappers import Figure
@@ -18,6 +19,12 @@ class Graph(dcc.Graph):
     super().__init__(id=f'graph-{Graph.counter}', figure=fig.figure, **kwargs)
     Graph.counter += 1
     self.wrapped_figure = fig
+
+
+class DataTable(dash_table.DataTable):
+  def __init__(self, columns, **kwargs):
+
+    super().__init__(**kwargs)
 
 
 class AutoUpdate(html.Div):

@@ -104,7 +104,7 @@ def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:
       case _:
         return prefix
 
-  def rows(data, prefix: str = '', partial_row: dict = {}) -> list[str]:
+  def rows(data, prefix: str = '', partial_row: dict = {}) -> list[dict[str, Any]]:
     def merge(data: dict, item: dict | list[dict]) -> dict | list[dict]:
       match item:
         case dict():
@@ -126,7 +126,7 @@ def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:
       case value:
         return {prefix: value}
 
-  def flatten(data: list):
+  def flatten(data: list[list[Any]]) -> list[Any]:
     match data[0]:
       case dict():
         return data

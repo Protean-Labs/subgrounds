@@ -1,11 +1,10 @@
 import dash
 from dash import html
-from dash import dcc
-from dash import html
 
 from subgrounds.plotly_wrappers import Bar, Figure
 from subgrounds.dash_wrappers import Graph
 from subgrounds.subgrounds import Subgrounds
+
 
 sg = Subgrounds()
 aaveV2 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/aave/protocol-v2')
