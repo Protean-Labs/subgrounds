@@ -1,6 +1,7 @@
 from __future__ import annotations
+from abc import ABC, abstractmethod
 
-from typing import ClassVar
+from typing import Any, ClassVar
 from pipe import traverse, where, map
 
 from dash import dcc
@@ -9,9 +10,23 @@ from dash import dash_table
 from dash.dependencies import Input, Output
 
 from subgrounds.plotly_wrappers import Figure
+from subgrounds.subgraph import FieldPath
+from subgrounds.subgrounds import Subgrounds, to_dataframe
 
 
-class Graph(dcc.Graph):
+class Refreshable(ABC):
+  @property
+  @abstractmethod
+  def dash_dependencies(self) -> list[Output]:
+    raise NotImplementedError
+
+  @property
+  @abstractmethod
+  def dash_dependencies_outputs(self) -> list[Any]:
+    raise NotImplementedError
+
+
+class Graph(dcc.Graph, Refreshable):
   counter: ClassVar[int] = 0
   wrapped_figure: Figure
 
@@ -20,11 +35,41 @@ class Graph(dcc.Graph):
     Graph.counter += 1
     self.wrapped_figure = fig
 
+  @property
+  def dash_dependencies(self) -> list[Output]:
+    return [Output(self.id, 'figure')]
 
-class DataTable(dash_table.DataTable):
-  def __init__(self, columns, **kwargs):
+  @property
+  def dash_dependencies_outputs(self) -> list[Any]:
+    self.wrapped_figure.refresh()
+    return [self.wrapped_figure.figure]
 
-    super().__init__(**kwargs)
+
+class DataTable(dash_table.DataTable, Refreshable):
+  counter: ClassVar[int] = 0
+
+  def __init__(self, subgrounds: Subgrounds, columns: FieldPath | list[FieldPath], **kwargs):
+    self.subgrounds = subgrounds
+    self.req = self.subgrounds.mk_request(list([columns] | traverse))
+
+    super().__init__(id=f'datatable-{DataTable.counter}', **kwargs)
+    DataTable.counter += 1
+
+    self.refresh()
+
+  def refresh(self) -> None:
+    self.df = to_dataframe(self.subgrounds.execute(self.req))
+    self.columns = [{"name": i, "id": i} for i in self.df.columns]
+    self.data = self.df.to_dict('records')
+
+  @property
+  def dash_dependencies(self) -> list[Output]:
+    return [Output(self.id, 'data')]
+
+  @property
+  def dash_dependencies_outputs(self) -> list[Output]:
+    self.refresh()
+    return [self.df.to_dict('records')]
 
 
 class AutoUpdate(html.Div):
@@ -40,18 +85,19 @@ class AutoUpdate(html.Div):
 
     AutoUpdate.counter += 1
 
-    subgrounds_children = list(children | where(lambda child: isinstance(child, Graph)))
-    deps = list(subgrounds_children | map(lambda child: Output(child.id, 'figure')))
-    figures = list(subgrounds_children | map(lambda child: child.wrapped_figure))
+    subgrounds_children = list(children | where(lambda child: isinstance(child, Refreshable)))
+    deps = list(subgrounds_children | map(lambda child: child.dash_dependencies) | traverse)
+
+    def flatten(l):
+      return [item for sublist in l for item in sublist]
 
     def update(n):
-      for fig in figures:
-        fig.refresh()
+      outputs = flatten(list(subgrounds_children | map(lambda child: child.dash_dependencies_outputs)))
 
-      if len(figures) == 1:
-        return figures[0].figure
+      if len(outputs) == 1:
+        return outputs[0]
       else:
-        return tuple(figures | map(lambda fig: fig.figure))
+        return outputs
 
     # Register callback
     app.callback(*deps, Input(id, 'n_intervals'))(update)
