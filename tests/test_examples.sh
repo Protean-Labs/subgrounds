@@ -21,7 +21,7 @@ for f in examples/*.py; do
   fi
 done
 
-if [ "$FAILING" == true ];
+if [ "$FAILING" == "true" ];
 then
   echo "ERROR"
   exit 1
