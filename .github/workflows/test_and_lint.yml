@@ -1,6 +1,10 @@
 name: Python Package using Conda
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build-linux:
@@ -32,9 +36,13 @@ jobs:
       run: |
         pipenv install --deploy --dev
 
-    - name: Run test suite
+    - name: Run unit tests
       run: |
         pipenv run nose2
+
+    - name: Run examples smoke tests
+      run: |
+        sh tests/test_examples.sh
 
     - name: Lint with flake8
       run: |
