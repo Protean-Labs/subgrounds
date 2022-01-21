@@ -41,6 +41,7 @@ jobs:
         pipenv run nose2
 
     - name: Run examples smoke tests
+      shell: bash
       run: |
         sh tests/test_examples.sh
 

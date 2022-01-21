@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FAILING=false
+FAILING=0
 
 for f in examples/*.py; do
   cp $f .
@@ -15,13 +15,13 @@ for f in examples/*.py; do
   if [ "$RESP_CODE" != "200" ];
   then
     echo "$f FAILED! ($RESP_CODE)"
-    FAILING=true
+    FAILING=1
   else
     echo "$f Ok ($RESP_CODE)"
   fi
 done
 
-if [ "$FAILING" == "true" ];
+if [ $FAILING -eq 1 ];
 then
   echo "ERROR"
   exit 1
