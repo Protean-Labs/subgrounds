@@ -1,7 +1,6 @@
 #!/bin/bash
 
 FAILING=false
-TESTS=()
 
 for f in examples/*.py; do
   cp $f .
