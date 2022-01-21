@@ -5,6 +5,7 @@ from subgrounds.plotly_wrappers import Bar, Figure
 from subgrounds.dash_wrappers import DataTable, AutoUpdate
 from subgrounds.subgrounds import Subgrounds
 
+
 sg = Subgrounds()
 uniswapV2 = sg.load_subgraph("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
 

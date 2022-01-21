@@ -20,9 +20,10 @@ olympusDAO.ProtocolMetric.datetime = SyntheticField(
   olympusDAO.ProtocolMetric.timestamp,
 )
 
-olympusDAO.ProtocolMetric.circ_supply_percent = 100 * olympusDAO.ProtocolMetric.ohmCirculatingSupply / olympusDAO.ProtocolMetric.totalSupply
+# olympusDAO.ProtocolMetric.circ_supply_percent = 100 * olympusDAO.ProtocolMetric.ohmCirculatingSupply / olympusDAO.ProtocolMetric.totalSupply
 
-
+olympusDAO.ProtocolMetric.staked_supply_percent = 100 * olympusDAO.ProtocolMetric.sOhmCirculatingSupply / olympusDAO.ProtocolMetric.totalSupply
+olympusDAO.ProtocolMetric.unstaked_supply_percent = 100 - olympusDAO.ProtocolMetric.staked_supply_percent
 
 protocol_metrics_1year = olympusDAO.Query.protocolMetrics(
   orderBy=olympusDAO.ProtocolMetric.timestamp,
@@ -77,9 +78,20 @@ app.layout = html.Div([
         subgrounds=sg,
         traces=[
           Scatter(
-            name='circ_supply_percent',
+            name='staked_supply_percent',
             x=protocol_metrics_1year.datetime,
-            y=protocol_metrics_1year.circ_supply_percent,
+            y=protocol_metrics_1year.staked_supply_percent,
+            mode='lines',
+            line={'width': 0.5, 'color': 'rgb(0, 255, 0)'},
+            stackgroup='one',
+          ),
+          Scatter(
+            name='unstaked_supply_percent',
+            x=protocol_metrics_1year.datetime,
+            y=protocol_metrics_1year.unstaked_supply_percent,
+            mode='lines',
+            line={'width': 0.5, 'color': 'rgb(255, 0, 0)'},
+            stackgroup='one',
           )
         ],
         layout={

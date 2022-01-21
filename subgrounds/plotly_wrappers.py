@@ -85,12 +85,16 @@ class Indicator(TraceWrapper):
     self.args = kwargs
 
   def mk_trace(self, data: dict[str, Any]) -> BaseTraceType:
-    val = self.value.extract_data(data)
+    match self.value:
+      case FieldPath():
+        val = self.value.extract_data(data)
 
-    return self.graph_object(
-      value=val[0] if type(val) == list else val,
-      **self.args
-    )
+        return self.graph_object(
+          value=val[0] if type(val) == list else val,
+          **self.args
+        )
+      case value:
+        return self.graph_object(value=value, **self.args)
 
   @property
   def field_paths(self) -> list[FieldPath]:
