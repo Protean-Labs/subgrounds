@@ -85,11 +85,11 @@ class AutoUpdate(html.Div):
 
     AutoUpdate.counter += 1
 
-    subgrounds_children = list(children | where(lambda child: isinstance(child, Refreshable)))
-    deps = list(subgrounds_children | map(lambda child: child.dash_dependencies) | traverse)
-
     def flatten(l):
       return [item for sublist in l for item in sublist]
+
+    subgrounds_children = list(children | where(lambda child: isinstance(child, Refreshable)))
+    deps = flatten(list(subgrounds_children | map(lambda child: child.dash_dependencies)))
 
     def update(n):
       outputs = flatten(list(subgrounds_children | map(lambda child: child.dash_dependencies_outputs)))
