@@ -17,6 +17,6 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License"
     ],
     packages=setuptools.find_packages(exclude=["tests", "examples"]),
-    install_requires=['dash', 'requests', 'pipe'],
+    install_requires=['dash', 'requests', 'pipe', 'pandas'],
     python_requires=">=3.10",
 )
