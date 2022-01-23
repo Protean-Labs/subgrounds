@@ -3,6 +3,7 @@ import unittest
 from subgrounds.query import Argument, DataRequest, Document, Query, Selection, InputValue, VariableDefinition, execute
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.subgraph import Subgraph, SyntheticField
+from subgrounds.subgrounds import Subgrounds
 
 from tests.utils import schema
 
@@ -75,6 +76,8 @@ class TestQueryString(unittest.TestCase):
   }
 }"""
 
+    app = Subgrounds()
+
     pairs = self.subgraph.Query.pairs(
       first=100,
       where=[
@@ -84,7 +87,7 @@ class TestQueryString(unittest.TestCase):
       orderDirection='desc'
     )
 
-    req = self.subgraph.mk_request([
+    req = app.mk_request([
       pairs.id,
       pairs.token0.name,
       pairs.token0.symbol,

@@ -16,6 +16,8 @@ setuptools = "*"
 build = "*"
 twine = "*"
 pipe = "*"
+pandas = "*"
+ipykernel = "*"
 
 [dev-packages]
 

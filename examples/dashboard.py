@@ -1,19 +1,60 @@
 import dash
 from dash import html
 
-from subgrounds.components import AutoUpdate, BarChart, IndicatorWithChange
-from subgrounds.subgraph import Subgraph
+# from subgrounds.components import AutoUpdate, BarChart, IndicatorWithChange
+# from subgrounds.subgraph import Subgraph
+from subgrounds.dash_wrappers import Graph, AutoUpdate
+from subgrounds.plotly_wrappers import Figure, Bar, Indicator
+from subgrounds.subgrounds import Subgrounds
 
-uniswapV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
-aaveV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/aave/protocol-v2")
-klima_markets = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/0xplaygrounds/playgrounds-klima-markets")
 
-# This is unecessary, but nice for brevity
-univ2Pair = uniswapV2.Pair
-Borrow = aaveV2.Borrow
-Repay = aaveV2.Repay
+sg = Subgrounds()
+uniswapV2 = sg.load_subgraph("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
+aaveV2 = sg.load_subgraph("https://api.thegraph.com/subgraphs/name/aave/protocol-v2")
+klima_markets = sg.load_subgraph("https://api.thegraph.com/subgraphs/name/0xplaygrounds/playgrounds-klima-markets")
 
-Trade = klima_markets.Trade
+# Define formatted token amounts on Borrow and Repay entities
+aaveV2.Borrow.adjusted_amount = aaveV2.Borrow.amount / 10 ** aaveV2.Borrow.reserve.decimals
+aaveV2.Repay.adjusted_amount = aaveV2.Repay.amount / 10 ** aaveV2.Repay.reserve.decimals
+
+weth_usdc_last_price = uniswapV2.Query.pair(
+  id='0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc',
+).token0Price
+
+wbtc_usdc_last_price = uniswapV2.Query.pair(
+  id='0x004375dff511095cc5a197a54140a24efef3a416',
+).token1Price
+
+klima_usdc_last_close = klima_markets.Query.trades(
+  orderBy=klima_markets.Trade.timestamp,
+  orderDirection='desc',
+  first=1,
+  where=[
+    klima_markets.Trade.pair == "0x5786b267d35f9d011c4750e0b0ba584e1fdbead1"
+  ]
+).close
+
+bct_usdc_last_close = klima_markets.Query.trades(
+  orderBy=klima_markets.Trade.timestamp,
+  orderDirection='desc',
+  first=1,
+  where=[
+    klima_markets.Trade.pair == "0x1e67124681b402064cd0abe8ed1b5c79d2e02f64"
+  ]
+).close
+
+borrows = aaveV2.Query.borrows(
+  orderBy=aaveV2.Borrow.timestamp,
+  orderDirection='desc',
+  first=100,
+)
+
+repays = aaveV2.Query.repays(
+  orderBy=aaveV2.Repay.timestamp,
+  orderDirection='desc',
+  first=100,
+)
+
 
 # Dashboard
 app = dash.Dash(__name__)
@@ -26,13 +67,14 @@ app.layout = html.Div([
       AutoUpdate(
         app,
         sec_interval=20,
-        id='price-indicator-update',
-        component=IndicatorWithChange(
-          uniswapV2.Query.pair,
-          component_id='price-indicator',
-          id='0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc',
-          x=univ2Pair.token0Price
-        )
+        children=[
+          Graph(Figure(
+            subgrounds=sg,
+            traces=[
+              Indicator(value=weth_usdc_last_price)
+            ]
+          ))
+        ]
       )
     ], style={'width': '25%', 'display': 'inline-block'}),
     html.Div([
@@ -40,13 +82,14 @@ app.layout = html.Div([
       AutoUpdate(
         app,
         sec_interval=20,
-        id='price-indicator-update2',
-        component=IndicatorWithChange(
-          uniswapV2.Query.pair,
-          component_id='price-indicator2',
-          id='0x004375dff511095cc5a197a54140a24efef3a416',
-          x=univ2Pair.token1Price
-        )
+        children=[
+          Graph(Figure(
+            subgrounds=sg,
+            traces=[
+              Indicator(value=wbtc_usdc_last_price)
+            ]
+          ))
+        ]
       )
     ], style={'width': '25%', 'display': 'inline-block'}),
     html.Div([
@@ -54,18 +97,14 @@ app.layout = html.Div([
       AutoUpdate(
         app,
         sec_interval=20,
-        id='price-indicator-update3',
-        component=IndicatorWithChange(
-          klima_markets.Query.trades,
-          component_id='price-indicator3',
-          orderBy=Trade.timestamp,
-          orderDirection="desc",
-          first=1,
-          where=[
-            Trade.pair == "0x5786b267d35f9d011c4750e0b0ba584e1fdbead1"
-          ],
-          x=Trade.close
-        )
+        children=[
+          Graph(Figure(
+            subgrounds=sg,
+            traces=[
+              Indicator(value=klima_usdc_last_close)
+            ]
+          ))
+        ]
       )
     ], style={'width': '25%', 'display': 'inline-block'}),
     html.Div([
@@ -73,18 +112,14 @@ app.layout = html.Div([
       AutoUpdate(
         app,
         sec_interval=20,
-        id='price-indicator-update4',
-        component=IndicatorWithChange(
-          klima_markets.Query.trades,
-          component_id='price-indicator4',
-          orderBy=Trade.timestamp,
-          orderDirection="desc",
-          first=1,
-          where=[
-            Trade.pair == "0x1e67124681b402064cd0abe8ed1b5c79d2e02f64"
-          ],
-          x=Trade.close
-        )
+        children=[
+          Graph(Figure(
+            subgrounds=sg,
+            traces=[
+              Indicator(value=bct_usdc_last_close)
+            ]
+          ))
+        ]
       )
     ], style={'width': '25%', 'display': 'inline-block'})
   ]),
@@ -94,31 +129,15 @@ app.layout = html.Div([
     html.Div([
       html.H4('Aave V2 last 100 borrows'),
       html.Div([
-        BarChart(
-          aaveV2.Query.borrows,
-          component_id='bar-chart2',
-          orderBy=Borrow.timestamp,
-          orderDirection="desc",
-          first=100,
-          x=Borrow.reserve.symbol,
-          y=Borrow.amount
-        )
+        Graph(Figure(
+          subgrounds=sg,
+          traces=[
+            Bar(x=borrows.reserve.symbol, y=borrows.adjusted_amount),
+            Bar(x=repays.reserve.symbol, y=repays.adjusted_amount)
+          ]
+        ))
       ])
-    ], style={'width': '48%', 'display': 'inline-block'}),
-    html.Div([
-      html.H4('Aave V2 last 100 repayments'),
-      html.Div([
-        BarChart(
-          aaveV2.Query.repays,
-          component_id='bar-chart2',
-          orderBy=Repay.timestamp,
-          orderDirection="desc",
-          first=100,
-          x=Repay.reserve.symbol,
-          y=Repay.amount
-        )
-      ])
-    ], style={'width': '48%', 'display': 'inline-block'})
+    ])
   ])
 ])
 

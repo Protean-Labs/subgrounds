@@ -3,6 +3,7 @@ import unittest
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef
 from subgrounds.subgraph import FieldPath, Filter, Object, Subgraph, SyntheticField
 from subgrounds.query import Argument, DataRequest, InputValue, Query, Selection
+from subgrounds.subgrounds import Subgrounds
 from subgrounds.utils import identity
 
 from tests.utils import schema
@@ -17,7 +18,7 @@ class TestAddType(unittest.TestCase):
     SyntheticField.counter = 0
 
   def test_add_synthetic_field_1(self):
-    sfield = SyntheticField(self.subgraph, identity, TypeRef.Named('Float'))
+    sfield = SyntheticField(identity, TypeRef.Named('Float'))
 
     expected = SchemaMeta(query_type='Query', type_map={
       'Int': TypeMeta.ScalarMeta('Int', ''),
@@ -283,7 +284,7 @@ class TestFieldPath(unittest.TestCase):
     self.subgraph = Subgraph("", self.schema)
 
   def tearDown(self) -> None:
-    Filter.test_mode = False
+    FieldPath.test_mode = False
 
   def test_object(self):
     object_ = TypeMeta.ObjectMeta('Pair', '', fields=[
@@ -299,7 +300,7 @@ class TestFieldPath(unittest.TestCase):
 
     Pair = self.subgraph.Pair
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(Pair, expected)
 
   def test_field_path_1(self):
@@ -321,7 +322,7 @@ class TestFieldPath(unittest.TestCase):
 
     fpath = self.subgraph.Pair.token0
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_2(self):
@@ -343,7 +344,7 @@ class TestFieldPath(unittest.TestCase):
 
     fpath = self.subgraph.Pair.id
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_3(self):
@@ -366,11 +367,11 @@ class TestFieldPath(unittest.TestCase):
 
     fpath = self.subgraph.Pair.token0.id
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_1(self):
-    sfield = SyntheticField(self.subgraph, identity, TypeRef.Named('Float'))
+    sfield = SyntheticField(identity, TypeRef.Named('Float'))
 
     expected = FieldPath(
       self.subgraph,
@@ -391,11 +392,11 @@ class TestFieldPath(unittest.TestCase):
     self.subgraph.Pair.reserveCAD = sfield
     fpath = self.subgraph.Pair.reserveCAD
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_2(self):
-    sfield = SyntheticField(self.subgraph, identity, TypeRef.Named('String'))
+    sfield = SyntheticField(identity, TypeRef.Named('String'))
 
     expected = FieldPath(
       self.subgraph,
@@ -415,21 +416,13 @@ class TestFieldPath(unittest.TestCase):
     self.subgraph.Token.frenchName = sfield
     fpath = self.subgraph.Pair.token0.frenchName
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_3(self):
     expected = FieldPath(
       self.subgraph,
-      TypeMeta.ObjectMeta('Pair', '', fields=[
-        TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-        TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
-        TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token')),
-        TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')),
-      ]),
+      TypeRef.Named('Pair'),
       TypeRef.Named('String'),
       [
         (None, TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')))
@@ -439,7 +432,7 @@ class TestFieldPath(unittest.TestCase):
     self.subgraph.Pair.token0Id = self.subgraph.Pair.token0.id
     fpath = self.subgraph.Pair.token0Id
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_filter_1(self):
@@ -451,29 +444,13 @@ class TestFieldPath(unittest.TestCase):
 
     filter_ = self.subgraph.Pair.reserveUSD > 100
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(filter_, expected)
 
   def test_field_path_args_1(self):
     expected = FieldPath(
       self.subgraph,
-      TypeMeta.ObjectMeta('Query', '', fields=[
-        TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-        ], TypeRef.non_null_list('Pair')),
-        TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
-      ]),
-      # TypeMeta.ObjectMeta('Pair', '', fields=[
-      #   TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-      #   TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
-      #   TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token')),
-      #   TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
-      #   TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
-      #   TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-      # ]),
+      TypeRef.Named("Query"),
       TypeRef.non_null_list('Pair'),
       [
         (
@@ -502,21 +479,13 @@ class TestFieldPath(unittest.TestCase):
       orderDirection='desc'
     )
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_args_2(self):
     expected = FieldPath(
       self.subgraph,
-      TypeMeta.ObjectMeta('Query', '', fields=[
-        TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-        ], TypeRef.non_null_list('Pair')),
-        TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
-      ]),
+      TypeRef.Named("Query"),
       TypeRef.non_null_list('Pair'),
       [
         (
@@ -527,10 +496,6 @@ class TestFieldPath(unittest.TestCase):
               'token0': 'abcd'
             }
           },
-          # [
-          #   Argument('first', InputValue.Int(100)),
-          #   Argument('where', InputValue.Object({'reserveUSD_gt': InputValue.String('100.0'), 'token0': InputValue.String("abcd")})),
-          # ],
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
@@ -549,7 +514,7 @@ class TestFieldPath(unittest.TestCase):
       ]
     )
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_args_3(self):
@@ -590,7 +555,7 @@ class TestFieldPath(unittest.TestCase):
       orderBy=self.subgraph.Pair.reserveUSD
     )
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_extend_1(self):
@@ -626,7 +591,7 @@ class TestFieldPath(unittest.TestCase):
 
     fpath = FieldPath.extend(fpath1, fpath2)
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.assertEqual(fpath, expected)
 
 
@@ -657,12 +622,14 @@ class TestQueryBuilding(unittest.TestCase):
       )
     ]))
 
-    query = self.subgraph.mk_request([
+    app = Subgrounds()
+
+    query = app.mk_request([
       self.subgraph.Query.pairs(first=10).id,
       self.subgraph.Query.pairs.token0.symbol
     ])
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.maxDiff = None
     self.assertEqual(query, expected)
 
@@ -675,7 +642,9 @@ class TestQueryBuilding(unittest.TestCase):
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
-        arguments=[Argument("first", InputValue.Int(10))],
+        arguments=[
+          Argument("first", InputValue.Int(10))
+        ],
         selection=[
           Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
           Selection(TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')))
@@ -683,15 +652,17 @@ class TestQueryBuilding(unittest.TestCase):
       )
     ]))
 
+    app = Subgrounds()
+
     Pair = self.subgraph.Pair
     Pair.token0Id = Pair.token0.id
 
-    query = self.subgraph.mk_request([
+    query = app.mk_request([
       self.subgraph.Query.pairs(first=10).id,
       self.subgraph.Query.pairs.token0Id
     ])
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
     self.maxDiff = None
     self.assertEqual(query, expected)
 
@@ -703,15 +674,39 @@ class TestQueryBuilding(unittest.TestCase):
       ])
     ]))
 
+    app = Subgrounds()
+
     Swap = self.subgraph.Swap
     Swap.price = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
 
-    query = self.subgraph.mk_request([
+    query = app.mk_request([
       self.subgraph.Query.swaps.timestamp,
       self.subgraph.Query.swaps.price
     ])
 
-    Filter.test_mode = True
+    FieldPath.test_mode = True
+    self.maxDiff = None
+    self.assertEqual(query, expected)
+
+  def test_mk_request_4(self):
+    expected = DataRequest.single_query("", Query(selection=[
+      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), selection=[
+        Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+        Selection(TypeMeta.FieldMeta('my_value', '', [], TypeRef.Named('Float')))
+      ])
+    ]))
+
+    app = Subgrounds()
+
+    Swap = self.subgraph.Swap
+    Swap.my_value = Swap.amount0In / 10 ** Swap.amount0Out
+
+    query = app.mk_request([
+      self.subgraph.Query.swaps.timestamp,
+      self.subgraph.Query.swaps.my_value
+    ])
+
+    FieldPath.test_mode = True
     self.maxDiff = None
     self.assertEqual(query, expected)
 
@@ -732,7 +727,6 @@ class TestSyntheticField(unittest.TestCase):
     ]
 
     sfield = SyntheticField(
-      self.subgraph,
       lambda x: x * 10,
       TypeRef.Named('Int'),
       Swap.amount0In
@@ -761,7 +755,6 @@ class TestSyntheticField(unittest.TestCase):
       Swap.amount0In,
       Swap.amount0Out,
       Swap.amount1In,
-      # Swap.amount1Out
     ]
 
     sfield: SyntheticField = Swap.amount0In - Swap.amount0Out + Swap.amount1In
@@ -782,4 +775,17 @@ class TestSyntheticField(unittest.TestCase):
     sfield: SyntheticField = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
 
     self.assertEqual(sfield.f(10, 0, 0, 20), 0.5)
+    self.assertEqual(sfield.deps, expected_deps)
+
+  def test_synthetic_field_6(self):
+    Swap = self.subgraph.Swap
+
+    expected_deps = [
+      Swap.amount0In,
+      Swap.amount0Out,
+    ]
+
+    sfield: SyntheticField = Swap.amount0In / 10 ** Swap.amount0Out
+
+    self.assertEqual(sfield.f(100, 2), 1)
     self.assertEqual(sfield.deps, expected_deps)

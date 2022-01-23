@@ -492,8 +492,8 @@ class Query:
   ) -> Query:
     return Query(
       name=query.name,
-      selection=list(query.selection | map(selection_f)),
-      variables=list(query.variables | map(variable_f))
+      selection=list(query.selection | map(selection_f) | traverse),
+      variables=list(query.variables | map(variable_f) | traverse)
     )
 
   @staticmethod
@@ -643,7 +643,8 @@ class Document:
     return Document(
       url=doc.url,
       query=query_f(doc.query),
-      fragments=list(doc.fragments | map(fragment_f))
+      fragments=list(doc.fragments | map(fragment_f)),
+      variables=doc.variables
     )
 
 
