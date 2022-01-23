@@ -182,14 +182,19 @@ class Selection:
   def graphql_string(self, level: int = 0) -> str:
     indent = "  " * level
 
+    if self.alias:
+      alias_str = f'{self.alias}: '
+    else:
+      alias_str = ''
+
     match (self.selection):
       case None | []:
-        return f"{indent}{self.fmeta.name}{self.args_graphql_string}"
+        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql_string}"
       case inner_selection:
         inner_str = "\n".join(
           [f.graphql_string(level=level + 1) for f in inner_selection]
         )
-        return f"{indent}{self.fmeta.name}{self.args_graphql_string} {{\n{inner_str}\n{indent}}}"
+        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql_string} {{\n{inner_str}\n{indent}}}"
 
   @staticmethod
   def add_selections(select: Selection, new_selections: list[Selection]) -> Selection:

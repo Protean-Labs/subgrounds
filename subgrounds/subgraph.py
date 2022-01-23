@@ -311,6 +311,8 @@ class FieldPath(FieldOperatorMixin):
         case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
           return [Selection(
             fmeta,
+            # TODO: Revisit this
+            alias='x' + hex(hash(str(args))).split('x')[-1],
             arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
             selection=selection_of_path(fpath.subgraph.schema, rest)
           )]
