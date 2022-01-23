@@ -173,6 +173,13 @@ class Selection:
   selection: list[Selection] = field(default_factory=list)
 
   @property
+  def key(self):
+    if self.alias:
+      return self.alias
+    else:
+      return self.fmeta.name
+
+  @property
   def args_graphql_string(self) -> str:
     if self.arguments:
       return f'({", ".join([arg.graphql_string for arg in self.arguments])})'
@@ -364,7 +371,7 @@ class Query:
       selection=union(
         query.selection,
         new_selections,
-        key=lambda select: select.fmeta.name,
+        key=lambda select: select.key,
         combine=Selection.combine
       )
     )

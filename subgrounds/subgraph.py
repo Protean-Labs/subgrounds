@@ -270,11 +270,15 @@ class FieldPath(FieldOperatorMixin):
 
   @property
   def data_path(self) -> list[str]:
-    return list(self.path | map(lambda ele: ele[1].name))
+    return list(self.path | map(lambda ele: FieldPath.hashargs(ele[0]) if ele[0] != {} or ele[0] != None else ele[1].name))
 
   @property
   def longname(self) -> str:
     return '_'.join(self.data_path)
+
+  @staticmethod
+  def hashargs(args: dict) -> str:
+    return 'x' + hex(hash(str(args))).split('x')[-1]
 
   def extract_data(self, data: dict) -> list[Any] | Any:
     def f(data_path: list[str], data: dict | list | Any):
@@ -312,7 +316,7 @@ class FieldPath(FieldOperatorMixin):
           return [Selection(
             fmeta,
             # TODO: Revisit this
-            alias='x' + hex(hash(str(args))).split('x')[-1],
+            alias=FieldPath.hashargs(args) if args != {} or args != None else None,
             arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
             selection=selection_of_path(fpath.subgraph.schema, rest)
           )]
