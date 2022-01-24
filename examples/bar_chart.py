@@ -37,7 +37,11 @@ app.layout = html.Div(
         traces=[
           Bar(x=borrows.reserve.symbol, y=borrows.adjusted_amount),
           Bar(x=repays.reserve.symbol, y=repays.adjusted_amount)
-        ]
+        ],
+        layout={
+          'paper_bgcolor': 'rga(39,51,66)',
+          'plot_bgcolor': 'rga(39,51,66)'
+        }
       ))
     ])
   ])

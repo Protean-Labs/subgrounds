@@ -31,10 +31,12 @@ def transform_request(fmeta: TypeMeta.FieldMeta, replacement: list[Selection], r
 
 def select_data(select: Selection, data: dict) -> list[Any]:
   match (select, data):
-    case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name in data:
+    case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name in data:
       return [data[name]]
-    case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data) if name in data:
+
+    case (Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data) if name in data:
       return list(inner_select | map(partial(select_data, data=data[name])) | traverse)
+
     case (select, data):
       raise Exception(f"select_data: invalid selection {select} for data {data}")
 
@@ -143,11 +145,11 @@ class TypeTransform(DocumentTransform):
     def transform(select: Selection, data: dict) -> None:
       # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
       match (select, data):
-        case (Selection(TypeMeta.FieldMeta(name, _, _, ftype), _, _, [] | None), dict() as data) if TypeRef.root_type_name(self.type_) == TypeRef.root_type_name(ftype):
+        case (Selection(TypeMeta.FieldMeta(name, _, _, ftype), None, _, [] | None) | Selection(TypeMeta.FieldMeta(_, _, _, ftype), name, _, [] | None), dict() as data) if TypeRef.root_type_name(self.type_) == TypeRef.root_type_name(ftype):
           data[name] = self.f(data[name])
         case (Selection(_, _, _, [] | None), dict()):
           pass
-        case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data):
+        case (Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data):
           match data[name]:
             case list() as elts:
               for elt in elts:
@@ -193,12 +195,13 @@ class LocalSyntheticField(DocumentTransform):
   def transform_response(self, doc: Document, data: dict[str, Any]) -> list[dict[str, Any]]:
     def transform(select: Selection, data: dict) -> None:
       match (select, data):
-        case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
+        case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
           arg_values = flatten(list(self.args | map(partial(select_data, data=data))))
           data[name] = self.f(*arg_values)
-        case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data):
+
+        case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data):
           pass
-        case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data) if name in data:
+        case (Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data) if name in data:
           match data[name]:
             case list() as elts:
               for elt in elts:

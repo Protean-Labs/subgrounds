@@ -270,7 +270,7 @@ class FieldPath(FieldOperatorMixin):
 
   @property
   def data_path(self) -> list[str]:
-    return list(self.path | map(lambda ele: FieldPath.hashargs(ele[0]) if ele[0] != {} or ele[0] != None else ele[1].name))
+    return list(self.path | map(lambda ele: FieldPath.hashargs(ele[0]) if ele[0] != {} and ele[0] is not None else ele[1].name))
 
   @property
   def longname(self) -> str:
@@ -313,16 +313,21 @@ class FieldPath(FieldOperatorMixin):
     def f(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> list[Selection]:
       match path:
         case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
+          # print(f'FieldPath.selection: args = {args}')
           return [Selection(
             fmeta,
             # TODO: Revisit this
-            alias=FieldPath.hashargs(args) if args != {} or args != None else None,
+            alias=FieldPath.hashargs(args) if args != {} and args is not None else None,
             arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
             selection=selection_of_path(fpath.subgraph.schema, rest)
           )]
         case []:
           return []
 
+
+    # select = f(fpath.path)[0]
+    # print(f'FieldPath.selection: {select.graphql_string(0)}')
+    # return select
     return f(fpath.path)[0]
 
   @staticmethod
