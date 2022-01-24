@@ -612,6 +612,7 @@ class TestQueryBuilding(unittest.TestCase):
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
+        alias='x7983789533540c89',
         arguments=[Argument("first", InputValue.Int(10))],
         selection=[
           Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
@@ -624,9 +625,11 @@ class TestQueryBuilding(unittest.TestCase):
 
     app = Subgrounds()
 
+    pairs = self.subgraph.Query.pairs(first=10)
+
     query = app.mk_request([
-      self.subgraph.Query.pairs(first=10).id,
-      self.subgraph.Query.pairs.token0.symbol
+      pairs.id,
+      pairs.token0.symbol
     ])
 
     FieldPath.test_mode = True
@@ -642,6 +645,7 @@ class TestQueryBuilding(unittest.TestCase):
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
+        alias='x7983789533540c89',
         arguments=[
           Argument("first", InputValue.Int(10))
         ],
@@ -657,9 +661,11 @@ class TestQueryBuilding(unittest.TestCase):
     Pair = self.subgraph.Pair
     Pair.token0Id = Pair.token0.id
 
+    pairs = self.subgraph.Query.pairs(first=10)
+
     query = app.mk_request([
-      self.subgraph.Query.pairs(first=10).id,
-      self.subgraph.Query.pairs.token0Id
+      pairs.id,
+      pairs.token0Id
     ])
 
     FieldPath.test_mode = True

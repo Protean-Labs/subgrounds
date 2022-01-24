@@ -6,6 +6,7 @@ from functools import partial, reduce
 import os
 import json
 import operator
+from hashlib import blake2b
 from pipe import map
 
 import subgrounds.client as client
@@ -270,15 +271,17 @@ class FieldPath(FieldOperatorMixin):
 
   @property
   def data_path(self) -> list[str]:
-    return list(self.path | map(lambda ele: FieldPath.hashargs(ele[0]) if ele[0] != {} and ele[0] is not None else ele[1].name))
+    return list(self.path | map(lambda ele: FieldPath.hash(ele[0]) if ele[0] != {} and ele[0] is not None else ele[1].name))
 
   @property
   def longname(self) -> str:
     return '_'.join(self.data_path)
 
   @staticmethod
-  def hashargs(args: dict) -> str:
-    return 'x' + hex(hash(str(args))).split('x')[-1]
+  def hash(args: dict) -> str:
+    h = blake2b(digest_size=8)
+    h.update(str(args).encode('UTF-8'))
+    return 'x' + h.hexdigest()
 
   def extract_data(self, data: dict) -> list[Any] | Any:
     def f(data_path: list[str], data: dict | list | Any):
@@ -317,7 +320,7 @@ class FieldPath(FieldOperatorMixin):
           return [Selection(
             fmeta,
             # TODO: Revisit this
-            alias=FieldPath.hashargs(args) if args != {} and args is not None else None,
+            alias=FieldPath.hash(args) if args != {} and args is not None else None,
             arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
             selection=selection_of_path(fpath.subgraph.schema, rest)
           )]

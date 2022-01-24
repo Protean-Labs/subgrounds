@@ -210,6 +210,7 @@ class TestQueryString(unittest.TestCase):
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
           ], TypeRef.non_null_list('Pair')),
+          alias='x7983789533540c89',
           arguments=[
             Argument("first", InputValue.Int(10))
           ],
@@ -244,6 +245,7 @@ class TestQueryString(unittest.TestCase):
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
             ], TypeRef.non_null_list('Pair')),
+            alias='x7983789533540c89',
             arguments=[
               Argument("first", InputValue.Int(10))
             ],
@@ -264,6 +266,7 @@ class TestQueryString(unittest.TestCase):
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
             ], TypeRef.non_null_list('Pair')),
+            alias='x7983789533540c89',
             arguments=[
               Argument("first", InputValue.Int(10))
             ],
@@ -289,8 +292,10 @@ class TestQueryString(unittest.TestCase):
     req = app.mk_request([
       pairs.id,
       pairs.reserveUSD,
-      self.subgraph2.Query.pairs(first=10).id,
-      self.subgraph2.Query.pairs.token0Id
+      *self.subgraph2.Query.pairs(first=10, selection=[
+        self.subgraph2.Pair.id,
+        self.subgraph2.Pair.token0Id
+      ]),
     ])
 
     self.assertEqual(req, expected)
@@ -313,7 +318,7 @@ class TestData(unittest.TestCase):
     fpath = repays.amount
 
     data = {
-      'repays': [
+      'x011e6f213e173259': [
         {'amount': 1},
         {'amount': 2},
         {'amount': 3},

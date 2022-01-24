@@ -63,7 +63,7 @@ class TestQueryString(unittest.TestCase):
 
   def test_graphql_string_2(self):
     expected = """query {
-  pairs(first: 100, where: {reserveUSD_lt: "10.0"}, orderBy: reserveUSD, orderDirection: desc) {
+  xbd257bacca2146cb: pairs(first: 100, where: {reserveUSD_lt: "10.0"}, orderBy: reserveUSD, orderDirection: desc) {
     id
     token0 {
       name
