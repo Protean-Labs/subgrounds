@@ -1,15 +1,13 @@
 from abc import ABC, abstractmethod
-from trace import Trace
 from typing import Any
 from pipe import traverse, map
 
 import plotly.graph_objects as go
 from plotly.basedatatypes import BaseTraceType
-from subgrounds.query import DataRequest
 
-from subgrounds.schema import TypeRef
-from subgrounds.subgraph import Filter, FieldPath
+from subgrounds.subgraph import FieldPath
 from subgrounds.subgrounds import Subgrounds
+from subgrounds.query import DataRequest
 
 
 class TraceWrapper(ABC):

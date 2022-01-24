@@ -210,7 +210,7 @@ class TestQueryString(unittest.TestCase):
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
           ], TypeRef.non_null_list('Pair')),
-          alias='x7983789533540c89',
+          alias='x7ecb1bc5fd9e0dcf',
           arguments=[
             Argument("first", InputValue.Int(10))
           ],
@@ -245,7 +245,7 @@ class TestQueryString(unittest.TestCase):
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
             ], TypeRef.non_null_list('Pair')),
-            alias='x7983789533540c89',
+            alias='x7ecb1bc5fd9e0dcf',
             arguments=[
               Argument("first", InputValue.Int(10))
             ],
@@ -266,7 +266,7 @@ class TestQueryString(unittest.TestCase):
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
             ], TypeRef.non_null_list('Pair')),
-            alias='x7983789533540c89',
+            alias='x7ecb1bc5fd9e0dcf',
             arguments=[
               Argument("first", InputValue.Int(10))
             ],
@@ -318,7 +318,7 @@ class TestData(unittest.TestCase):
     fpath = repays.amount
 
     data = {
-      'x011e6f213e173259': [
+      'x84d7be5e0ed4ef8a': [
         {'amount': 1},
         {'amount': 2},
         {'amount': 3},

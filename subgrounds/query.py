@@ -246,8 +246,8 @@ class Selection:
 
   @staticmethod
   def combine(select: Selection, other: Selection) -> Selection:
-    if select.fmeta != other.fmeta:
-      raise Exception(f"Selection.combine: {select.fmeta} != {other.fmeta}")
+    if select.key != select.key:
+      raise Exception(f"Selection.combine: {select.key} != {select.key}")
 
     return Selection(
       fmeta=select.fmeta,
@@ -290,6 +290,7 @@ class Selection:
   def substitute_arg(select: Selection, arg_name: str, replacement: Argument | list[Argument]) -> Selection:
     return Selection(
       fmeta=select.fmeta,
+      alias=select.alias,
       arguments=list(
         select.arguments
         | map(lambda arg: replacement if arg.name == arg_name else arg)
@@ -491,7 +492,7 @@ class Query:
       selection=union(
         query.selection,
         other.selection,
-        key=lambda select: select.fmeta.name,
+        key=lambda select: select.key,
         combine=Selection.combine
       )
     )

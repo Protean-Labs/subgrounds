@@ -612,7 +612,7 @@ class TestQueryBuilding(unittest.TestCase):
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
-        alias='x7983789533540c89',
+        alias='x7ecb1bc5fd9e0dcf',
         arguments=[Argument("first", InputValue.Int(10))],
         selection=[
           Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
@@ -645,7 +645,7 @@ class TestQueryBuilding(unittest.TestCase):
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
-        alias='x7983789533540c89',
+        alias='x7ecb1bc5fd9e0dcf',
         arguments=[
           Argument("first", InputValue.Int(10))
         ],

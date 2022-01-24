@@ -271,19 +271,21 @@ class FieldPath(FieldOperatorMixin):
 
   @property
   def data_path(self) -> list[str]:
-    return list(self.path | map(lambda ele: FieldPath.hash(ele[0]) if ele[0] != {} and ele[0] is not None else ele[1].name))
+    # return list(self.path | map(lambda ele: ele[1].name))
+    return list(self.path | map(lambda ele: FieldPath.hash(ele[1].name + str(ele[0])) if ele[0] != {} and ele[0] is not None else ele[1].name))
 
   @property
   def longname(self) -> str:
     return '_'.join(self.data_path)
 
   @staticmethod
-  def hash(args: dict) -> str:
+  def hash(msg: str) -> str:
     h = blake2b(digest_size=8)
-    h.update(str(args).encode('UTF-8'))
+    h.update(msg.encode('UTF-8'))
     return 'x' + h.hexdigest()
 
   def extract_data(self, data: dict) -> list[Any] | Any:
+    # print(f'path = {self.data_path}')
     def f(data_path: list[str], data: dict | list | Any):
       match data_path:
         case []:
@@ -320,7 +322,7 @@ class FieldPath(FieldOperatorMixin):
           return [Selection(
             fmeta,
             # TODO: Revisit this
-            alias=FieldPath.hash(args) if args != {} and args is not None else None,
+            alias=FieldPath.hash(fmeta.name + str(args)) if args != {} and args is not None else None,
             arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
             selection=selection_of_path(fpath.subgraph.schema, rest)
           )]
