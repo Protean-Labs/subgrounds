@@ -18,22 +18,34 @@ class Subgrounds:
   global_transforms: list[RequestTransform] = field(default_factory=lambda: DEFAULT_GLOBAL_TRANSFORMS)
   subgraphs: dict[str, Subgraph] = field(default_factory=dict)
 
-  def load_subgraph(self, url: str) -> Subgraph:
+  def load_subgraph(self, url: str, save_schema: bool = False) -> Subgraph:
+    """Performs introspection on the provided GraphQL API `url` to get the schema, 
+    stores the schema if `save_schema` is `True` and returns a generated class representing 
+    the subgraph with all its entities.
+
+    Args:
+        url (str): The url of the API
+        save_schema (bool, optional): Flag indicating whether or not the schema should be saved to disk. Defaults to False.
+
+    Returns:
+        Subgraph: A generated class representing the subgraph and its entities
+    """
     filename = url.split("/")[-1] + ".json"
     if os.path.isfile(filename):
       with open(filename) as f:
         schema = json.load(f)
     else:
       schema = client.get_schema(url)
-      with open(filename, mode="w") as f:
-        json.dump(schema, f)
+      if save_schema:
+        with open(filename, mode="w") as f:
+          json.dump(schema, f)
 
     sg = Subgraph(url, mk_schema(schema), DEFAULT_SUBGRAPH_TRANSFORMS)
     self.subgraphs[url] = sg
     return sg
 
   def mk_request(self, fpaths: list[FieldPath]) -> DataRequest:
-    """ Creates a `DataRequest` object by combining multiple `FieldPath` objects
+    """Creates a `DataRequest` object by combining multiple `FieldPath` objects
 
     Args:
         fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
@@ -51,7 +63,7 @@ class Subgrounds:
     ))
 
   def execute(self, req: DataRequest) -> list[dict]:
-    """ Executes a `DataRequest` object, sending the underlying query(ies) to the server and returning 
+    """Executes a `DataRequest` object, sending the underlying query(ies) to the server and returning 
     a data blob (list of Python dictionaries, one per actual query).
 
     Args:
@@ -90,7 +102,7 @@ class Subgrounds:
     return transform_req(self.global_transforms, req)
 
   def query(self, fpaths: list[FieldPath]) -> list[dict]:
-    """ Combines `Subgrounds.mk_request` and `Subgrounds.execute` into one function.
+    """Combines `Subgrounds.mk_request` and `Subgrounds.execute` into one function.
 
     Args:
         fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
@@ -102,6 +114,15 @@ class Subgrounds:
     return self.execute(req)
 
   def query_df(self, fpaths: list[FieldPath], columns: Optional[list[str]] = None) -> pd.DataFrame:
+    """Same as `Subgrounds.query` but formats the response as a DataFrame.
+
+    Args:
+        fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
+        columns (Optional[list[str]], optional): The column labels. Defaults to None.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the reponse data
+    """
     if columns is None:
       columns = list(fpaths | map(lambda fpath: fpath.longname))
     
