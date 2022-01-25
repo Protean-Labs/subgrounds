@@ -11,12 +11,12 @@ from subgrounds.subgrounds import Subgrounds
 
 
 sg = Subgrounds()
-olympusDAO = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/drondin/olympus-graph')
+olympusDAO = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/drondin/olympus-protocol-metrics')
 
 # Define useful synthetic fields
 olympusDAO.ProtocolMetric.datetime = SyntheticField(
   lambda timestamp: str(datetime.fromtimestamp(timestamp)),
-  TypeRef.Named('String'),
+  SyntheticField.STRING,
   olympusDAO.ProtocolMetric.timestamp,
 )
 

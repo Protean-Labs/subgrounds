@@ -111,46 +111,46 @@ class FieldOperatorMixin:
   type_: TypeRef.T
 
   def __add__(self, other: Any) -> SyntheticField:
-    return SyntheticField(operator.add, typeref_of_binary_op('add', self.type_, other), self, other)
+    return SyntheticField(operator.add, typeref_of_binary_op('add', self.type_, other), [self, other])
 
   def __radd__(self, other: Any) -> SyntheticField:
-    return SyntheticField(lambda x, y: operator.add(y, x), typeref_of_binary_op('add', self.type_, other), self, other)
+    return SyntheticField(lambda x, y: operator.add(y, x), typeref_of_binary_op('add', self.type_, other), [self, other])
 
   def __sub__(self, other: Any) -> SyntheticField:
-    return SyntheticField(operator.sub, typeref_of_binary_op('sub', self.type_, other), self, other)
+    return SyntheticField(operator.sub, typeref_of_binary_op('sub', self.type_, other), [self, other])
 
   def __rsub__(self, other: Any) -> SyntheticField:
-    return SyntheticField(lambda x, y: operator.sub(y, x), typeref_of_binary_op('sub', self.type_, other), self, other)
+    return SyntheticField(lambda x, y: operator.sub(y, x), typeref_of_binary_op('sub', self.type_, other), [self, other])
 
   def __mul__(self, other: Any) -> SyntheticField:
-    return SyntheticField(operator.mul, typeref_of_binary_op('mul', self.type_, other), self, other)
+    return SyntheticField(operator.mul, typeref_of_binary_op('mul', self.type_, other), [self, other])
 
   def __rmul__(self, other: Any) -> SyntheticField:
-    return SyntheticField(lambda x, y: operator.mul(y, x), typeref_of_binary_op('mul', self.type_, other), self, other)
+    return SyntheticField(lambda x, y: operator.mul(y, x), typeref_of_binary_op('mul', self.type_, other), [self, other])
 
   def __truediv__(self, other: Any) -> SyntheticField:
-    return SyntheticField(operator.truediv, typeref_of_binary_op('div', self.type_, other), self, other)
+    return SyntheticField(operator.truediv, typeref_of_binary_op('div', self.type_, other), [self, other])
 
   def __rtruediv__(self, other: Any) -> SyntheticField:
-    return SyntheticField(lambda x, y: operator.truediv(y, x), typeref_of_binary_op('div', self.type_, other), self, other)
+    return SyntheticField(lambda x, y: operator.truediv(y, x), typeref_of_binary_op('div', self.type_, other), [self, other])
 
   def __floordiv__(self, other: Any) -> SyntheticField:
-    return SyntheticField(operator.floordiv, typeref_of_binary_op('div', self.type_, other), self, other)
+    return SyntheticField(operator.floordiv, typeref_of_binary_op('div', self.type_, other), [self, other])
 
   def __rfloordiv__(self, other: Any) -> SyntheticField:
-    return SyntheticField(lambda x, y: operator.floordiv(y, x), typeref_of_binary_op('div', self.type_, other), self, other)
+    return SyntheticField(lambda x, y: operator.floordiv(y, x), typeref_of_binary_op('div', self.type_, other), [self, other])
 
   def __pow__(self, rhs: Any) -> SyntheticField:
-    return SyntheticField(operator.pow, typeref_of_binary_op('pow', self.type_, rhs), self, rhs)
+    return SyntheticField(operator.pow, typeref_of_binary_op('pow', self.type_, rhs), [self, rhs])
 
   def __rpow__(self, lhs: Any) -> SyntheticField:
-    return SyntheticField(lambda x, y: operator.pow(y, x), typeref_of_binary_op('pow', self.type_, lhs), self, lhs)
+    return SyntheticField(lambda x, y: operator.pow(y, x), typeref_of_binary_op('pow', self.type_, lhs), [self, lhs])
 
   def __mod__(self, rhs: Any) -> SyntheticField:
-    return SyntheticField(operator.mod, typeref_of_binary_op('mod', self.type_, rhs), self, rhs)
+    return SyntheticField(operator.mod, typeref_of_binary_op('mod', self.type_, rhs), [self, rhs])
 
   def __rmod__(self, lhs: Any) -> SyntheticField:
-    return SyntheticField(lambda x, y: operator.mod(y, x), typeref_of_binary_op('mod', self.type_, lhs), self, lhs)
+    return SyntheticField(lambda x, y: operator.mod(y, x), typeref_of_binary_op('mod', self.type_, lhs), [self, lhs])
 
   def __neg__(self) -> SyntheticField:
     return SyntheticField(operator.neg, type_ref_of_unary_op('neg', self.type_), self)
@@ -161,16 +161,29 @@ class FieldOperatorMixin:
 
 @dataclass
 class SyntheticField(FieldOperatorMixin):
+  STRING: ClassVar[TypeRef.Named] = TypeRef.Named('String')
+  INT:    ClassVar[TypeRef.Named] = TypeRef.Named('Int')
+  FLOAT:  ClassVar[TypeRef.Named] = TypeRef.Named('Float')
+  BOOL:   ClassVar[TypeRef.Named] = TypeRef.Named('Boolean')
+
   counter: ClassVar[int] = 0
+
 
   # subgraph: Subgraph
   f: Callable
   type_: TypeRef.T
+  default: Any
   deps: list[FieldPath]
 
   # def __init__(self, subgraph: Subgraph, f: Callable, type_: TypeRef.T, *deps: list[FieldPath | SyntheticField]) -> None:
-  def __init__(self, f: Callable, type_: TypeRef.T, *deps: list[FieldPath | SyntheticField]) -> None:
-    # self.subgraph = subgraph
+  def __init__(
+    self,
+    f: Callable,
+    type_: TypeRef.T,
+    deps: list[FieldPath | SyntheticField] | FieldPath | SyntheticField,
+    default: Any = None
+  ) -> None:
+    deps = deps if type(deps) == list else [deps]
 
     def mk_deps(
       deps: list(FieldPath | SyntheticField),
@@ -238,13 +251,24 @@ class SyntheticField(FieldOperatorMixin):
     (f, deps) = mk_deps(deps, f)
     self.f = f
     self.type_ = type_
+    self.default = default if default is not None else SyntheticField.default_of_type(type_)
     self.deps = deps
 
     SyntheticField.counter += 1
 
-  # @property
-  # def schema(self):
-  #   return self.subgraph.schema
+  @staticmethod
+  def default_of_type(type_: TypeRef.T):
+    match type_.name:
+      case 'String':
+        return ''
+      case 'Int':
+        return 0
+      case 'Float':
+        return 0.0
+      case 'Boolean':
+        return False
+      case _:
+        return 0
 
 
 @dataclass
@@ -284,8 +308,8 @@ class FieldPath(FieldOperatorMixin):
     h.update(msg.encode('UTF-8'))
     return 'x' + h.hexdigest()
 
-  def extract_data(self, data: dict) -> list[Any] | Any:
-    # print(f'path = {self.data_path}')
+  def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
+    print(f'path = {self.data_path}')
     def f(data_path: list[str], data: dict | list | Any):
       match data_path:
         case []:
@@ -299,7 +323,18 @@ class FieldPath(FieldOperatorMixin):
             case _:
               raise Exception(f"extract_data: unexpected state! path = {data_path}, data = {data}")
 
-    return f(self.data_path, data)
+    match data:
+      case dict():
+        return f(self.data_path, data)
+      case list():
+        for doc_data in data:
+          try:
+            return f(self.data_path, doc_data)
+          except KeyError:
+            continue
+        raise Exception('extract_data: not found')
+      case _:
+        raise Exception('extract_data: data is not dict or list')
 
   def split_args(self, kwargs: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     query_args = {}
@@ -317,22 +352,24 @@ class FieldPath(FieldOperatorMixin):
   def selection(fpath: FieldPath) -> Selection:
     def f(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> list[Selection]:
       match path:
+        case [(None, TypeMeta.FieldMeta() as fmeta), *rest]:
+          return [Selection(fmeta, selection=selection_of_path(fpath.subgraph.schema, rest))]
+
+        case [(args, TypeMeta.FieldMeta() as fmeta), *rest] if args == {}:
+          return [Selection(fmeta, selection=selection_of_path(fpath.subgraph.schema, rest))]
+
         case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
-          # print(f'FieldPath.selection: args = {args}')
           return [Selection(
             fmeta,
             # TODO: Revisit this
-            alias=FieldPath.hash(fmeta.name + str(args)) if args != {} and args is not None else None,
+            alias=FieldPath.hash(fmeta.name + str(args)),
             arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
             selection=selection_of_path(fpath.subgraph.schema, rest)
           )]
+
         case []:
           return []
 
-
-    # select = f(fpath.path)[0]
-    # print(f'FieldPath.selection: {select.graphql_string(0)}')
-    # return select
     return f(fpath.path)[0]
 
   @staticmethod
@@ -589,6 +626,7 @@ class Subgraph:
       self,
       fmeta,
       sfield.f,
+      sfield.default,
       [FieldPath.selection(dep) for dep in sfield.deps]
     )
 
