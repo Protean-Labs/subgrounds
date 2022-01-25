@@ -381,7 +381,7 @@ class TestQueryTransform(unittest.TestCase):
 
   def test_roundtrip_3(self):
     expected = [{
-      'borrows': [
+      'x5847f08709be4c59': [
         {
           'amount': 52627231563,
           'reserve': {
@@ -422,7 +422,7 @@ class TestQueryTransform(unittest.TestCase):
 
   def test_roundtrip_4(self):
     expected = [{
-      'borrows': [
+      'x5847f08709be4c59': [
         {
           'amount': 52627231563,
           'reserve': {

@@ -6,6 +6,7 @@ from functools import partial, reduce
 import os
 import json
 import operator
+from hashlib import blake2b
 from pipe import map
 
 import subgrounds.client as client
@@ -270,13 +271,21 @@ class FieldPath(FieldOperatorMixin):
 
   @property
   def data_path(self) -> list[str]:
-    return list(self.path | map(lambda ele: ele[1].name))
+    # return list(self.path | map(lambda ele: ele[1].name))
+    return list(self.path | map(lambda ele: FieldPath.hash(ele[1].name + str(ele[0])) if ele[0] != {} and ele[0] is not None else ele[1].name))
 
   @property
   def longname(self) -> str:
     return '_'.join(self.data_path)
 
+  @staticmethod
+  def hash(msg: str) -> str:
+    h = blake2b(digest_size=8)
+    h.update(msg.encode('UTF-8'))
+    return 'x' + h.hexdigest()
+
   def extract_data(self, data: dict) -> list[Any] | Any:
+    # print(f'path = {self.data_path}')
     def f(data_path: list[str], data: dict | list | Any):
       match data_path:
         case []:
@@ -309,14 +318,21 @@ class FieldPath(FieldOperatorMixin):
     def f(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> list[Selection]:
       match path:
         case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
+          # print(f'FieldPath.selection: args = {args}')
           return [Selection(
             fmeta,
+            # TODO: Revisit this
+            alias=FieldPath.hash(fmeta.name + str(args)) if args != {} and args is not None else None,
             arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
             selection=selection_of_path(fpath.subgraph.schema, rest)
           )]
         case []:
           return []
 
+
+    # select = f(fpath.path)[0]
+    # print(f'FieldPath.selection: {select.graphql_string(0)}')
+    # return select
     return f(fpath.path)[0]
 
   @staticmethod

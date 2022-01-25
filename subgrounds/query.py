@@ -173,6 +173,13 @@ class Selection:
   selection: list[Selection] = field(default_factory=list)
 
   @property
+  def key(self):
+    if self.alias:
+      return self.alias
+    else:
+      return self.fmeta.name
+
+  @property
   def args_graphql_string(self) -> str:
     if self.arguments:
       return f'({", ".join([arg.graphql_string for arg in self.arguments])})'
@@ -182,14 +189,19 @@ class Selection:
   def graphql_string(self, level: int = 0) -> str:
     indent = "  " * level
 
+    if self.alias:
+      alias_str = f'{self.alias}: '
+    else:
+      alias_str = ''
+
     match (self.selection):
       case None | []:
-        return f"{indent}{self.fmeta.name}{self.args_graphql_string}"
+        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql_string}"
       case inner_selection:
         inner_str = "\n".join(
           [f.graphql_string(level=level + 1) for f in inner_selection]
         )
-        return f"{indent}{self.fmeta.name}{self.args_graphql_string} {{\n{inner_str}\n{indent}}}"
+        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql_string} {{\n{inner_str}\n{indent}}}"
 
   @staticmethod
   def add_selections(select: Selection, new_selections: list[Selection]) -> Selection:
@@ -234,8 +246,8 @@ class Selection:
 
   @staticmethod
   def combine(select: Selection, other: Selection) -> Selection:
-    if select.fmeta != other.fmeta:
-      raise Exception(f"Selection.combine: {select.fmeta} != {other.fmeta}")
+    if select.key != select.key:
+      raise Exception(f"Selection.combine: {select.key} != {select.key}")
 
     return Selection(
       fmeta=select.fmeta,
@@ -278,6 +290,7 @@ class Selection:
   def substitute_arg(select: Selection, arg_name: str, replacement: Argument | list[Argument]) -> Selection:
     return Selection(
       fmeta=select.fmeta,
+      alias=select.alias,
       arguments=list(
         select.arguments
         | map(lambda arg: replacement if arg.name == arg_name else arg)
@@ -359,7 +372,7 @@ class Query:
       selection=union(
         query.selection,
         new_selections,
-        key=lambda select: select.fmeta.name,
+        key=lambda select: select.key,
         combine=Selection.combine
       )
     )
@@ -479,7 +492,7 @@ class Query:
       selection=union(
         query.selection,
         other.selection,
-        key=lambda select: select.fmeta.name,
+        key=lambda select: select.key,
         combine=Selection.combine
       )
     )

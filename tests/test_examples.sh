@@ -5,9 +5,16 @@ FAILING=0
 for f in examples/*.py; do
   cp $f .
   pipenv run python $(basename $f) &
+  
+  # Grace period for the Dash app to startup
   sleep 20
+
+  # Get the response code with curl
   RESP_CODE=$(curl --head --location --write-out %{http_code} --silent --output /dev/null http://127.0.0.1:8050/)
-  kill `lsof -w -n -i tcp:8050 | awk '$2!="PID" {print $2;}'`
+
+  # Kill the process listening on port 8050 (i.e.: the Dash app process)
+  kill `lsof -w -n -i tcp:8050 | awk '$2!="PID" {print $2;}'` 
+
   rm $(basename $f)
   if [ "$RESP_CODE" != "200" ];
   then
