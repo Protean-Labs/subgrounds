@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from functools import reduce
-from re import L
-from typing import Any
+from typing import Any, Optional
 from pipe import map, groupby, traverse, where
 import os
 import json
@@ -34,6 +33,14 @@ class Subgrounds:
     return sg
 
   def mk_request(self, fpaths: list[FieldPath]) -> DataRequest:
+    """ Creates a `DataRequest` object by combining multiple `FieldPath` objects
+
+    Args:
+        fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
+
+    Returns:
+        DataRequest: A new `DataRequest` object
+    """
     return DataRequest(documents=list(
       fpaths
       | groupby(lambda fpath: fpath.subgraph.url)
@@ -43,7 +50,16 @@ class Subgrounds:
       ))
     ))
 
-  def execute(self, req: DataRequest) -> dict:
+  def execute(self, req: DataRequest) -> list[dict]:
+    """ Executes a `DataRequest` object, sending the underlying query(ies) to the server and returning 
+    a data blob (list of Python dictionaries, one per actual query).
+
+    Args:
+        req (DataRequest): The `DataRequest` object to be executed
+
+    Returns:
+        list[dict]: The reponse data
+    """
     def execute_document(doc: Document) -> dict:
       match doc.variables:
         case []:
@@ -62,7 +78,7 @@ class Subgrounds:
           data = transform_doc(rest, new_doc)
           return transform.transform_response(doc, data)
 
-    def transform_req(transforms: list[RequestTransform], req: DataRequest) -> dict:
+    def transform_req(transforms: list[RequestTransform], req: DataRequest) -> list[dict]:
       match transforms:
         case []:
           return list(req.documents | map(lambda doc: transform_doc(self.subgraphs[doc.url].transforms, doc)))
@@ -72,6 +88,27 @@ class Subgrounds:
           return transform.transform_response(req, data)
     
     return transform_req(self.global_transforms, req)
+
+  def query(self, fpaths: list[FieldPath]) -> list[dict]:
+    """ Combines `Subgrounds.mk_request` and `Subgrounds.execute` into one function.
+
+    Args:
+        fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
+
+    Returns:
+        list[dict]: The reponse data
+    """
+    req = self.mk_request(fpaths)
+    return self.execute(req)
+
+  def query_df(self, fpaths: list[FieldPath], columns: Optional[list[str]] = None) -> pd.DataFrame:
+    if columns is None:
+      columns = list(fpaths | map(lambda fpath: fpath.longname))
+    
+    data = self.query(fpaths)
+    col_fpaths = zip(columns, fpaths)
+    
+    return pd.DataFrame({key: fpath.extract_data(data) for key, fpath in col_fpaths})
 
 
 def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:

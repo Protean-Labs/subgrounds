@@ -295,12 +295,19 @@ class FieldPath(FieldOperatorMixin):
 
   @property
   def data_path(self) -> list[str]:
-    # return list(self.path | map(lambda ele: ele[1].name))
     return list(self.path | map(lambda ele: FieldPath.hash(ele[1].name + str(ele[0])) if ele[0] != {} and ele[0] is not None else ele[1].name))
 
   @property
-  def longname(self) -> str:
+  def dataname(self) -> str:
     return '_'.join(self.data_path)
+
+  @property
+  def name_path(self) -> list[str]:
+    return list(self.path | map(lambda ele: ele[1].name))
+
+  @property
+  def longname(self) -> str:
+    return '_'.join(self.name_path)
 
   @staticmethod
   def hash(msg: str) -> str:
