@@ -309,7 +309,7 @@ class FieldPath(FieldOperatorMixin):
     return 'x' + h.hexdigest()
 
   def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
-    print(f'path = {self.data_path}')
+    # print(f'path = {self.data_path}')
     def f(data_path: list[str], data: dict | list | Any):
       match data_path:
         case []:

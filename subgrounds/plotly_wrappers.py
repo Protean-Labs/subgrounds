@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from re import L
 from typing import Any
 from pipe import traverse, map
 
@@ -28,7 +29,14 @@ class TraceWrapper(ABC):
           self.args[key] = arg
 
   def mk_trace(self, data: list[dict[str, Any]] | dict[str, Any]) -> BaseTraceType:
-    fpath_data = {key: fpath.extract_data(data) for key, fpath in self.fpaths.items()}
+    fpath_data = {}
+    for key, fpath in self.fpaths.items():
+      item = fpath.extract_data(data)
+      if type(item) == list and len(item) == 1:
+        fpath_data[key] = item[0]
+      else:
+        fpath_data[key] = item
+    # fpath_data = {key: fpath.extract_data(data) for key, fpath in self.fpaths.items()}
 
     return self.graph_object(
       **(fpath_data | self.args)
