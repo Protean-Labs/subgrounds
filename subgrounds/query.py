@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial, reduce
 from typing import Any, Callable, Optional, Tuple
-from pipe import map, traverse, where, take
+from pipe import map, traverse, where, take, take_while
 import math
 
 from subgrounds.schema import (
@@ -280,11 +280,14 @@ class Selection:
       return any(select.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
 
   @staticmethod
-  def get_argument(select: Selection, arg_name: str) -> Optional[Argument]:
+  def get_argument(select: Selection, target: str) -> Optional[Argument]:
     try:
-      return next(filter(lambda arg: arg.name == arg_name, select.arguments))
+      return next(select.arguments | where(lambda arg: arg.name == target))
     except StopIteration:
-      return next(select.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
+      try:
+        return next(select.selection | map(partial(Selection.get_argument, target=target)))
+      except StopIteration:
+        return None
 
   @staticmethod
   def substitute_arg(select: Selection, arg_name: str, replacement: Argument | list[Argument]) -> Selection:
@@ -530,8 +533,15 @@ class Query:
     return any(query.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
 
   @staticmethod
-  def get_argument(query: Selection, arg_name: str) -> Optional[Argument]:
-    return next(query.selection | map(partial(Selection.get_argument, arg_name=arg_name)))
+  def get_argument(query: Query, target: str) -> Optional[Argument]:
+    try:
+      return next(
+        query.selection
+        | map(partial(Selection.get_argument, target=target))
+        | where(lambda x: x is not None)
+      )
+    except StopIteration:
+      return None
 
   @staticmethod
   def substitute_arg(query: Query, arg_name: str, replacement: Argument | list[Argument]) -> Query:

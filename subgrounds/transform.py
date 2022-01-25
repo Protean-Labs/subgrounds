@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable
+from typing import Any, Callable, Tuple
 from functools import partial
 from pipe import map, traverse
 
@@ -26,8 +26,6 @@ def transform_request(fmeta: TypeMeta.FieldMeta, replacement: list[Selection], r
     lambda doc: Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
   )
 
-  # return Query(selection=list(map(transform, query.selection)))
-
 
 def select_data(select: Selection, data: dict) -> list[Any]:
   match (select, data):
@@ -41,75 +39,64 @@ def select_data(select: Selection, data: dict) -> list[Any]:
       raise Exception(f"select_data: invalid selection {select} for data {data}")
 
 
-def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: list[Selection], req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-  def transform(select: Selection, data: dict) -> None:
-    match (select, data):
-      case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == fmeta.name and name not in data:
-        arg_values = list(args | map(partial(select_data, data=data)) | traverse)
-        data[name] = func(*arg_values)
-      case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data):
-        pass
-      case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data) if name in data:
-        match data[name]:
-          case list() as elts:
-            for elt in elts:
-              for select in inner_select:
-                transform(select, elt)
-          case dict() as elt:
-            for select in inner_select:
-              transform(select, elt)
-          case _:
-            raise Exception(f"transform_response: data for selection {select} is neither list or dict {data[name]}")
+# def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: list[Selection], req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+#   def transform(select: Selection, data: dict) -> None:
+#     match (select, data):
+#       case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == fmeta.name and name not in data:
+#         arg_values = list(args | map(partial(select_data, data=data)) | traverse)
+#         data[name] = func(*arg_values)
+#       case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data):
+#         pass
+#       case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data) if name in data:
+#         match data[name]:
+#           case list() as elts:
+#             for elt in elts:
+#               for select in inner_select:
+#                 transform(select, elt)
+#           case dict() as elt:
+#             for select in inner_select:
+#               transform(select, elt)
+#           case _:
+#             raise Exception(f"transform_response: data for selection {select} is neither list or dict {data[name]}")
 
-      case (select, data):
-        raise Exception(f"transform_response: invalid selection {select} for data {data}")
+#       case (select, data):
+#         raise Exception(f"transform_response: invalid selection {select} for data {data}")
 
-  for (doc, data_) in zip(req.documents, data):
-    for select in doc.query.selection:
-      transform(select, data_)
+#   for (doc, data_) in zip(req.documents, data):
+#     for select in doc.query.selection:
+#       transform(select, data_)
 
-  return data
-
-
-def transform_data_type(type_: TypeRef.T, f: Callable, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-  def transform(select: Selection, data: dict) -> None:
-    # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
-    match (select, data):
-      case (Selection(TypeMeta.FieldMeta(name, _, _, ftype), _, _, [] | None), dict() as data) if TypeRef.root_type_name(type_) == TypeRef.root_type_name(ftype):
-        data[name] = f(data[name])
-      case (Selection(_, _, _, [] | None), dict()):
-        pass
-      case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data):
-        match data[name]:
-          case list() as elts:
-            for elt in elts:
-              for select in inner_select:
-                transform(select, elt)
-          case dict() as elt:
-            for select in inner_select:
-              transform(select, elt)
-          case _:
-            raise Exception(f"transform_data_type: data for selection {select} is neither list or dict {data[name]}")
-
-      case (select, data):
-        raise Exception(f"transform_data_type: invalid selection {select} for data {data}")
-
-  for (doc, data_) in zip(req.documents, data):
-    for select in doc.query.selection:
-      transform(select, data_)
-
-  return data
+#   return data
 
 
-# def chain_transforms(transforms: list[Transform], req: DataRequest) -> dict:
-#   match transforms:
-#     case []:
-#       return execute(req)
-#       # return list(map(lambda doc: client.query(doc.url, doc.graphql_string), req.documents))
-#     case [transform, *rest]:
-#       new_req = transform.transform_request(req)
-#       data = chain_transforms(rest, new_req)
-#       return transform.transform_response(req, data)
+# def transform_data_type(type_: TypeRef.T, f: Callable, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+#   def transform(select: Selection, data: dict) -> None:
+#     # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
+#     match (select, data):
+#       case (Selection(TypeMeta.FieldMeta(name, _, _, ftype), _, _, [] | None), dict() as data) if TypeRef.root_type_name(type_) == TypeRef.root_type_name(ftype):
+#         data[name] = f(data[name])
+#       case (Selection(_, _, _, [] | None), dict()):
+#         pass
+#       case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data):
+#         match data[name]:
+#           case list() as elts:
+#             for elt in elts:
+#               for select in inner_select:
+#                 transform(select, elt)
+#           case dict() as elt:
+#             for select in inner_select:
+#               transform(select, elt)
+#           case _:
+#             raise Exception(f"transform_data_type: data for selection {select} is neither list or dict {data[name]}")
+
+#       case (select, data):
+#         raise Exception(f"transform_data_type: invalid selection {select} for data {data}")
+
+#   for (doc, data_) in zip(req.documents, data):
+#     for select in doc.query.selection:
+#       transform(select, data_)
+
+#   return data
 
 
 class RequestTransform(ABC):
@@ -171,10 +158,11 @@ class TypeTransform(DocumentTransform):
 
 
 class LocalSyntheticField(DocumentTransform):
-  def __init__(self, subgraph, fmeta: TypeMeta.FieldMeta, f: Callable, args: list[Selection]) -> None:
+  def __init__(self, subgraph, fmeta: TypeMeta.FieldMeta, f: Callable, default: Any, args: list[Selection]) -> None:
     self.subgraph = subgraph
     self.fmeta = fmeta
     self.f = f
+    self.default = default
     self.args = args
 
   def transform_document(self, doc: Document) -> Document:
@@ -197,7 +185,11 @@ class LocalSyntheticField(DocumentTransform):
       match (select, data):
         case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
           arg_values = flatten(list(self.args | map(partial(select_data, data=data))))
-          data[name] = self.f(*arg_values)
+          
+          try:
+            data[name] = self.f(*arg_values)
+          except ZeroDivisionError:
+            data[name] = self.default
 
         case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data):
           pass

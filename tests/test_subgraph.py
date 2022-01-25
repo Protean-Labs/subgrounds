@@ -18,7 +18,7 @@ class TestAddType(unittest.TestCase):
     SyntheticField.counter = 0
 
   def test_add_synthetic_field_1(self):
-    sfield = SyntheticField(identity, TypeRef.Named('Float'))
+    sfield = SyntheticField(identity, SyntheticField.FLOAT, self.subgraph.Pair.reserveUSD)
 
     expected = SchemaMeta(query_type='Query', type_map={
       'Int': TypeMeta.ScalarMeta('Int', ''),
@@ -371,7 +371,7 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_1(self):
-    sfield = SyntheticField(identity, TypeRef.Named('Float'))
+    sfield = SyntheticField(identity, SyntheticField.FLOAT, self.subgraph.Pair.reserveUSD)
 
     expected = FieldPath(
       self.subgraph,
@@ -396,7 +396,7 @@ class TestFieldPath(unittest.TestCase):
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_2(self):
-    sfield = SyntheticField(identity, TypeRef.Named('String'))
+    sfield = SyntheticField(identity, SyntheticField.STRING, "Le Token")
 
     expected = FieldPath(
       self.subgraph,
@@ -734,7 +734,7 @@ class TestSyntheticField(unittest.TestCase):
 
     sfield = SyntheticField(
       lambda x: x * 10,
-      TypeRef.Named('Int'),
+      SyntheticField.INT,
       Swap.amount0In
     )
 

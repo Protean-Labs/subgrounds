@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from re import L
 from typing import Any
 from pipe import traverse, map
 
@@ -11,116 +12,55 @@ from subgrounds.query import DataRequest
 
 
 class TraceWrapper(ABC):
-  args: dict[str, Any]
   graph_object: BaseTraceType
 
-  @abstractmethod
-  def mk_trace(self, data: dict[str, Any]) -> BaseTraceType:
-    raise NotImplementedError
+  fpaths: dict[str, FieldPath]
+  args: dict[str, Any]
+
+  def __init__(self, **kwargs) -> None:
+    self.fpaths = {}
+    self.args = {}
+
+    for key, arg in kwargs.items():
+      match arg:
+        case FieldPath():
+          self.fpaths[key] = arg
+        case _:
+          self.args[key] = arg
+
+  def mk_trace(self, data: list[dict[str, Any]] | dict[str, Any]) -> BaseTraceType:
+    fpath_data = {}
+    for key, fpath in self.fpaths.items():
+      item = fpath.extract_data(data)
+      if type(item) == list and len(item) == 1:
+        fpath_data[key] = item[0]
+      else:
+        fpath_data[key] = item
+    # fpath_data = {key: fpath.extract_data(data) for key, fpath in self.fpaths.items()}
+
+    return self.graph_object(
+      **(fpath_data | self.args)
+    )
 
   @property
-  @abstractmethod
   def field_paths(self) -> list[FieldPath]:
-    raise NotImplementedError
+    return [fpath for _, fpath in self.fpaths.items()]
 
 
 class Scatter(TraceWrapper):
   graph_object = go.Scatter
 
-  x: FieldPath
-  y: FieldPath
-
-  def __init__(self, x: FieldPath, y: FieldPath, **kwargs) -> None:
-    self.x = x
-    self.y = y
-
-    self.args = kwargs
-
-  def mk_trace(self, data: dict[str, Any]) -> BaseTraceType:
-    return self.graph_object(
-      x=self.x.extract_data(data),
-      y=self.y.extract_data(data),
-      **self.args
-    )
-
-  @property
-  def field_paths(self) -> list[FieldPath]:
-    return [self.x, self.y]
-
 
 class Bar(TraceWrapper):
   graph_object = go.Bar
-
-  x: FieldPath
-  y: FieldPath
-
-  def __init__(self, x: FieldPath, y: FieldPath, **kwargs) -> None:
-    self.x = x
-    self.y = y
-
-    self.args = kwargs
-
-  def mk_trace(self, data: dict[str, Any]) -> BaseTraceType:
-    return self.graph_object(
-      x=self.x.extract_data(data),
-      y=self.y.extract_data(data),
-      **self.args
-    )
-
-  @property
-  def field_paths(self) -> list[FieldPath]:
-    return [self.x, self.y]
 
 
 class Indicator(TraceWrapper):
   graph_object = go.Indicator
 
-  value: FieldPath
-
-  def __init__(self, value: FieldPath, **kwargs) -> None:
-    self.value = value
-
-    self.args = kwargs
-
-  def mk_trace(self, data: dict[str, Any]) -> BaseTraceType:
-    match self.value:
-      case FieldPath():
-        val = self.value.extract_data(data)
-
-        return self.graph_object(
-          value=val[0] if type(val) == list else val,
-          **self.args
-        )
-      case value:
-        return self.graph_object(value=value, **self.args)
-
-  @property
-  def field_paths(self) -> list[FieldPath]:
-    return [self.value] if type(self.value) == FieldPath else []
-
 
 class Pie(TraceWrapper):
   graph_object = go.Pie
-
-  labels: FieldPath
-  values: FieldPath
-
-  def __init__(self, labels: FieldPath, values: FieldPath, **kwargs) -> None:
-    self.labels = labels
-    self.values = values
-
-    self.args = kwargs
-
-  def mk_trace(self, data: dict[str, Any]) -> BaseTraceType:
-    return self.graph_object(
-      labels=self.labels.extract_data(data),
-      values=self.values.extract_data(data),
-      **self.args
-    )
-
-  @property
-  def field_paths(self) -> list[FieldPath]:
-    return [self.labels, self.values]
 
 
 class Figure:
@@ -148,7 +88,7 @@ class Figure:
 
   def refresh(self) -> None:
     # TODO: Modify this to support x/y in different documents
-    self.data = self.subgrounds.execute(self.req)[0]
+    self.data = self.subgrounds.execute(self.req)
 
     self.figure = go.Figure(**self.args)
     for trace in self.traces:

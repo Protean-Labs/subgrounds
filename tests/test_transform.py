@@ -4,270 +4,270 @@ from subgrounds.query import Argument, DataRequest, Document, InputValue, Query,
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.subgraph import Subgraph
 from subgrounds.subgrounds import Subgrounds
-from subgrounds.transform import LocalSyntheticField, PaginationTransform, SplitTransform, TypeTransform, transform_response, transform_data_type, transform_request
+from subgrounds.transform import LocalSyntheticField, PaginationTransform, SplitTransform, TypeTransform
 from tests.utils import schema
 
 
-class TestTransform(unittest.TestCase):
-  def test_transform_request1(self):
-    expected = DataRequest(documents=[
-      Document(
-        'abc',
-        Query(None, [
-          Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
-            Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-            Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-            Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-            Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-          ])
-        ])
-      )
-    ])
+# class TestTransform(unittest.TestCase):
+  # def test_transform_request1(self):
+  #   expected = DataRequest(documents=[
+  #     Document(
+  #       'abc',
+  #       Query(None, [
+  #         Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+  #           Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #           Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #           Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #           Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #         ])
+  #       ])
+  #     )
+  #   ])
 
-    fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
+  #   fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
-    req = DataRequest(documents=[
-      Document(
-        'abc',
-        Query(None, [
-          Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
-            Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
-          ])
-        ])
-      )
-    ])
+  #   req = DataRequest(documents=[
+  #     Document(
+  #       'abc',
+  #       Query(None, [
+  #         Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+  #           Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
+  #         ])
+  #       ])
+  #     )
+  #   ])
 
-    replacement = [
-      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-    ]
+  #   replacement = [
+  #     Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #   ]
 
-    new_query = transform_request(fmeta, replacement, req)
+  #   new_query = transform_request(fmeta, replacement, req)
 
-    self.assertEqual(new_query, expected)
+  #   self.assertEqual(new_query, expected)
 
-  def test_transform_response1(self):
-    expected = [{
-      'price1': 0.5,
-      'amount0In': 0.0,
-      'amount0Out': 10.0,
-      'amount1In': 20.0,
-      'amount1Out': 0.0
-    }]
+  # def test_transform_response1(self):
+  #   expected = [{
+  #     'price1': 0.5,
+  #     'amount0In': 0.0,
+  #     'amount0Out': 10.0,
+  #     'amount1In': 20.0,
+  #     'amount1Out': 0.0
+  #   }]
 
-    data = [{
-      'amount0In': 0.0,
-      'amount0Out': 10.0,
-      'amount1In': 20.0,
-      'amount1Out': 0.0
-    }]
+  #   data = [{
+  #     'amount0In': 0.0,
+  #     'amount0Out': 10.0,
+  #     'amount1In': 20.0,
+  #     'amount1Out': 0.0
+  #   }]
 
-    fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
+  #   fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
-    def f(in0, out0, in1, out1):
-      return abs(in0 - out0) / abs(in1 - out1)
+  #   def f(in0, out0, in1, out1):
+  #     return abs(in0 - out0) / abs(in1 - out1)
 
-    arg_select = [
-      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-    ]
+  #   arg_select = [
+  #     Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #   ]
 
-    req = DataRequest(documents=[
-      Document(
-        'abc',
-        Query(None, [
-          Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None)
-        ])
-      )
-    ])
+  #   req = DataRequest(documents=[
+  #     Document(
+  #       'abc',
+  #       Query(None, [
+  #         Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None)
+  #       ])
+  #     )
+  #   ])
 
-    transformed_data = transform_response(fmeta, f, arg_select, req, data)
+  #   transformed_data = transform_response(fmeta, f, arg_select, req, data)
 
-    self.assertEqual(transformed_data, expected)
+  #   self.assertEqual(transformed_data, expected)
 
-  def test_transform_response2(self):
-    expected = [{
-      'swap': {
-        'price1': 0.5,
-        'amount0In': 0.0,
-        'amount0Out': 10.0,
-        'amount1In': 20.0,
-        'amount1Out': 0.0
-      }
-    }]
+  # def test_transform_response2(self):
+  #   expected = [{
+  #     'swap': {
+  #       'price1': 0.5,
+  #       'amount0In': 0.0,
+  #       'amount0Out': 10.0,
+  #       'amount1In': 20.0,
+  #       'amount1Out': 0.0
+  #     }
+  #   }]
 
-    data = [{
-      'swap': {
-        'amount0In': 0.0,
-        'amount0Out': 10.0,
-        'amount1In': 20.0,
-        'amount1Out': 0.0
-      }
-    }]
+  #   data = [{
+  #     'swap': {
+  #       'amount0In': 0.0,
+  #       'amount0Out': 10.0,
+  #       'amount1In': 20.0,
+  #       'amount1Out': 0.0
+  #     }
+  #   }]
 
-    fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
+  #   fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
-    def f(in0, out0, in1, out1):
-      return abs(in0 - out0) / abs(in1 - out1)
+  #   def f(in0, out0, in1, out1):
+  #     return abs(in0 - out0) / abs(in1 - out1)
 
-    arg_select = [
-      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-    ]
+  #   arg_select = [
+  #     Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #   ]
 
-    req = DataRequest(documents=[
-      Document(
-        'abc',
-        Query(None, [
-          Selection(TypeMeta.FieldMeta('swap', '', [], TypeRef.Named('Swap')), None, None, [
-            Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
-          ])
-        ])
-      )
-    ])
+  #   req = DataRequest(documents=[
+  #     Document(
+  #       'abc',
+  #       Query(None, [
+  #         Selection(TypeMeta.FieldMeta('swap', '', [], TypeRef.Named('Swap')), None, None, [
+  #           Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
+  #         ])
+  #       ])
+  #     )
+  #   ])
 
-    transformed_data = transform_response(fmeta, f, arg_select, req, data)
+  #   transformed_data = transform_response(fmeta, f, arg_select, req, data)
 
-    self.assertEqual(transformed_data, expected)
+  #   self.assertEqual(transformed_data, expected)
 
-  def test_transform_response3(self):
-    expected = [{
-      'swaps': [{
-        'price1': 0.5,
-        'amount0In': 0.0,
-        'amount0Out': 10.0,
-        'amount1In': 20.0,
-        'amount1Out': 0.0
-      }]
-    }]
+  # def test_transform_response3(self):
+  #   expected = [{
+  #     'swaps': [{
+  #       'price1': 0.5,
+  #       'amount0In': 0.0,
+  #       'amount0Out': 10.0,
+  #       'amount1In': 20.0,
+  #       'amount1Out': 0.0
+  #     }]
+  #   }]
 
-    data = [{
-      'swaps': [{
-        'amount0In': 0.0,
-        'amount0Out': 10.0,
-        'amount1In': 20.0,
-        'amount1Out': 0.0
-      }]
-    }]
+  #   data = [{
+  #     'swaps': [{
+  #       'amount0In': 0.0,
+  #       'amount0Out': 10.0,
+  #       'amount1In': 20.0,
+  #       'amount1Out': 0.0
+  #     }]
+  #   }]
 
-    def f(in0, out0, in1, out1):
-      return abs(in0 - out0) / abs(in1 - out1)
+  #   def f(in0, out0, in1, out1):
+  #     return abs(in0 - out0) / abs(in1 - out1)
 
-    arg_select = [
-      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-      Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-    ]
+  #   arg_select = [
+  #     Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #     Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #   ]
 
-    fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
+  #   fmeta = TypeMeta.FieldMeta('price1', '', [], TypeRef.non_null('Float'))
 
-    req = DataRequest(documents=[
-      Document(
-        'abc',
-        Query(None, [
-          Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
-            Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
-          ])
-        ])
-      )
-    ])
+  #   req = DataRequest(documents=[
+  #     Document(
+  #       'abc',
+  #       Query(None, [
+  #         Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+  #           Selection(TypeMeta.FieldMeta('price1', '', [], TypeRef.Named('Float')), None, None, None),
+  #         ])
+  #       ])
+  #     )
+  #   ])
 
-    transformed_data = transform_response(fmeta, f, arg_select, req, data)
+  #   transformed_data = transform_response(fmeta, f, arg_select, req, data)
 
-    self.assertEqual(transformed_data, expected)
+  #   self.assertEqual(transformed_data, expected)
 
-  def test_transform_response4(self):
-    expected = [{
-      'pair': {
-        'token0Symbol': 'USDC',
-        'token0': {
-          'symbol': 'USDC'
-        }
-      }
-    }]
+  # def test_transform_response4(self):
+  #   expected = [{
+  #     'pair': {
+  #       'token0Symbol': 'USDC',
+  #       'token0': {
+  #         'symbol': 'USDC'
+  #       }
+  #     }
+  #   }]
 
-    data = [{
-      'pair': {
-        'token0': {
-          'symbol': 'USDC'
-        }
-      }
-    }]
+  #   data = [{
+  #     'pair': {
+  #       'token0': {
+  #         'symbol': 'USDC'
+  #       }
+  #     }
+  #   }]
 
-    fmeta = TypeMeta.FieldMeta('token0Symbol', '', [], TypeRef.non_null('String'))
+  #   fmeta = TypeMeta.FieldMeta('token0Symbol', '', [], TypeRef.non_null('String'))
 
-    def f(x):
-      return x
+  #   def f(x):
+  #     return x
 
-    arg_select = [
-      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, None, [
-        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.non_null('String')))
-      ])
-    ]
+  #   arg_select = [
+  #     Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, None, [
+  #       Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.non_null('String')))
+  #     ])
+  #   ]
 
-    query = DataRequest(documents=[
-      Document(
-        'abc',
-        Query(None, [
-          Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.Named('Pair')), None, None, [
-            Selection(TypeMeta.FieldMeta('token0Symbol', '', [], TypeRef.Named('String')), None, None, None),
-          ])
-        ])
-      )
-    ])
+  #   query = DataRequest(documents=[
+  #     Document(
+  #       'abc',
+  #       Query(None, [
+  #         Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.Named('Pair')), None, None, [
+  #           Selection(TypeMeta.FieldMeta('token0Symbol', '', [], TypeRef.Named('String')), None, None, None),
+  #         ])
+  #       ])
+  #     )
+  #   ])
 
-    transformed_data = transform_response(fmeta, f, arg_select, query, data)
+  #   transformed_data = transform_response(fmeta, f, arg_select, query, data)
 
-    self.assertEqual(transformed_data, expected)
+  #   self.assertEqual(transformed_data, expected)
 
-  def test_transform_data_type1(self):
-    expected = [{
-      'swaps': [{
-        'amount0In': 0.0,
-        'amount0Out': 10.0,
-        'amount1In': 20.0,
-        'amount1Out': 0.0
-      }]
-    }]
+  # def test_transform_data_type1(self):
+  #   expected = [{
+  #     'swaps': [{
+  #       'amount0In': 0.0,
+  #       'amount0Out': 10.0,
+  #       'amount1In': 20.0,
+  #       'amount1Out': 0.0
+  #     }]
+  #   }]
 
-    data = [{
-      'swaps': [{
-        'amount0In': '0.0',
-        'amount0Out': '10.0',
-        'amount1In': '20.0',
-        'amount1Out': '0.0'
-      }]
-    }]
+  #   data = [{
+  #     'swaps': [{
+  #       'amount0In': '0.0',
+  #       'amount0Out': '10.0',
+  #       'amount1In': '20.0',
+  #       'amount1Out': '0.0'
+  #     }]
+  #   }]
 
-    def f(bigdecimal):
-      return float(bigdecimal)
+  #   def f(bigdecimal):
+  #     return float(bigdecimal)
 
-    query = DataRequest(documents=[
-      Document(
-        'abc',
-        Query(None, [
-          Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
-            Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-            Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-            Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-            Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
-          ])
-        ])
-      )
-    ])
+  #   query = DataRequest(documents=[
+  #     Document(
+  #       'abc',
+  #       Query(None, [
+  #         Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, None, [
+  #           Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #           Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #           Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #           Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
+  #         ])
+  #       ])
+  #     )
+  #   ])
 
-    type_ = TypeRef.Named('BigDecimal')
+  #   type_ = TypeRef.Named('BigDecimal')
 
-    transformed_data = transform_data_type(type_, f, query, data)
+  #   transformed_data = transform_data_type(type_, f, query, data)
 
-    self.assertEqual(transformed_data, expected)
+  #   self.assertEqual(transformed_data, expected)
 
 
 class TestQueryTransform(unittest.TestCase):
@@ -335,10 +335,11 @@ class TestQueryTransform(unittest.TestCase):
 
     subgraph_transforms = [
       LocalSyntheticField(
-        None,
-        TypeMeta.FieldMeta('price0', '', [], TypeRef.non_null('Float')),
-        lambda in0, out0, in1, out1: abs(in1 - out1) / abs(in0 - out0),
-        [
+        subgraph=None,
+        fmeta=TypeMeta.FieldMeta('price0', '', [], TypeRef.non_null('Float')),
+        f=lambda in0, out0, in1, out1: abs(in1 - out1) / abs(in0 - out0),
+        default=0.0,
+        args=[
           Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
           Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')), None, None, None),
           Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')), None, None, None),
