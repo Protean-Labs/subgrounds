@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from re import L
+from abc import ABC
 from typing import Any
 from pipe import traverse, map
 
@@ -36,7 +35,6 @@ class TraceWrapper(ABC):
         fpath_data[key] = item[0]
       else:
         fpath_data[key] = item
-    # fpath_data = {key: fpath.extract_data(data) for key, fpath in self.fpaths.items()}
 
     return self.graph_object(
       **(fpath_data | self.args)
@@ -47,20 +45,175 @@ class TraceWrapper(ABC):
     return [fpath for _, fpath in self.fpaths.items()]
 
 
+# Simple
 class Scatter(TraceWrapper):
+  """See https://plotly.com/python/line-and-scatter/"""
   graph_object = go.Scatter
 
 
+class Pie(TraceWrapper):
+  """See https://plotly.com/python/pie-charts/"""
+  graph_object = go.Pie
+
+
 class Bar(TraceWrapper):
+  """See https://plotly.com/python/bar-charts/"""
   graph_object = go.Bar
 
 
+class Heatmap(TraceWrapper):
+  """See https://plotly.com/python/heatmaps/"""
+  graph_object = go.Heatmap
+
+
+class Contour(TraceWrapper):
+  """See https://plotly.com/python/contour-plots/"""
+  graph_object = go.Contour
+
+
+# Distributions
+class Box(TraceWrapper):
+  """See https://plotly.com/python/box-plots/"""
+  graph_object = go.Box
+
+
+class Violin(TraceWrapper):
+  """See https://plotly.com/python/violin/"""
+  graph_object = go.Violin
+
+
+class Histogram(TraceWrapper):
+  """See https://plotly.com/python/histograms/"""
+  graph_object = go.Histogram
+
+
+class Histogram2d(TraceWrapper):
+  """See https://plotly.com/python/2D-Histogram/"""
+  graph_object = go.Histogram2d
+
+
+class Histogram2dContour(TraceWrapper):
+  """See https://plotly.com/python/2d-histogram-contour/"""
+  graph_object = go.Histogram2dContour
+
+
+# Finance
+class Ohlc(TraceWrapper):
+  """See https://plotly.com/python/ohlc-charts/"""
+  graph_object = go.Ohlc
+
+
+class Candlestick(TraceWrapper):
+  """See https://plotly.com/python/candlestick-charts/"""
+  graph_object = go.Candlestick
+
+
+class Waterfall(TraceWrapper):
+  """See https://plotly.com/python/waterfall-charts/"""
+  graph_object = go.Waterfall
+
+
+class Funnel(TraceWrapper):
+  """See https://plotly.com/python/funnel-charts/"""
+  graph_object = go.Funnel
+
+
 class Indicator(TraceWrapper):
+  """See https://plotly.com/python/indicator/"""
   graph_object = go.Indicator
 
 
-class Pie(TraceWrapper):
-  graph_object = go.Pie
+# 3d
+class Scatter3d(TraceWrapper):
+  """See https://plotly.com/python/3d-scatter-plots/"""
+  graph_object = go.Scatter3d
+
+
+class Surface(TraceWrapper):
+  """See https://plotly.com/python/3d-surface-plots/"""
+  graph_object = go.Surface
+
+
+# Maps
+class Scattergeo(TraceWrapper):
+  """See https://plotly.com/python/scatter-plots-on-maps/"""
+  graph_object = go.Scattergeo
+
+
+class Choropleth(TraceWrapper):
+  """See https://plotly.com/python/choropleth-maps/"""
+  graph_object = go.Choropleth
+
+
+class Scattermapbox(TraceWrapper):
+  """See https://plotly.com/python/scattermapbox/"""
+  graph_object = go.Scattermapbox
+
+
+class Choroplethmapbox(TraceWrapper):
+  """See https://plotly.com/python/mapbox-county-choropleth/"""
+  graph_object = go.Choroplethmapbox
+
+
+class Densitymapbox(TraceWrapper):
+  """See https://plotly.com/python/mapbox-density-heatmaps/"""
+  graph_object = go.Densitymapbox
+
+
+# Specialized
+class Scatterpolar(TraceWrapper):
+  """See https://plotly.com/python/polar-chart/"""
+  graph_object = go.Scatterpolar
+
+
+class Barpolar(TraceWrapper):
+  """See https://plotly.com/python/wind-rose-charts/"""
+  graph_object = go.Barpolar
+
+
+class Sunburst(TraceWrapper):
+  """See https://plotly.com/python/sunburst-charts/"""
+  graph_object = go.Sunburst
+
+
+class Treemap(TraceWrapper):
+  """See https://plotly.com/python/treemaps/"""
+  graph_object = go.Treemap
+
+
+class Icicle(TraceWrapper):
+  """See https://plotly.com/python/icicle-charts/"""
+  graph_object = go.Icicle
+
+
+class Sankey(TraceWrapper):
+  """See https://plotly.com/python/sankey-diagram/"""
+  graph_object = go.Sankey
+
+
+class Parcoords(TraceWrapper):
+  """See https://plotly.com/python/parallel-coordinates-plot/"""
+  graph_object = go.Parcoords
+
+
+class Parcats(TraceWrapper):
+  """See https://plotly.com/python/parallel-categories-diagram/"""
+  graph_object = go.Parcats
+
+
+class Carpet(TraceWrapper):
+  """See https://plotly.com/python/carpet-plot/"""
+  graph_object = go.Carpet
+
+
+class Scattercarpet(TraceWrapper):
+  """See https://plotly.com/python/carpet-scatter/"""
+  graph_object = go.Scattercarpet
+
+
+class Contourcarpet(TraceWrapper):
+  """See https://plotly.com/python/carpet-contour/"""
+  graph_object = go.Contourcarpet
 
 
 class Figure:
@@ -80,16 +233,24 @@ class Figure:
   ) -> None:
     self.subgrounds = subgrounds
     self.traces = list([traces] | traverse)
-    self.req = self.subgrounds.mk_request(list(self.traces | map(lambda trace: trace.field_paths) | traverse))
-    self.data = self.subgrounds.execute(self.req)
+
+    traces = list(self.traces | map(lambda trace: trace.field_paths) | traverse)
+    if len(traces) > 0:
+      self.req = self.subgrounds.mk_request(traces)
+      self.data = self.subgrounds.execute(self.req)
+    else:
+      self.req = None
+      self.data = None
 
     self.args = kwargs
     self.refresh()
 
   def refresh(self) -> None:
     # TODO: Modify this to support x/y in different documents
-    self.data = self.subgrounds.execute(self.req)
-
     self.figure = go.Figure(**self.args)
-    for trace in self.traces:
-      self.figure.add_trace(trace.mk_trace(self.data))
+
+    if self.req is not None:
+      self.data = self.subgrounds.execute(self.req)
+
+      for trace in self.traces:
+        self.figure.add_trace(trace.mk_trace(self.data))
