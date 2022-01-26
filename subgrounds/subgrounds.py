@@ -131,6 +131,22 @@ class Subgrounds:
     
     return pd.DataFrame({key: fpath.extract_data(data) for key, fpath in col_fpaths})
 
+  def oneshot(self, fpath: FieldPath) -> str | int | float | bool | list | None:
+    """Executes a single `FieldPath` query.
+
+    Args:
+      fpath (FieldPath): The `FieldPath` object to query.
+
+    Returns:
+        [type]: The single `FieldPath` data
+    """
+    blob = self.query([fpath])
+    data = fpath.extract_data(blob)
+    if type(data) == list and len(data) == 1:
+      return data[0]
+    else:
+      return data
+
 
 def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:
   """ Formats the dictionary `data` into a pandas DataFrame using some
