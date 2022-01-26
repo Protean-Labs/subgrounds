@@ -83,17 +83,17 @@ class TestDataFrame(unittest.TestCase):
 
   def test_query_df_2(self):
     expected = pd.DataFrame(data={
-      'swaps_datetime': [
-        '2022-01-26 09:23:12',
-        '2022-01-26 09:23:12',
-        '2022-01-26 09:23:12',
-        '2022-01-26 09:23:12',
-        '2022-01-26 09:23:12',
-        '2022-01-26 09:23:12',
-        '2022-01-26 09:23:12',
-        '2022-01-26 09:23:12',
-        '2022-01-26 09:23:12',
-        '2022-01-26 09:23:12'
+      'swaps_timestamp': [
+        1643206992,
+        1643206992,
+        1643206992,
+        1643206992,
+        1643206992,
+        1643206992,
+        1643206992,
+        1643206992,
+        1643206992,
+        1643206992
       ],
       'swaps_pool_id': [
         '0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640',
@@ -130,14 +130,22 @@ class TestDataFrame(unittest.TestCase):
         'USDT',
         'WETH',
         'WETH'
+      ],
+      'swaps_price': [
+        2658.525855,
+        2671.271244,
+        0.514571,
+        2653.578717,
+        509832.972416,
+        0.999497,
+        2654.770457,
+        0.000377,
+        2661.936385,
+        2657.060763
       ]
     })
 
-    self.univ3.Swap.datetime = SyntheticField(
-      lambda timestamp: str(datetime.fromtimestamp(timestamp)),
-      SyntheticField.STRING,
-      self.univ3.Swap.timestamp,
-    )
+    self.univ3.Swap.price = abs(self.univ3.Swap.amount0) / abs(self.univ3.Swap.amount1)
 
     swaps = self.univ3.Query.swaps(
       orderBy=self.univ3.Swap.timestamp,
@@ -149,10 +157,11 @@ class TestDataFrame(unittest.TestCase):
     )
 
     df = self.sg.query_df([
-      swaps.datetime,
+      swaps.timestamp,
       swaps.pool.id,
       swaps.token0.symbol,
-      swaps.token1.symbol
+      swaps.token1.symbol,
+      swaps.price
     ])
 
     assert_frame_equal(df, expected)
