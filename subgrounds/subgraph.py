@@ -295,12 +295,19 @@ class FieldPath(FieldOperatorMixin):
 
   @property
   def data_path(self) -> list[str]:
-    # return list(self.path | map(lambda ele: ele[1].name))
     return list(self.path | map(lambda ele: FieldPath.hash(ele[1].name + str(ele[0])) if ele[0] != {} and ele[0] is not None else ele[1].name))
 
   @property
-  def longname(self) -> str:
+  def dataname(self) -> str:
     return '_'.join(self.data_path)
+
+  @property
+  def name_path(self) -> list[str]:
+    return list(self.path | map(lambda ele: ele[1].name))
+
+  @property
+  def longname(self) -> str:
+    return '_'.join(self.name_path)
 
   @staticmethod
   def hash(msg: str) -> str:
@@ -353,10 +360,10 @@ class FieldPath(FieldOperatorMixin):
     def f(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> list[Selection]:
       match path:
         case [(None, TypeMeta.FieldMeta() as fmeta), *rest]:
-          return [Selection(fmeta, selection=selection_of_path(fpath.subgraph.schema, rest))]
+          return [Selection(fmeta, selection=f(rest))]
 
         case [(args, TypeMeta.FieldMeta() as fmeta), *rest] if args == {}:
-          return [Selection(fmeta, selection=selection_of_path(fpath.subgraph.schema, rest))]
+          return [Selection(fmeta, selection=f(rest))]
 
         case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
           return [Selection(
@@ -364,12 +371,13 @@ class FieldPath(FieldOperatorMixin):
             # TODO: Revisit this
             alias=FieldPath.hash(fmeta.name + str(args)),
             arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
-            selection=selection_of_path(fpath.subgraph.schema, rest)
+            selection=f(rest)
           )]
 
         case []:
           return []
 
+    # print(f'FieldPath.selection: path = {fpath.path}')
     return f(fpath.path)[0]
 
   @staticmethod
@@ -529,16 +537,19 @@ class FieldPath(FieldOperatorMixin):
     else:
       return FieldPath.mk_filter(self, Filter.Operator.EQ, value)
 
+  def __ne__(self, value: Any) -> Filter:
+    return FieldPath.mk_filter(self, Filter.Operator.NEQ, value)
+
   def __lt__(self, value: Any) -> Filter:
     return FieldPath.mk_filter(self, Filter.Operator.LT, value)
 
   def __gt__(self, value: Any) -> Filter:
     return FieldPath.mk_filter(self, Filter.Operator.GT, value)
 
-  def __lte__(self, value: Any) -> Filter:
+  def __le__(self, value: Any) -> Filter:
     return FieldPath.mk_filter(self, Filter.Operator.LTE, value)
 
-  def __gte__(self, value: Any) -> Filter:
+  def __ge__(self, value: Any) -> Filter:
     return FieldPath.mk_filter(self, Filter.Operator.GTE, value)
 
   # Utility
