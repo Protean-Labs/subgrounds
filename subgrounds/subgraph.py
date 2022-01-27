@@ -9,6 +9,9 @@ import operator
 from hashlib import blake2b
 from pipe import map
 
+import warnings
+warnings.simplefilter('default')
+
 import subgrounds.client as client
 import subgrounds.schema as schema
 from subgrounds.query import Selection, arguments_of_field_args, selection_of_path
@@ -611,8 +614,10 @@ class Subgraph:
   schema: SchemaMeta
   transforms: list[DocumentTransform] = field(default_factory=list)
 
+  # TODO: Remove
   @staticmethod
   def of_url(url: str) -> None:
+    warnings.warn("`of_url` will be deprecated! Use `Subgrounds`'s `load_subgraph` instead", DeprecationWarning)
     filename = url.split("/")[-1] + ".json"
     if os.path.isfile(filename):
       with open(filename) as f:

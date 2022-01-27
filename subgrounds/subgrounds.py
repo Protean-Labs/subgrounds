@@ -10,7 +10,6 @@ warnings.simplefilter('default')
 
 import pandas as pd
 
-
 from subgrounds.query import DataRequest, Document, Query
 from subgrounds.schema import mk_schema
 from subgrounds.subgraph import FieldPath, Subgraph
@@ -80,11 +79,11 @@ class Subgrounds:
     def execute_document(doc: Document) -> dict:
       match doc.variables:
         case []:
-          return client.query(doc.url, doc.graphql_string)
+          return client.query(doc.url, doc.graphql)
         case [args]:
-          return client.query(doc.url, doc.graphql_string, args)
+          return client.query(doc.url, doc.graphql, args)
         case args_list:
-          return client.repeat(doc.url, doc.graphql_string, args_list)
+          return client.repeat(doc.url, doc.graphql, args_list)
     
     def transform_doc(transforms: list[DocumentTransform], doc: Document) -> dict:
       match transforms:
@@ -222,14 +221,14 @@ class Subgrounds:
     else:
       return list(data | map(lambda data: fmt_cols(pd.DataFrame(columns=gen_columns(data), data=flatten(gen_rows(data))), col_map)))
 
-  def oneshot(self, fpath: FieldPath) -> str | int | float | bool | list | None:
-    """Executes a single `FieldPath` query.
+  def oneshot(self, fpath: FieldPath | list[FieldPath]) -> str | int | float | bool | list | tuple | None:
+    """Executes one or multiple `FieldPath` objects immediately and return the data (as a tuple if multiple `FieldPath` objects are provided).
 
     Args:
-      fpath (FieldPath): The `FieldPath` object to query.
+      fpath (FieldPath): The `FieldPath` object(s) to query.
 
     Returns:
-        [type]: The single `FieldPath` data
+        [type]: The `FieldPath` object(s) data
 
     Example:
     ```python
@@ -253,19 +252,25 @@ class Subgrounds:
     2628.975030015892
     ```
     """
-    blob = self.query([fpath])
-    data = fpath.extract_data(blob)
-    if type(data) == list and len(data) == 1:
+    def f(fpath):
+      blob = self.query([fpath])
+      data = fpath.extract_data(blob)
+      if type(data) == list and len(data) == 1:
+        return data[0]
+      else:
+        return data
+
+    data = tuple([fpath] | traverse | map(f))
+    if len(data) == 1:
       return data[0]
     else:
       return data
-
 
 def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:
   """ Formats the dictionary `data` into a pandas DataFrame using some
   heuristics when no clear "flattening" scheme is present.
   """
-  warnings.warn("`to_dataframe` will be deprecated! Use `Subgrounds.query_df` instead", DeprecationWarning)
+  warnings.warn("`to_dataframe` will be deprecated! Use `Subgrounds`'s `query_df` instead", DeprecationWarning)
 
   def columns(data, prefix: str = '') -> list[str]:
     match data:
