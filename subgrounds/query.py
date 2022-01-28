@@ -24,7 +24,7 @@ class InputValue:
   class T(ABC):
     @property
     @abstractmethod
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       """ Returns a GraphQL string representation of the input value
 
       Returns:
@@ -53,7 +53,7 @@ class InputValue:
   @dataclass(frozen=True)
   class Null(T):
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return "null"
 
   @dataclass(frozen=True)
@@ -61,7 +61,7 @@ class InputValue:
     value: int
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return str(self.value)
 
     @property
@@ -73,7 +73,7 @@ class InputValue:
     value: float
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return str(self.value)
 
     @property
@@ -85,7 +85,7 @@ class InputValue:
     value: str
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return f"\"{self.value}\""
 
   @dataclass(frozen=True)
@@ -93,7 +93,7 @@ class InputValue:
     value: bool
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return str(self.value).lower()
 
   @dataclass(frozen=True)
@@ -101,7 +101,7 @@ class InputValue:
     value: str
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return self.value
 
   @dataclass(frozen=True)
@@ -109,7 +109,7 @@ class InputValue:
     name: str
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return f'${self.name}'
 
     @property
@@ -121,16 +121,16 @@ class InputValue:
     value: list[InputValue.T]
 
     @property
-    def graphql_string(self) -> str:
-      return f"[{', '.join([val.graphql_string for val in self.value])}]"
+    def graphql(self) -> str:
+      return f"[{', '.join([val.graphql for val in self.value])}]"
 
   @dataclass(frozen=True)
   class Object(T):
     value: dict[str, InputValue.T]
 
     @property
-    def graphql_string(self) -> str:
-      return f"{{{', '.join([f'{key}: {value.graphql_string}' for key, value in self.value.items()])}}}"
+    def graphql(self) -> str:
+      return f"{{{', '.join([f'{key}: {value.graphql}' for key, value in self.value.items()])}}}"
 
 
 @dataclass(frozen=True)
@@ -140,11 +140,11 @@ class VariableDefinition:
   default: Optional[InputValue.T] = None
 
   @property
-  def graphql_string(self) -> str:
+  def graphql(self) -> str:
     if self.default is None:
-      return f'${self.name}: {TypeRef.graphql_string(self.type_)}'
+      return f'${self.name}: {TypeRef.graphql(self.type_)}'
     else:
-      return f'${self.name}: {TypeRef.graphql_string(self.type_)} = {self.default.graphql_string}'
+      return f'${self.name}: {TypeRef.graphql(self.type_)} = {self.default.graphql}'
 
 
 @dataclass(frozen=True)
@@ -153,8 +153,8 @@ class Argument:
   value: InputValue.T
 
   @property
-  def graphql_string(self) -> str:
-    return f"{self.name}: {self.value.graphql_string}"
+  def graphql(self) -> str:
+    return f"{self.name}: {self.value.graphql}"
 
 
 @dataclass(frozen=True)
@@ -180,13 +180,13 @@ class Selection:
       return self.fmeta.name
 
   @property
-  def args_graphql_string(self) -> str:
+  def args_graphql(self) -> str:
     if self.arguments:
-      return f'({", ".join([arg.graphql_string for arg in self.arguments])})'
+      return f'({", ".join([arg.graphql for arg in self.arguments])})'
     else:
       return ""
 
-  def graphql_string(self, level: int = 0) -> str:
+  def graphql(self, level: int = 0) -> str:
     indent = "  " * level
 
     if self.alias:
@@ -196,12 +196,12 @@ class Selection:
 
     match (self.selection):
       case None | []:
-        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql_string}"
+        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql}"
       case inner_selection:
         inner_str = "\n".join(
-          [f.graphql_string(level=level + 1) for f in inner_selection]
+          [f.graphql(level=level + 1) for f in inner_selection]
         )
-        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql_string} {{\n{inner_str}\n{indent}}}"
+        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql} {{\n{inner_str}\n{indent}}}"
 
   @staticmethod
   def add_selections(select: Selection, new_selections: list[Selection]) -> Selection:
@@ -341,18 +341,18 @@ class Query:
   variables: list[VariableDefinition] = field(default_factory=list)
 
   @property
-  def graphql_string(self) -> str:
+  def graphql(self) -> str:
     """ Returns a string containing a GraphQL query matching the current query
 
     Returns:
       str: The string containing the GraphQL query
     """
     selection_str = "\n".join(
-      [select.graphql_string(level=1) for select in self.selection]
+      [select.graphql(level=1) for select in self.selection]
     )
 
     if len(self.variables) > 0:
-      args_str = f'({", ".join([vardef.graphql_string for vardef in self.variables])})'
+      args_str = f'({", ".join([vardef.graphql for vardef in self.variables])})'
     else:
       args_str = ""
 
@@ -607,9 +607,9 @@ class Fragment:
   variables: list[VariableDefinition] = field(default_factory=list)
 
   @property
-  def graphql_string(self):
+  def graphql(self):
     selection_str = "\n".join(
-      [select.graphql_string(level=1) for select in self.selection]
+      [select.graphql(level=1) for select in self.selection]
     )
     return f"""fragment {self.name} on {TypeRef.root_type_name(self.type_)} {{\n{selection_str}\n}}"""
 
@@ -637,8 +637,8 @@ class Document:
   variables: list[dict[str, Any]] = field(default_factory=list)
 
   @property
-  def graphql_string(self):
-    return '\n'.join([self.query.graphql_string, *list(self.fragments | map(lambda frag: frag.graphql_string))])
+  def graphql(self):
+    return '\n'.join([self.query.graphql, *list(self.fragments | map(lambda frag: frag.graphql))])
 
   @staticmethod
   def mk_single_query(url: str, query: Query) -> Document:
@@ -675,6 +675,10 @@ class Document:
 class DataRequest:
   documents: list[Document] = field(default_factory=list)
 
+  @property
+  def graphql(self):
+    return '\n'.join(list(self.documents | map(lambda doc: doc.graphql)))
+
   @staticmethod
   def combine(req: DataRequest, other: DataRequest) -> None:
     return DataRequest(
@@ -707,11 +711,11 @@ def execute(request: DataRequest) -> list:
   def f(doc: Document) -> dict:
     match doc.variables:
       case []:
-        return client.query(doc.url, doc.graphql_string)
+        return client.query(doc.url, doc.graphql)
       case [args]:
-        return client.query(doc.url, doc.graphql_string, args)
+        return client.query(doc.url, doc.graphql, args)
       case args_list:
-        return client.repeat(doc.url, doc.graphql_string, args_list)
+        return client.repeat(doc.url, doc.graphql, args_list)
 
   return list(request.documents | map(f))
 

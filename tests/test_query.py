@@ -16,7 +16,7 @@ class TestQueryString(unittest.TestCase):
   def tearDown(self) -> None:
     SyntheticField.counter = 0
 
-  def test_graphql_string_1(self):
+  def test_graphql_1(self):
     expected = """query {
   pairs(first: 100, where: {reserveUSD_lt: "10.0"}, orderBy: reserveUSD, orderDirection: desc) {
     id
@@ -59,9 +59,9 @@ class TestQueryString(unittest.TestCase):
       )
     ])
 
-    self.assertEqual(query.graphql_string, expected)
+    self.assertEqual(query.graphql, expected)
 
-  def test_graphql_string_2(self):
+  def test_graphql_2(self):
     expected = """query {
   xab8f96f0e14a4db3: pairs(first: 100, where: {reserveUSD_lt: "10.0"}, orderBy: reserveUSD, orderDirection: desc) {
     id
@@ -95,9 +95,9 @@ class TestQueryString(unittest.TestCase):
       pairs.token1.symbol,
     ])
 
-    self.assertEqual(req.documents[0].query.graphql_string, expected)
+    self.assertEqual(req.documents[0].query.graphql, expected)
 
-  def test_graphql_string_3(self):
+  def test_graphql_3(self):
     expected = """query($tokenId: String!) {
   token(id: $tokenId) {
     id
@@ -120,7 +120,7 @@ class TestQueryString(unittest.TestCase):
       ]
     )
 
-    self.assertEqual(query.graphql_string, expected)
+    self.assertEqual(query.graphql, expected)
 
 
 class TestExecution(unittest.TestCase):
