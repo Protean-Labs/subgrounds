@@ -22,10 +22,75 @@ Initialize Subgrounds and load a subgraph.
 >>> aaveV2 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/aave/protocol-v2')
 ```
 
-<!-- Configure the subgrounds component. In this example, we are creating a bar chart of the amount borrowed in the last 100 borrows on Aave V2, grouped by the reserve token. -->
+## FieldPaths
+Create a subgrounds request by combining `FieldPath` objects. `FieldPath` objects represent selection paths through the graphql entities starting from the root entity `Query`. The example below shows how to create a single `FieldPath` and print out its GraphQL equivalent.
+```python
+>>> fpath = aaveV2.Query.borrows.reserve.symbol
 
-Create a subgrounds request by combining `FieldPath` objects. Fieldpaths are selection paths through the graphql entities starting from the root entity `Query`. In the code below, `borrows` is a `FieldPath` object representing the selection path `Query.borrows` with the arguments `orderBy`, `orderDirection` and `first` specified. The two field paths used in the request (i.e.: `borrows.reserve.symbol` and `borrows.amount`) extend the `borrows` field path with further selections.
+>>> req = sg.mk_request([fpath])
+>>> print(req.graphql)
+query {
+  borrows {
+    reserve {
+      symbol
+    }
+  }
+}
+```
 
+Partial `FieldPath` objects can also be created to avoid rewriting the field path from the start and multiple `FieldPath` objects can be combined to make a more complicated request:
+```python
+>>> borrows = aaveV2.Query.borrows
+>>> borrows_reserve_symbol = borrows.reserve.symbol
+>>> borrows_amounts = borrows.amount
+
+>>> req = sg.mk_request([
+...   borrows_reserve_symbol,
+...   borrows_amounts
+... ])
+>>> print(req.graphql)
+query {
+  borrows {
+    reserve {
+      symbol
+    }
+    amount
+  }
+}
+```
+
+`FieldPath` from different subgraphs can also be combined in a single request (internally, Subgrounds sends one request to each subgraph):
+```python
+>>> uniV3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
+
+>>> aaveV2_borrows = aaveV2.Query.borrows
+>>> uniV3_swaps = uniV3.Query.swaps
+
+>>> req = sg.mk_request([
+...   aaveV2_borrows.reserve.symbol,
+...   aaveV2_borrows.amount,
+...   uniV3_swaps.timestamp,
+...   uniV3_swaps.amountUSD
+... ])
+
+>>> print(req.graphql)
+query {
+  borrows {
+    reserve {
+      symbol
+    }
+    amount
+  }
+}
+query {
+  swaps {
+    timestamp
+    amountUSD
+  }
+}
+```
+
+`FieldPath` also accept arguments which correspond to GraphQL arguments:
 ```python
 >>> borrows = aaveV2.Query.borrows(
 ...  orderBy=aaveV2.Borrow.timestamp,
@@ -47,6 +112,8 @@ query {
   }
 }
 ```
+Note: For an explanation of why the `xf608864358427cfb` alias is present in the query string, see `GraphQL Aliases` in the `Notes` section at the end of the README. 
+
 ### FieldPaths as arguments
 Notice in the previous example that the `FieldPath` `aaveV2.Borrow.timestamp` was used as the value for the `orderBy` argument when creating the `borrows` variable. With Subgrounds it is possible to use such `FieldPath` objects as GraphQL arguments in specific cases (as is the case with `orderBy`). They can also be used with the `where` argument to create a filter:
 ```python
@@ -61,21 +128,20 @@ Notice in the previous example that the `FieldPath` `aaveV2.Borrow.timestamp` wa
 ...   first=10
 ... )
 
->>> sg.query_df([
+>>> req = sg.mk_request([
 ...   usdc_borrows.timestamp, 
 ...   usdc_borrows.amount
 ... ])
-   reserves_borrowHistory_timestamp  reserves_borrowHistory_amount
-0                        1643305508                    37500000000
-1                        1643304646                    10000000000
-2                        1643304427                    10000000000
-3                        1643304323                     5000000000
-4                        1643304273                    75000000000
-5                        1643303440                       15000000
-6                        1643301584                   220000000000
-7                        1643296256                    50000000000
-8                        1643286238                     2500000000
-9                        1643280595                     1635372921
+
+>>> print(req.graphql)
+query {
+  x47607b0dcc7608b8: reserves(first: 1, where: {symbol: "USDC"}) {
+    xc1acc74cbca2083c: borrowHistory(first: 10, orderBy: timestamp, orderDirection: desc) {
+      timestamp
+      amount
+    }
+  }
+}
 ```
 Alternatively, raw values can also be used as arguments. The following is equivalent to the above:
 ```python
@@ -91,50 +157,12 @@ Alternatively, raw values can also be used as arguments. The following is equiva
 ... )
 ```
 
-### GraphQL Aliases
-The use of the alias `xf608864358427cfb` in the query string is to prevent conflict when merging fieldpaths that select the same fields with different arguments. For example, in the following code, the `borrows` query field is selected twice with different arguments:
-```python
->>> latest_borrows = aaveV2.Query.borrows(
-...  orderBy=aaveV2.Borrow.timestamp,
-...  orderDirection='desc',
-...  first=100
-...)
-
->>> largest_borrows = aaveV2.Query.borrows(
-...  orderBy=aaveV2.Borrow.amount,
-...  orderDirection='desc',
-...  first=100
-...)
-
->>> req = sg.mk_request([
-...   latest_borrows.reserve.symbol,
-...   latest_borrows.amount,
-...   largest_borrows.reserve.symbol,
-...   largest_borrows.amount,
-... ])
->>> print(req.graphql)
-query {
-  x8b3edf3dc6501837: borrows(first: 100, orderBy: amount, orderDirection: desc) {
-    reserve {
-      symbol
-    }
-    amount
-  }
-  xf608864358427cfb: borrows(first: 100, orderBy: timestamp, orderDirection: desc) {
-    reserve {
-      symbol
-    }
-    amount
-  }
-}
-```
-
 ## Getting data
 Following the code above, we can use fieldpaths to get data from The Graph.
 
 **NOTE**: The data shown depends on when the query was executed.
 
-Fetch one or multiple fieldpath and return the data immediately
+Fetch one or multiple fieldpath and return the data immediately using the `onshot` method:
 ```python
 >>> last_borrow = aaveV2.Query.borrows(
 ...   orderBy=aaveV2.Borrow.timestamp,
@@ -174,7 +202,7 @@ Fetch one or multiple fieldpath and return the data immediately
   38942581537902421206923])
 ```
 
-Fetch multiple fieldpaths and return the data as a DataFrame
+Fetch multiple fieldpaths and return the data as a DataFrame using the `query_df` method:
 ```python
 >>> last10_borrow = aaveV2.Query.borrows(
 ...   orderBy=aaveV2.Borrow.timestamp,
@@ -200,8 +228,9 @@ Fetch multiple fieldpaths and return the data as a DataFrame
 9                   USDT         1643289117              14000000000
 ```
 
-Fetch multiple fieldpaths and return the raw data as Python dictionaries. 
-**WARNING**: Query aliases will be present in the dictionaries (see GraphQL Aliases above). This method is not reccommended. 
+Fetch multiple fieldpaths and return the raw data as Python dictionaries using the `query` method.
+
+**WARNING**: Query aliases will be present in the dictionaries (see `GraphQL Aliases` in the `Notes` section at the end of the README). This method is not the preferred approach to fetching data with Subgrounds. 
 ```python
 >>> last10_borrow = aaveV2.Query.borrows(
 ...   orderBy=aaveV2.Borrow.timestamp,
@@ -312,9 +341,9 @@ The `Borrow.timestamp` field can also be formatted to something more human-reada
 9                   USDT  2022-01-27 08:11:57             14000.000000
 ```
 
-Looking at the `SyntheticField` constructor arguments, `f` is the function to apply to the dependencies `deps`, `type_` is the GraphQL type of the resulting synthetic field `datetime` and `deps` are the `FieldPath` objects which constitute the synthetic field's dependencies.
+Looking at the `SyntheticField` constructor arguments, `f` is the function to apply to the dependencies `deps`, `type_` is the GraphQL type of the resulting synthetic field `datetime` and `deps` are the `FieldPath` objects on which the synthetic field depends.
 
-You can also create `SyntheticField` objects that take more than one argument (notice the two `FieldPath` objects for `deps` as well as the two arguments to the funciton `f`), as well as default values:
+You can also create `SyntheticField` objects that take more than one argument (notice the two `FieldPath` objects for `deps` as well as the two arguments to the funciton `f`), as well as default values which will be used in case of error (e.g.: division by zero) or if the data is missing (e.g.: GraphQL optional fields):
 ```python
 >>> aaveV2.Borrow.token_name = SyntheticField(
 ...   f=lambda symbol, name: f'{symbol}: {name}'),
@@ -398,3 +427,47 @@ Generates the following Dash dashboard (at time of writing):
 
 # Examples
 See the `examples/` directory for an evergrowing list of examples.
+
+# Acknowledgments
+This software project would not be possible without the support of The Graph Foundation. You can learn more about The Graph and its mission [here](https://thegraph.com/en/).
+
+This project also builds on the excellent work by the good folks over at Plotly. Lean more about Dash and Plotly [here](https://plotly.com/).
+
+# Notes
+## GraphQL Aliases
+The use of the alias `xf608864358427cfb` in the query string is to prevent conflict when merging fieldpaths that select the same fields with different arguments. For example, in the following code, the `borrows` query field is selected twice with different arguments:
+```python
+>>> latest_borrows = aaveV2.Query.borrows(
+...  orderBy=aaveV2.Borrow.timestamp,
+...  orderDirection='desc',
+...  first=100
+...)
+
+>>> largest_borrows = aaveV2.Query.borrows(
+...  orderBy=aaveV2.Borrow.amount,
+...  orderDirection='desc',
+...  first=100
+...)
+
+>>> req = sg.mk_request([
+...   latest_borrows.reserve.symbol,
+...   latest_borrows.amount,
+...   largest_borrows.reserve.symbol,
+...   largest_borrows.amount,
+... ])
+>>> print(req.graphql)
+query {
+  x8b3edf3dc6501837: borrows(first: 100, orderBy: amount, orderDirection: desc) {
+    reserve {
+      symbol
+    }
+    amount
+  }
+  xf608864358427cfb: borrows(first: 100, orderBy: timestamp, orderDirection: desc) {
+    reserve {
+      symbol
+    }
+    amount
+  }
+}
+```
