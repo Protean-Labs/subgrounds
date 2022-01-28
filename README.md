@@ -1,5 +1,5 @@
 # Subgrounds
-A framework for integrating The Graph data with dash components
+A framework for querying, manipulating and visualizing data indexed on The Graph network.
 
 ## WARNING
 Subgrounds is still in the very early stages of development. APIs can and will change (now is the time to make suggestions!). Some features are still incomplete. Documentation is sparse (but getting better). Expect the Subgrounds API to change frequently.
@@ -9,6 +9,33 @@ Subgrounds is still in the very early stages of development. APIs can and will c
 
 Subgrounds is available on PyPi. To install it, run the following:<br>
 `pip install subgrounds`.
+
+# Simple example
+```python
+>>> from subgrounds.subgrounds import Subgrounds
+
+>>> sg = Subgrounds()
+>>> aaveV2 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/aave/protocol-v2')
+
+>>> aaveV2.Borrow.adjusted_amount = aaveV2.Borrow.amount / 10 ** aaveV2.Borrow.reserve.decimals
+
+>>> sg.query_df([
+...   last10_borrow.reserve.symbol, 
+...   last10_borrow.timestamp,
+...   last10_borrow.adjusted_amount
+... ])
+  borrows_reserve_symbol  borrows_timestamp  borrows_adjusted_amount
+0                   USDT         1643300294            500000.000000
+1                    DAI         1643299575              6000.000000
+2                   USDT         1643298921            900000.000000
+3                   USDT         1643297685            500000.000000
+4                   USDC         1643296256             50000.000000
+5                    PAX         1643295342              4150.000000
+6                   USDT         1643294783              9000.000000
+7                    DAI         1643293451             45585.919063
+8                    UNI         1643289600             50000.000000
+9                   USDT         1643289117             14000.000000
+```
 
 # Getting started
 ## Loading a subgraph
@@ -23,7 +50,7 @@ Initialize Subgrounds and load a subgraph.
 ```
 
 ## FieldPaths
-Create a subgrounds request by combining `FieldPath` objects. `FieldPath` objects represent selection paths through the graphql entities starting from the root entity `Query`. The example below shows how to create a single `FieldPath` and print out its GraphQL equivalent.
+Create a subgrounds request by combining `FieldPath` objects. `FieldPath` objects represent selection paths through the graphql entities starting from the root entity `Query`. `FieldPath` objects do NOT contain any subgraph data. Instead they are used to build queries. The example below shows how to create a single `FieldPath` and print out its GraphQL equivalent.
 ```python
 >>> fpath = aaveV2.Query.borrows.reserve.symbol
 
@@ -162,7 +189,7 @@ Following the code above, we can use fieldpaths to get data from The Graph.
 
 **NOTE**: The data shown depends on when the query was executed.
 
-Fetch one or multiple fieldpath and return the data immediately using the `onshot` method:
+Fetch one or multiple fieldpath and return the data immediately using the `query` method:
 ```python
 >>> last_borrow = aaveV2.Query.borrows(
 ...   orderBy=aaveV2.Borrow.timestamp,
@@ -170,10 +197,10 @@ Fetch one or multiple fieldpath and return the data immediately using the `onsho
 ...   first=1
 ... )
 
->>> sg.oneshot(last_borrow.reserve.symbol)
+>>> sg.query(last_borrow.reserve.symbol)
 'PAX'
 
->>> sg.oneshot([
+>>> sg.query([
 ...   last_borrow.reserve.symbol,
 ...   last_borrow.amount
 ... ])
@@ -185,7 +212,7 @@ Fetch one or multiple fieldpath and return the data immediately using the `onsho
 ...   first=10
 ... )
 
->>> sg.oneshot([
+>>> sg.query([
 ...   last10_borrow.reserve.symbol,
 ...   last10_borrow.amount
 ... ])
@@ -228,7 +255,7 @@ Fetch multiple fieldpaths and return the data as a DataFrame using the `query_df
 9                   USDT         1643289117              14000000000
 ```
 
-Fetch multiple fieldpaths and return the raw data as Python dictionaries using the `query` method.
+Fetch multiple fieldpaths and return the raw data as Python dictionaries using the `query_json` method.
 
 **WARNING**: Query aliases will be present in the dictionaries (see `GraphQL Aliases` in the `Notes` section at the end of the README). This method is not the preferred approach to fetching data with Subgrounds. 
 ```python
@@ -238,7 +265,7 @@ Fetch multiple fieldpaths and return the raw data as Python dictionaries using t
 ...   first=10
 ... )
 
->>> sg.query([
+>>> sg.query_json([
 ...   last10_borrow.reserve.symbol,
 ...   last10_borrow.amount
 ... ])
@@ -261,7 +288,7 @@ Fetch multiple fieldpaths and return the raw data as Python dictionaries using t
 
 **Note**: `FieldPath` objects contain a method called `extract_data`, which takes raw response data in Python dictionaries and returns the data corresponding to the field path. Reusing the previous code:
 ```python
->>> raw_data = sg.query([
+>>> raw_data = sg.query_json([
 ...   last10_borrow.reserve.symbol,
 ...   last10_borrow.amount
 ... ])

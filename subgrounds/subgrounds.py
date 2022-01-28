@@ -105,7 +105,7 @@ class Subgrounds:
     
     return transform_req(self.global_transforms, req)
 
-  def query(self, fpaths: list[FieldPath]) -> list[dict]:
+  def query_json(self, fpaths: list[FieldPath]) -> list[dict]:
     """Combines `Subgrounds.mk_request` and `Subgrounds.execute` into one function.
 
     Args:
@@ -214,14 +214,14 @@ class Subgrounds:
     col_fpaths = zip(fpaths, columns)
     col_map = {fpath.dataname: colname for fpath, colname in col_fpaths}
 
-    data = self.query(fpaths)
+    data = self.query_json(fpaths)
 
     if len(data) == 1:
       return fmt_cols(pd.DataFrame(columns=gen_columns(data), data=flatten(gen_rows(data))), col_map)
     else:
       return list(data | map(lambda data: fmt_cols(pd.DataFrame(columns=gen_columns(data), data=flatten(gen_rows(data))), col_map)))
 
-  def oneshot(self, fpath: FieldPath | list[FieldPath]) -> str | int | float | bool | list | tuple | None:
+  def query(self, fpath: FieldPath | list[FieldPath]) -> str | int | float | bool | list | tuple | None:
     """Executes one or multiple `FieldPath` objects immediately and return the data (as a tuple if multiple `FieldPath` objects are provided).
 
     Args:
@@ -253,7 +253,7 @@ class Subgrounds:
     ```
     """
     def f(fpath):
-      blob = self.query([fpath])
+      blob = self.query_json([fpath])
       data = fpath.extract_data(blob)
       if type(data) == list and len(data) == 1:
         return data[0]
