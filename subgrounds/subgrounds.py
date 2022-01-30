@@ -6,7 +6,13 @@ import os
 import json
 
 import warnings
+
+from subgrounds.utils import union
 warnings.simplefilter('default')
+
+import logging
+logging.basicConfig(format='%(asctime)s %(message)s')
+logger = logging.getLogger('subgrounds')
 
 import pandas as pd
 
@@ -77,6 +83,7 @@ class Subgrounds:
         list[dict]: The reponse data
     """
     def execute_document(doc: Document) -> dict:
+      logger.debug(f'execute.execute_document: doc = \n{doc.graphql}')
       match doc.variables:
         case []:
           return client.query(doc.url, doc.graphql)
@@ -86,6 +93,7 @@ class Subgrounds:
           return client.repeat(doc.url, doc.graphql, args_list)
     
     def transform_doc(transforms: list[DocumentTransform], doc: Document) -> dict:
+      logger.debug(f'execute.transform_doc: doc = \n{doc.graphql}')
       match transforms:
         case []:
           return execute_document(doc)
@@ -117,15 +125,27 @@ class Subgrounds:
     req = self.mk_request(fpaths)
     return self.execute(req)
 
-  def query_df(self, fpaths: list[FieldPath], columns: Optional[list[str]] = None) -> pd.DataFrame:
-    """Same as `Subgrounds.query` but formats the response as a DataFrame.
+  def query_df(
+    self,
+    fpaths: list[FieldPath],
+    columns: Optional[list[str]] = None,
+    merge: bool = False,
+  ) -> pd.DataFrame | list[pd.DataFrame]:
+    """Same as `Subgrounds.query` but formats the response as a DataFrame. If the request
+    involves making multiple different GraphQL queries (e.g.: when querying data from different
+    subgraphs), then the function returns multiple dataframe (one per query).
+    
+    If `merge` is `True`, then the function will attempt to merge the DataFrames. Merging
+    requires that all DataFrames have the same number of columns of the same type. If the
+    column names differ, an explicit list of columns can be provided with the `columns` argument.
 
     Args:
         fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
         columns (Optional[list[str]], optional): The column labels. Defaults to None.
+        merge (bool, optional): Whether or not to merge resulting dataframes.
 
     Returns:
-        pd.DataFrame: A DataFrame containing the reponse data
+        pd.DataFrame | list[pd.DataFrame]: A DataFrame containing the reponse data
 
     Example:
     ```python
@@ -162,6 +182,7 @@ class Subgrounds:
     """
 
     def gen_columns(data: list | dict, prefix: str = '') -> list[str]:
+      logger.debug(f'query_df.gen_columns: data = {data}, prefix = {prefix}')
       match data:
         case dict():
           return list(
@@ -174,52 +195,58 @@ class Subgrounds:
         case _:
           return prefix
 
-    def gen_rows(data, prefix: str = '', partial_row: dict = {}) -> list[dict[str, Any]]:
-      def merge(data: dict, item: dict | list[dict]) -> dict | list[dict]:
-        match item:
-          case dict():
-            return data | item
-          case list():
-            return list(item | map(lambda item: merge(data, item)))
-
-      match data:
-        case dict():
-          row_items = list(
-            list(data.keys())
-            | map(lambda key: gen_rows(data[key], f'{prefix}_{key}' if prefix != '' else key, partial_row))
-          )
-
-          return reduce(merge, row_items, partial_row)
-
-        case list():
-          return list(data | map(lambda row: gen_rows(row, prefix, partial_row)))
-        case value:
-          return {prefix: value}
-
-    def flatten(data: list[list[Any]]) -> list[Any]:
-      match data[0]:
-        case dict():
-          return data
-        case list():
-          return reduce(lambda l1, l2: l1 + flatten(l2), data, [])
-
     def fmt_cols(df: pd.DataFrame, col_map: dict[str, str]) -> pd.DataFrame:
+      logger.debug(f'query_df.fmt_cols: df = \n{df}\n, col_map = {col_map}')
+      col_map = {key: val for key, val in col_map.items() if key in df.columns}
       df = df.rename(col_map, axis='columns')
       cols = list(col_map.values() | where(lambda name: name in df.columns))
       return df[cols]
 
     if columns is None:
       columns = list(fpaths | map(lambda fpath: fpath.longname))
+
+    def col_generator():
+      while True:
+        for col in columns:
+          yield col
     
-    col_fpaths = zip(fpaths, columns)
+    col_fpaths = zip(fpaths, col_generator())
     col_map = {fpath.dataname: colname for fpath, colname in col_fpaths}
 
-    data = self.query_json(fpaths)
+    def mk_df(cols):
+      fpaths = [col[1] for col in cols]
+      data = [col[0] for col in cols]
 
-    if len(data) == 1:
-      return fmt_cols(pd.DataFrame(columns=gen_columns(data), data=flatten(gen_rows(data))), col_map)
-    else:
-      return list(data | map(lambda data: fmt_cols(pd.DataFrame(columns=gen_columns(data), data=flatten(gen_rows(data))), col_map)))
+      df_data = []
+      for i in list(range(len(data[0]))):
+        row = {}
+        for rowidx, fpath in enumerate(fpaths):
+          row[fpath.dataname] = data[rowidx][i]
+        df_data.append(row)
+
+      return pd.DataFrame(
+        columns=list(fpaths | map(lambda fpath: fpath.dataname)),
+        data=df_data
+      )
+
+    flat_data = tuple(self.query(fpaths) | map(lambda data: list(data | traverse)))
+
+    dfs = tuple(
+      zip(flat_data, fpaths)
+      | groupby(lambda col: (len(col[0]), col[1].name_path[:-1]))
+      | map(lambda group: mk_df(list(group[1])))
+    )
+
+    match (len(dfs), merge):
+      case (1, _):
+        return fmt_cols(dfs[0], col_map)
+      case (_, False):
+        return list(dfs | map(lambda df: fmt_cols(df, col_map)))
+      case (_, True):
+        dfs = list(dfs | map(lambda df: fmt_cols(df, col_map)))
+        logger.debug('query_df: dfs = \n{}'.format('\n'.join([repr(df) for df in dfs])))
+        return pd.concat(dfs, ignore_index=True)
+        # return pd.concat(list(dfs | map(lambda df: fmt_cols(df, col_map))), ignore_index=True)
 
   def query(self, fpath: FieldPath | list[FieldPath]) -> str | int | float | bool | list | tuple | None:
     """Executes one or multiple `FieldPath` objects immediately and return the data (as a tuple if multiple `FieldPath` objects are provided).
@@ -248,19 +275,22 @@ class Subgrounds:
     ...   ]
     ... ).price
 
-    >>> sg.oneshot(eth_usdc_last)
+    >>> sg.query(eth_usdc_last)
     2628.975030015892
     ```
     """
+    fpaths = list([fpath] | traverse)
+    blob = self.query_json(fpaths)
+
     def f(fpath):
-      blob = self.query_json([fpath])
       data = fpath.extract_data(blob)
       if type(data) == list and len(data) == 1:
         return data[0]
       else:
         return data
 
-    data = tuple([fpath] | traverse | map(f))
+    data = tuple(fpaths | map(f))
+
     if len(data) == 1:
       return data[0]
     else:

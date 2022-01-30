@@ -1,8 +1,9 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Optional
 from pipe import traverse, where, map
+import pandas as pd
 
 from dash import dcc
 from dash import html
@@ -48,9 +49,21 @@ class Graph(dcc.Graph, Refreshable):
 class DataTable(dash_table.DataTable, Refreshable):
   counter: ClassVar[int] = 0
 
-  def __init__(self, subgrounds: Subgrounds, columns: FieldPath | list[FieldPath], **kwargs):
+  def __init__(
+    self,
+    subgrounds: Subgrounds,
+    data: FieldPath | list[FieldPath],
+    columns: Optional[list[str]] = None,
+    merge: bool = True,
+    append: bool = False,
+    **kwargs
+  ):
     self.subgrounds = subgrounds
-    self.req = self.subgrounds.mk_request(list([columns] | traverse))
+    self.fpaths = data if type(data) == list else [data]
+    self.columns = columns
+    self.merge = merge
+    self.append = append
+    self.df = None
 
     super().__init__(id=f'datatable-{DataTable.counter}', **kwargs)
     DataTable.counter += 1
@@ -58,7 +71,13 @@ class DataTable(dash_table.DataTable, Refreshable):
     self.refresh()
 
   def refresh(self) -> None:
-    self.df = to_dataframe(self.subgrounds.execute(self.req))
+    match (self.df, self.append):
+      case (None, _) | (_, False):
+        self.df = self.subgrounds.query_df(self.fpaths, columns=self.columns, merge=self.merge)
+      case (_, True):
+        self.df = pd.concat([self.df, self.subgrounds.query_df(self.fpaths, columns=self.columns, merge=self.merge)])
+        self.df = self.df.drop_duplicates()
+
     self.columns = [{"name": i, "id": i} for i in self.df.columns]
     self.data = self.df.to_dict('records')
 

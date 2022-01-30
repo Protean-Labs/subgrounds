@@ -7,10 +7,13 @@ import os
 import json
 import operator
 from hashlib import blake2b
-from pipe import map
+from pipe import map, where
 
 import warnings
 warnings.simplefilter('default')
+
+import logging
+logger = logging.getLogger('subgrounds')
 
 import subgrounds.client as client
 import subgrounds.schema as schema
@@ -273,6 +276,17 @@ class SyntheticField(FieldOperatorMixin):
       case _:
         return 0
 
+  @staticmethod
+  def constant(value: str | int | float | bool) -> SyntheticField:
+    match value:
+      case str():
+        return SyntheticField(lambda: value, SyntheticField.STRING, [])
+      case int():
+        return SyntheticField(lambda: value, SyntheticField.INT, [])
+      case float():
+        return SyntheticField(lambda: value, SyntheticField.FLOAT, [])
+      case bool():
+        return SyntheticField(lambda: value, SyntheticField.BOOL, [])
 
 @dataclass
 class FieldPath(FieldOperatorMixin):
@@ -587,6 +601,28 @@ class Object:
 
   @staticmethod
   def add_sfield(obj: Object, name: str, sfield: SyntheticField) -> None:
+    # TODO: Add check to make sure obj has the deps of sfield
+    # obj_fields = [field.name for field in obj.object_.fields]
+    # sfield_deps = [fpath.leaf.name for fpath in sfield.deps]
+    # for dep in sfield_deps:
+    #   if dep not in obj_fields:
+    #     raise Exception(f'SyntheticField {obj.object_.name}.{name}: {obj.object_.name} does not have the field {dep}')
+
+    def f(obj_: TypeMeta.ObjectMeta, path: list[str]) -> None:
+      match path:
+        case [field_name, *rest]:
+          try:
+            field: TypeMeta.FieldMeta = next(obj_.fields | where(lambda field: field.name == field_name))
+
+            f(obj.schema.type_map[field.type_.name], rest)
+          except StopIteration:
+            raise Exception(f'SyntheticField {obj.object_.name}.{name}: {obj_.name} does not have the field {field_name}')
+        case []:
+          return
+          
+    for fpath in sfield.deps:
+      f(obj.object_, fpath.name_path)
+
     obj.subgraph.add_synthetic_field(obj.object_, name, sfield)
 
   # ================================================================
@@ -638,12 +674,28 @@ class Subgraph:
     fmeta = TypeMeta.FieldMeta(name, '', [], sfield.type_)
     object_.fields.append(fmeta)
 
+    # dep_selections = Selection.consolidate(list(sfield.deps | map(FieldPath.selection)))
+    # match dep_selections:
+    #   case []:
+    #     dep_selections = []
+    #   case [select]:
+    #     dep_selections = []
+    #   case [select, *rest]:
+    #     dep_selections = reduce(Selection.consolidate, rest, select)
+
+    # print(sfield.deps)
+    # print(Selection.consolidate(list(sfield.deps | map(FieldPath.selection))))
+    sfield_fpath = FieldPath(self, TypeRef.Named(object_.name), sfield.type_, [(None, fmeta)])
+    logger.debug(f'Subgraph: Adding SyntheticField at FieldPath {sfield_fpath.root_type.name}.{sfield_fpath.name_path}')
+
     transform = LocalSyntheticField(
       self,
       fmeta,
+      object_,
+      FieldPath.selection(sfield_fpath),
       sfield.f,
       sfield.default,
-      [FieldPath.selection(dep) for dep in sfield.deps]
+      list(sfield.deps | map(FieldPath.selection))
     )
 
     self.transforms = [transform, *self.transforms]

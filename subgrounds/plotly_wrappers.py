@@ -71,6 +71,11 @@ class Contour(TraceWrapper):
   graph_object = go.Contour
 
 
+class Table(TraceWrapper):
+  """See https://plotly.com/python/contour-plots/"""
+  graph_object = go.Table
+
+
 # Distributions
 class Box(TraceWrapper):
   """See https://plotly.com/python/box-plots/"""
