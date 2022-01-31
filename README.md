@@ -19,10 +19,16 @@ Subgrounds is available on PyPi. To install it, run the following:<br>
 
 >>> aaveV2.Borrow.adjusted_amount = aaveV2.Borrow.amount / 10 ** aaveV2.Borrow.reserve.decimals
 
+>>> last10_borrows = aaveV2.Query.borrows(
+...   orderBy=aaveV2.Borrow.timestamp,
+...   orderDirection='desc',
+...   first=10
+... )
+
 >>> sg.query_df([
-...   last10_borrow.reserve.symbol, 
-...   last10_borrow.timestamp,
-...   last10_borrow.adjusted_amount
+...   last10_borrows.reserve.symbol, 
+...   last10_borrows.timestamp,
+...   last10_borrows.adjusted_amount
 ... ])
   borrows_reserve_symbol  borrows_timestamp  borrows_adjusted_amount
 0                   USDT         1643300294            500000.000000
