@@ -242,5 +242,3 @@ class TestDataFrame(unittest.TestCase):
     ])
 
     assert_frame_equal(df, expected)
-
-s
