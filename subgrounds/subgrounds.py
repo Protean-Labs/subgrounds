@@ -11,7 +11,7 @@ from subgrounds.utils import union
 warnings.simplefilter('default')
 
 import logging
-logging.basicConfig(format='%(asctime)s %(message)s')
+# logging.basicConfig(format='%(asctime)s %(message)s')
 logger = logging.getLogger('subgrounds')
 
 import pandas as pd
@@ -83,7 +83,7 @@ class Subgrounds:
         list[dict]: The reponse data
     """
     def execute_document(doc: Document) -> dict:
-      logger.debug(f'execute.execute_document: doc = \n{doc.graphql}')
+      logger.debug(f'execute.execute_document: variables = {doc.variables}, doc = \n{doc.graphql}')
       match doc.variables:
         case []:
           return client.query(doc.url, doc.graphql)
@@ -229,7 +229,13 @@ class Subgrounds:
         data=df_data
       )
 
-    flat_data = tuple(self.query(fpaths) | map(lambda data: list(data | traverse)))
+    # TODO: Handle the case where no data is returned more graciously
+    # raw_data = self.query(fpaths, unwrap=False)
+    # print(raw_data)
+    try:
+      flat_data = tuple(self.query(fpaths, unwrap=False) | map(lambda data: list(data | traverse) if type(data) == list else data))
+    except TypeError:
+      return []
 
     dfs = tuple(
       zip(flat_data, fpaths)
@@ -248,7 +254,7 @@ class Subgrounds:
         return pd.concat(dfs, ignore_index=True)
         # return pd.concat(list(dfs | map(lambda df: fmt_cols(df, col_map))), ignore_index=True)
 
-  def query(self, fpath: FieldPath | list[FieldPath]) -> str | int | float | bool | list | tuple | None:
+  def query(self, fpath: FieldPath | list[FieldPath], unwrap: bool = True) -> str | int | float | bool | list | tuple | None:
     """Executes one or multiple `FieldPath` objects immediately and return the data (as a tuple if multiple `FieldPath` objects are provided).
 
     Args:
@@ -284,7 +290,7 @@ class Subgrounds:
 
     def f(fpath):
       data = fpath.extract_data(blob)
-      if type(data) == list and len(data) == 1:
+      if type(data) == list and len(data) == 1 and unwrap:
         return data[0]
       else:
         return data
@@ -295,6 +301,22 @@ class Subgrounds:
       return data[0]
     else:
       return data
+
+  def query_timeseries(
+    self,
+    x: FieldPath,
+    y: FieldPath | list[FieldPath],
+    interval: str,
+    cumulative: bool
+  ):
+    # fpaths = list([x, y] | traverse)
+    # df = self.query_df(fpaths)[0]
+
+    # match interval:
+    #   case 'hour':
+    #     tmin
+
+    raise NotImplementedError
 
 def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:
   """ Formats the dictionary `data` into a pandas DataFrame using some

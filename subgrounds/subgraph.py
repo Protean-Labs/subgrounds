@@ -344,6 +344,8 @@ class FieldPath(FieldOperatorMixin):
               return f(rest, data[name])
             case list():
               return list(data | map(lambda row: f(rest, row[name])))
+            case None:
+              return None
             case _:
               raise Exception(f"extract_data: unexpected state! path = {data_path}, data = {data}")
 

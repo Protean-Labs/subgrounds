@@ -94,6 +94,8 @@ class TypeTransform(DocumentTransform):
             case dict() as elt:
               for select in inner_select:
                 transform(select, elt)
+            case None:
+              return None
             case _:
               raise Exception(f"transform_data_type: data for selection {select} is neither list or dict {data[name]}")
 
@@ -264,6 +266,7 @@ class SplitTransform(RequestTransform):
     return transform(req.documents, data, [])
 
 
+# TODO: Investigate bug in pagination transform where data json dicts are not combined (i.e.: only fisrt page is fetched)
 class PaginationTransform(RequestTransform):
   def __init__(self, page_size) -> None:
     self.page_size = page_size
@@ -346,7 +349,7 @@ class PaginationTransform(RequestTransform):
 
 
 DEFAULT_GLOBAL_TRANSFORMS: list[RequestTransform] = [
-  PaginationTransform(page_size=200)
+  PaginationTransform(page_size=500)
 ]
 
 DEFAULT_SUBGRAPH_TRANSFORMS: list[DocumentTransform] = [
