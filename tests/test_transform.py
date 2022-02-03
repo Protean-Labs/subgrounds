@@ -73,8 +73,17 @@ class TestQueryTransform(unittest.TestCase):
 
     subgraph_transforms = [
       LocalSyntheticField(
-        subgraph=None,
+        subgraph=self.subgraph,
         fmeta=TypeMeta.FieldMeta('price0', '', [], TypeRef.non_null('Float')),
+        type_=TypeMeta.ObjectMeta('Swap', '', fields=[
+          TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
+          TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt')),
+          TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')),
+          TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')),
+          TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')),
+          TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')),
+        ]),
+        fpath_selection=Selection(TypeMeta.FieldMeta('price0', '', [], TypeRef.Named('Float')), None, None, None),
         f=lambda in0, out0, in1, out1: abs(in1 - out1) / abs(in0 - out0),
         default=0.0,
         args=[

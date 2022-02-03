@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from functools import reduce
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 from pipe import map, groupby, traverse, where
 import os
 import json
@@ -213,22 +213,6 @@ class Subgrounds:
     col_fpaths = zip(fpaths, col_generator())
     col_map = {fpath.dataname: colname for fpath, colname in col_fpaths}
 
-    def mk_df(cols):
-      fpaths = [col[1] for col in cols]
-      data = [col[0] for col in cols]
-
-      df_data = []
-      for i in list(range(len(data[0]))):
-        row = {}
-        for rowidx, fpath in enumerate(fpaths):
-          row[fpath.dataname] = data[rowidx][i]
-        df_data.append(row)
-
-      return pd.DataFrame(
-        columns=list(fpaths | map(lambda fpath: fpath.dataname)),
-        data=df_data
-      )
-
     # TODO: Handle the case where no data is returned more graciously
     # raw_data = self.query(fpaths, unwrap=False)
     # print(raw_data)
@@ -237,9 +221,45 @@ class Subgrounds:
     except TypeError:
       return []
 
+    def group_f(data: Tuple[list | str | int | float | bool, FieldPath]) -> str:
+      if type(data[0]) == list:
+        return '{}:{}'.format(len(data[0]), '_'.join([fmeta.name for (_, fmeta) in data[1].deepest_list_path]))
+      else:
+        return f'{data[1].subgraph.url}'
+
+    def mk_df(cols: list[Tuple[list | str | int | float | bool, FieldPath]]) -> pd.DataFrame:
+      if type(cols[0][0]) == list:
+        fpaths = [col[1] for col in cols]
+        data = [col[0] for col in cols]
+
+        df_data = []
+        for i in list(range(len(data[0]))):
+          row = {}
+          for rowidx, fpath in enumerate(fpaths):
+            row[fpath.dataname] = data[rowidx][i]
+          df_data.append(row)
+
+        return pd.DataFrame(
+          columns=list(fpaths | map(lambda fpath: fpath.dataname)),
+          data=df_data
+        )
+      else:
+        fpaths = [col[1] for col in cols]
+        data = [col[0] for col in cols]
+
+        row = {}
+        for rowidx, fpath in enumerate(fpaths):
+          row[fpath.dataname] = data[rowidx]
+
+        return pd.DataFrame(
+          columns=list(fpaths | map(lambda fpath: fpath.dataname)),
+          data=[row]
+        )
+
+
     dfs = tuple(
       zip(flat_data, fpaths)
-      | groupby(lambda col: (len(col[0]), col[1].name_path[:-1]))
+      | groupby(group_f)
       | map(lambda group: mk_df(list(group[1])))
     )
 

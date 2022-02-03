@@ -2,6 +2,7 @@ from abc import ABC
 from typing import Any
 from pipe import traverse, map
 
+from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from plotly.basedatatypes import BaseTraceType
 
@@ -35,6 +36,10 @@ class TraceWrapper(ABC):
         fpath_data[key] = item[0]
       else:
         fpath_data[key] = item
+
+    # print(f'mk_trace: {fpath_data}')
+    # for key, item in fpath_data.items():
+    #   print(f'{key}: {len(item)} datapoints')
 
     return self.graph_object(
       **(fpath_data | self.args)
@@ -259,3 +264,7 @@ class Figure:
 
       for trace in self.traces:
         self.figure.add_trace(trace.mk_trace(self.data))
+  
+  # @staticmethod
+  # def mk_subplots(rows, cols, **kwargs):
+  #   return make_subplots(rows, cols, **kwargs)

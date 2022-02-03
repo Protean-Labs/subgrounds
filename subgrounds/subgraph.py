@@ -288,6 +288,7 @@ class SyntheticField(FieldOperatorMixin):
       case bool():
         return SyntheticField(lambda: value, SyntheticField.BOOL, [])
 
+
 @dataclass
 class FieldPath(FieldOperatorMixin):
   subgraph: Subgraph
@@ -325,6 +326,29 @@ class FieldPath(FieldOperatorMixin):
   @property
   def longname(self) -> str:
     return '_'.join(self.name_path)
+
+  @property
+  def deepest_list_path(self) -> list[str]:
+    def has_list(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> bool:
+      match path:
+        case []:
+          return False
+        case [(_, fmeta), *_] if fmeta.type_.is_list:
+          return True
+        case [_, *rest]:
+          return has_list(rest)
+    
+    def f(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> list[str]:
+      match path:
+        case []:
+          return []
+        case [(_, fmeta) as field, *rest] if fmeta.type_.is_list:
+          if not has_list(rest):
+            return [field]
+          else:
+            return [field, *f(rest)]
+
+    return f(self.path)
 
   @staticmethod
   def hash(msg: str) -> str:
@@ -574,6 +598,9 @@ class FieldPath(FieldOperatorMixin):
   # Utility
   def __str__(self) -> str:
     return '.'.join(self.path | map(lambda ele: ele[1].name))
+
+  def __repr__(self) -> str:
+    return f'FieldPath({self.subgraph.url}, {self.root_type.name}, {self.name_path})'
 
 
 @dataclass

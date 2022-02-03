@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 from subgrounds.utils import flatten, union
 
 
-
 def transform_request(fmeta: TypeMeta.FieldMeta, replacement: list[Selection], req: DataRequest) -> DataRequest:
   def transform(select: Selection) -> Selection:
     match select:

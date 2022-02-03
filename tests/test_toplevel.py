@@ -78,6 +78,7 @@ class TestDataFrame(unittest.TestCase):
       swaps.token0.symbol,
       swaps.token1.symbol
     ])
+    print(df)
 
     assert_frame_equal(df, expected)
 
@@ -224,3 +225,22 @@ class TestDataFrame(unittest.TestCase):
     ])
 
     assert_frame_equal(df, expected)
+
+  def test_query_df_4(self):
+    expected = pd.DataFrame(data={
+      'token_id': ['0xdbdb4d16eda451d0503b854cf79d55697f90c8df'],
+      'token_name': 'Alchemix',
+      'token_symbol': 'ALCX'
+    })
+
+    token = self.univ3.Query.token(id='0xdbdb4d16eda451d0503b854cf79d55697f90c8df')
+
+    df = self.sg.query_df([
+      token.id,
+      token.name,
+      token.symbol
+    ])
+
+    assert_frame_equal(df, expected)
+
+s
