@@ -348,7 +348,7 @@ class PaginationTransform(RequestTransform):
 
 
 DEFAULT_GLOBAL_TRANSFORMS: list[RequestTransform] = [
-  PaginationTransform(page_size=500)
+  PaginationTransform(page_size=100)
 ]
 
 DEFAULT_SUBGRAPH_TRANSFORMS: list[DocumentTransform] = [

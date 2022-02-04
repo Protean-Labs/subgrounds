@@ -328,7 +328,7 @@ class FieldPath(FieldOperatorMixin):
     return '_'.join(self.name_path)
 
   @property
-  def deepest_list_path(self) -> list[str]:
+  def deepest_list_path(self) -> list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]:
     def has_list(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> bool:
       match path:
         case []:
@@ -338,7 +338,7 @@ class FieldPath(FieldOperatorMixin):
         case [_, *rest]:
           return has_list(rest)
     
-    def f(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> list[str]:
+    def f(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]:
       match path:
         case []:
           return []
@@ -347,6 +347,8 @@ class FieldPath(FieldOperatorMixin):
             return [field]
           else:
             return [field, *f(rest)]
+        case [field, *rest]:
+          return [field, *f(rest)]
 
     return f(self.path)
 

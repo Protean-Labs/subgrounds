@@ -346,7 +346,11 @@ class Selection:
       return next(select.arguments | where(lambda arg: arg.name == target))
     except StopIteration:
       try:
-        return next(select.selection | map(partial(Selection.get_argument, target=target)))
+        return next(
+          select.selection 
+          | map(partial(Selection.get_argument, target=target))
+          | where(lambda x: x is not None)
+        )
       except StopIteration:
         return None
 
