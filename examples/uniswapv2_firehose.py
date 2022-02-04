@@ -34,7 +34,7 @@ app.layout = html.Div(
           children=[
             DataTable(
               subgrounds=sg,
-              columns=[
+              data=[
                 swaps.timestamp,
                 swaps.transaction.id,
                 swaps.pair.token0.symbol,
@@ -43,7 +43,7 @@ app.layout = html.Div(
                 swaps.amount1In,
                 swaps.amount0Out,
                 swaps.amount1Out,
-              ]
+              ],
             ),
           ]
         )

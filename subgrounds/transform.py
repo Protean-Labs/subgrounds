@@ -1,10 +1,18 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Tuple
+from typing import Any, Callable, Tuple, TYPE_CHECKING
 from functools import partial
 from pipe import map, traverse
 
-from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition, execute, pagination_args
+import logging
+logger = logging.getLogger('subgrounds')
+
+from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition, pagination_args
 from subgrounds.schema import TypeMeta, TypeRef
+
+if TYPE_CHECKING:
+  from subgrounds.subgraph import FieldPath, Subgraph
+
 from subgrounds.utils import flatten, union
 
 
@@ -37,66 +45,6 @@ def select_data(select: Selection, data: dict) -> list[Any]:
 
     case (select, data):
       raise Exception(f"select_data: invalid selection {select} for data {data}")
-
-
-# def transform_response(fmeta: TypeMeta.FieldMeta, func: Callable, args: list[Selection], req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-#   def transform(select: Selection, data: dict) -> None:
-#     match (select, data):
-#       case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data) if name == fmeta.name and name not in data:
-#         arg_values = list(args | map(partial(select_data, data=data)) | traverse)
-#         data[name] = func(*arg_values)
-#       case (Selection(TypeMeta.FieldMeta(name), _, _, [] | None), dict() as data):
-#         pass
-#       case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data) if name in data:
-#         match data[name]:
-#           case list() as elts:
-#             for elt in elts:
-#               for select in inner_select:
-#                 transform(select, elt)
-#           case dict() as elt:
-#             for select in inner_select:
-#               transform(select, elt)
-#           case _:
-#             raise Exception(f"transform_response: data for selection {select} is neither list or dict {data[name]}")
-
-#       case (select, data):
-#         raise Exception(f"transform_response: invalid selection {select} for data {data}")
-
-#   for (doc, data_) in zip(req.documents, data):
-#     for select in doc.query.selection:
-#       transform(select, data_)
-
-#   return data
-
-
-# def transform_data_type(type_: TypeRef.T, f: Callable, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-#   def transform(select: Selection, data: dict) -> None:
-#     # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
-#     match (select, data):
-#       case (Selection(TypeMeta.FieldMeta(name, _, _, ftype), _, _, [] | None), dict() as data) if TypeRef.root_type_name(type_) == TypeRef.root_type_name(ftype):
-#         data[name] = f(data[name])
-#       case (Selection(_, _, _, [] | None), dict()):
-#         pass
-#       case (Selection(TypeMeta.FieldMeta(name), _, _, inner_select), dict() as data):
-#         match data[name]:
-#           case list() as elts:
-#             for elt in elts:
-#               for select in inner_select:
-#                 transform(select, elt)
-#           case dict() as elt:
-#             for select in inner_select:
-#               transform(select, elt)
-#           case _:
-#             raise Exception(f"transform_data_type: data for selection {select} is neither list or dict {data[name]}")
-
-#       case (select, data):
-#         raise Exception(f"transform_data_type: invalid selection {select} for data {data}")
-
-#   for (doc, data_) in zip(req.documents, data):
-#     for select in doc.query.selection:
-#       transform(select, data_)
-
-#   return data
 
 
 class RequestTransform(ABC):
@@ -145,6 +93,8 @@ class TypeTransform(DocumentTransform):
             case dict() as elt:
               for select in inner_select:
                 transform(select, elt)
+            case None:
+              return None
             case _:
               raise Exception(f"transform_data_type: data for selection {select} is neither list or dict {data[name]}")
 
@@ -158,18 +108,32 @@ class TypeTransform(DocumentTransform):
 
 
 class LocalSyntheticField(DocumentTransform):
-  def __init__(self, subgraph, fmeta: TypeMeta.FieldMeta, f: Callable, default: Any, args: list[Selection]) -> None:
+  def __init__(
+    self,
+    subgraph: Subgraph,
+    fmeta: TypeMeta.FieldMeta,
+    type_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta,
+    fpath_selection: Selection,
+    f: Callable,
+    default: Any,
+    args: list[Selection]
+  ) -> None:
     self.subgraph = subgraph
     self.fmeta = fmeta
+    self.type_ = type_
+    self.fpath_selection = fpath_selection
     self.f = f
     self.default = default
     self.args = args
 
   def transform_document(self, doc: Document) -> Document:
+    logger.debug(f'LocalSyntheticField.transform_document: fmeta = {self.fmeta}, object = {self.type_}, fpath_selection = {self.fpath_selection}')
     def transform(select: Selection) -> Selection | list[Selection]:
+      logger.debug(f'LocalSyntheticField.transform_document.transform: select = {select}, args = {self.args}')
       match select:
+        # case Selection(TypeMeta.FieldMeta(name) as fmeta, _, _, [] | None) if name == self.fmeta.name and fmeta.type_.name == self.type_.name:
         case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == self.fmeta.name:
-          return self.args
+          return Selection.consolidate(self.args)
         case Selection(_, _, _, [] | None):
           return [select]
         case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
@@ -178,10 +142,24 @@ class LocalSyntheticField(DocumentTransform):
         case _:
           raise Exception(f"transform_document: unhandled selection {select}")
 
-    return Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
+    def transform_on_type(select: Selection) -> Selection:
+      match select:
+        case Selection(TypeMeta.FieldMeta(_, _, _, type_) as select_fmeta, alias, args, inner_select) if type_.name == self.type_.name:
+          new_inner_select = Selection.consolidate(list(inner_select | map(transform) | traverse))
+          return Selection(select_fmeta, alias, args, new_inner_select)
+
+        case Selection(fmeta, alias, args, inner_select):
+          return Selection(fmeta, alias, args, list(inner_select | map(transform_on_type)))
+
+    if self.subgraph.url == doc.url:
+      return Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform_on_type))
+    else:
+      return doc
 
   def transform_response(self, doc: Document, data: dict[str, Any]) -> list[dict[str, Any]]:
+    logger.debug(f'LocalSyntheticField.transform_response: fmeta = {self.fmeta}, object = {self.type_}, fpath_selection = {self.fpath_selection}')
     def transform(select: Selection, data: dict) -> None:
+      logger.debug(f'LocalSyntheticField.transform_response.transform: select = {select}, data = {data}')
       match (select, data):
         case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
           arg_values = flatten(list(self.args | map(partial(select_data, data=data))))
@@ -208,11 +186,33 @@ class LocalSyntheticField(DocumentTransform):
         case (select, data):
           raise Exception(f"transform_response: invalid selection {select} for data {data}")
 
-    for select in doc.query.selection:
-      transform(select, data)
+    def transform_on_type(select: Selection, data: dict) -> None:
+      logger.debug(f'LocalSyntheticField.transform_response.transform_on_type: select = {select}, data = {data}')
+      match select:
+        case Selection(TypeMeta.FieldMeta(_, _, _, type_), None, _, _) | Selection(TypeMeta.FieldMeta(_, _, _, type_), _, _, _) if type_.name == self.type_.name:
+          # for select in inner_select:
+          #   transform(select, data[name])
+          match data:
+            case list():
+              for d in data:
+                transform(select, d)
+            case dict():
+              transform(select, data)
+
+        case (Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(_, name, _, inner_select)):
+          match data:
+            case list():
+              for d in data:
+                list(inner_select | map(partial(transform_on_type, data=d[name])))
+            case dict():
+              list(inner_select | map(partial(transform_on_type, data=data[name])))
+
+
+    if self.subgraph.url == doc.url:
+      for select in doc.query.selection:
+        transform_on_type(select, data)
 
     return data
-
 
 # TODO: Test split transform
 class SplitTransform(RequestTransform):
@@ -265,6 +265,7 @@ class SplitTransform(RequestTransform):
     return transform(req.documents, data, [])
 
 
+# TODO: Investigate bug in pagination transform where data json dicts are not combined (i.e.: only fisrt page is fetched)
 class PaginationTransform(RequestTransform):
   def __init__(self, page_size) -> None:
     self.page_size = page_size
@@ -347,7 +348,7 @@ class PaginationTransform(RequestTransform):
 
 
 DEFAULT_GLOBAL_TRANSFORMS: list[RequestTransform] = [
-  PaginationTransform(page_size=200)
+  PaginationTransform(page_size=100)
 ]
 
 DEFAULT_SUBGRAPH_TRANSFORMS: list[DocumentTransform] = [

@@ -1,10 +1,15 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from ast import alias
 from dataclasses import dataclass, field
 from functools import partial, reduce
+from re import L
 from typing import Any, Callable, Optional, Tuple
 from pipe import map, traverse, where, take, take_while
 import math
+
+import logging
+logger = logging.getLogger('subgrounds')
 
 from subgrounds.schema import (
   TypeMeta,
@@ -203,6 +208,51 @@ class Selection:
         )
         return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql} {{\n{inner_str}\n{indent}}}"
 
+  @property
+  def data_path(self) -> list[str]:
+    match self:
+      case Selection(TypeMeta.FieldMeta(name), None, _, []) | Selection(TypeMeta.FieldMeta(_), name, _, []):
+        return [name]
+      case Selection(TypeMeta.FieldMeta(name), None, _, [inner_select, *_]) | Selection(TypeMeta.FieldMeta(_), name, _, [inner_select, *_]):
+        return [name] + inner_select.data_path
+    # return list(self.path | map(lambda ele: FieldPath.hash(ele[1].name + str(ele[0])) if ele[0] != {} and ele[0] is not None else ele[1].name))
+
+  @staticmethod
+  def split(select: Selection) -> list[Selection]:
+    match select:
+      case Selection(_, _, _, [] | None):
+        return [select]
+      case Selection(fmeta, alias, args, inner_select):       
+        return list(inner_select | map(Selection.split) | traverse | map(lambda inner_select: Selection(fmeta, alias, args, inner_select)))
+
+  def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
+    # print(f'path = {self.data_path}')
+    def f(data_path: list[str], data: dict | list | Any):
+      match data_path:
+        case []:
+          return data
+        case [name, *rest]:
+          match data:
+            case dict():
+              return f(rest, data[name])
+            case list():
+              return list(data | map(lambda row: f(rest, row[name])))
+            case _:
+              raise Exception(f"extract_data: unexpected state! path = {data_path}, data = {data}")
+
+    match data:
+      case dict():
+        return f(self.data_path, data)
+      case list():
+        for doc_data in data:
+          try:
+            return f(self.data_path, doc_data)
+          except KeyError:
+            continue
+        raise Exception('extract_data: not found')
+      case _:
+        raise Exception('extract_data: data is not dict or list')
+
   @staticmethod
   def add_selections(select: Selection, new_selections: list[Selection]) -> Selection:
     return Selection(
@@ -262,6 +312,17 @@ class Selection:
     )
 
   @staticmethod
+  def consolidate(selections: list[Selection]) -> list[Selection]:
+    def f(selections: list[Selection], other: Selection) -> list[Selection]:
+      try:
+        next(selections | where(lambda select: select.key == other.key))
+        return list(selections | map(lambda select: Selection.combine(select, other) if select.key == other.key else select))
+      except StopIteration:
+        return selections + [other]
+
+    return reduce(f, selections, [])
+
+  @staticmethod
   def contains(select: Selection, other: Selection) -> bool:
     if (select.fmeta == other.fmeta and rel_complement(other.selection, select.selection, key=lambda s: s.fmeta.name) == []):
       return all(
@@ -285,7 +346,11 @@ class Selection:
       return next(select.arguments | where(lambda arg: arg.name == target))
     except StopIteration:
       try:
-        return next(select.selection | map(partial(Selection.get_argument, target=target)))
+        return next(
+          select.selection 
+          | map(partial(Selection.get_argument, target=target))
+          | where(lambda x: x is not None)
+        )
       except StopIteration:
         return None
 
@@ -506,11 +571,10 @@ class Query:
     variable_f: Callable[[VariableDefinition], VariableDefinition] = identity,
     selection_f: Callable[[Selection], Selection] = identity
   ) -> Query:
-    return Query(
+    return reduce(Query.add_selection, query.selection | map(selection_f) | traverse, Query(
       name=query.name,
-      selection=list(query.selection | map(selection_f) | traverse),
       variables=list(query.variables | map(variable_f) | traverse)
-    )
+    ))
 
   @staticmethod
   def contains_selection(query: Query, selection: Selection) -> bool:
@@ -707,17 +771,18 @@ class DataRequest:
     return DataRequest([doc])
 
 
-def execute(request: DataRequest) -> list:
-  def f(doc: Document) -> dict:
-    match doc.variables:
-      case []:
-        return client.query(doc.url, doc.graphql)
-      case [args]:
-        return client.query(doc.url, doc.graphql, args)
-      case args_list:
-        return client.repeat(doc.url, doc.graphql, args_list)
+# def execute(request: DataRequest) -> list:
+#   logger.debug(f'subgrounds.query.execute: request = {request.graphql}')
+#   def f(doc: Document) -> dict:
+#     match doc.variables:
+#       case []:
+#         return client.query(doc.url, doc.graphql)
+#       case [args]:
+#         return client.query(doc.url, doc.graphql, args)
+#       case args_list:
+#         return client.repeat(doc.url, doc.graphql, args_list)
 
-  return list(request.documents | map(f))
+#   return list(request.documents | map(f))
 
   
 # ================================================================

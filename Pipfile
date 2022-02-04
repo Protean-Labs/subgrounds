@@ -18,6 +18,7 @@ twine = "*"
 pipe = "*"
 pandas = "*"
 ipykernel = "*"
+dash-bootstrap-components = "*"
 
 [dev-packages]
 

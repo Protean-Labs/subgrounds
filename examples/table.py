@@ -42,7 +42,7 @@ app.layout = html.Div(
         html.H4('Last 10 Mints of ETH-USDC LP tokens'),
         DataTable(
           subgrounds=sg,
-          columns=[
+          data=[
             mints.timestamp,
             mints.transaction,
             mints.to,
@@ -54,7 +54,7 @@ app.layout = html.Div(
         html.H4('Last 10 Burns of ETH-USDC LP tokens'),
         DataTable(
           subgrounds=sg,
-          columns=[
+          data=[
             burns.timestamp,
             burns.transaction,
             burns.to,
