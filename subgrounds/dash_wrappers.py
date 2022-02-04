@@ -54,13 +54,13 @@ class DataTable(dash_table.DataTable, Refreshable):
     subgrounds: Subgrounds,
     data: FieldPath | list[FieldPath],
     columns: Optional[list[str]] = None,
-    merge: bool = True,
+    merge: bool = False,
     append: bool = False,
     **kwargs
   ):
     self.subgrounds = subgrounds
     self.fpaths = data if type(data) == list else [data]
-    self.columns = columns
+    self.column_names = columns
     self.merge = merge
     self.append = append
     self.df = None
@@ -73,9 +73,9 @@ class DataTable(dash_table.DataTable, Refreshable):
   def refresh(self) -> None:
     match (self.df, self.append):
       case (None, _) | (_, False):
-        self.df = self.subgrounds.query_df(self.fpaths, columns=self.columns, merge=self.merge)
+        self.df = self.subgrounds.query_df(self.fpaths, columns=self.column_names, merge=self.merge)
       case (_, True):
-        self.df = pd.concat([self.df, self.subgrounds.query_df(self.fpaths, columns=self.columns, merge=self.merge)])
+        self.df = pd.concat([self.df, self.subgrounds.query_df(self.fpaths, columns=self.column_names, merge=self.merge)], ignore_index=True)
         self.df = self.df.drop_duplicates()
 
     self.columns = [{"name": i, "id": i} for i in self.df.columns]
