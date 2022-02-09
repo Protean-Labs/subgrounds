@@ -253,7 +253,6 @@ class Subgrounds:
         dfs = list(dfs | map(lambda df: fmt_cols(df, col_map)))
         return pd.concat(dfs, ignore_index=True)
 
-
   def query_df(
     self,
     fpaths: list[FieldPath],

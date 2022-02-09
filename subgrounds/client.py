@@ -153,3 +153,9 @@ def repeat(url: str, query_str: str, variables: list[dict[str, Any]]) -> dict[st
 def paginate(url: str, query_str: str, n: int, page_size: int = 200) -> dict[str, Any]:
   vars = [{'first': page_size, 'skip': i * page_size} for i in range(0, n % page_size + 1)]
   return repeat(url, query_str, variables=vars)
+
+
+
+
+
+

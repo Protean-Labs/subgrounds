@@ -1,6 +1,5 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from ast import alias
 from dataclasses import dataclass, field
 from functools import partial, reduce
 from re import L
@@ -18,7 +17,6 @@ from subgrounds.schema import (
   typeref_of_input_field
 )
 from subgrounds.utils import filter_none, identity, rel_complement, union
-import subgrounds.client as client
 
 
 # ================================================================
@@ -770,19 +768,9 @@ class DataRequest:
   def single_document(doc: Document) -> DataRequest:
     return DataRequest([doc])
 
-
-# def execute(request: DataRequest) -> list:
-#   logger.debug(f'subgrounds.query.execute: request = {request.graphql}')
-#   def f(doc: Document) -> dict:
-#     match doc.variables:
-#       case []:
-#         return client.query(doc.url, doc.graphql)
-#       case [args]:
-#         return client.query(doc.url, doc.graphql, args)
-#       case args_list:
-#         return client.repeat(doc.url, doc.graphql, args_list)
-
-#   return list(request.documents | map(f))
+  @staticmethod
+  def add_documents(self: DataRequest, docs: Document | list[Document]) -> DataRequest:
+    return DataRequest(list([self.documents, docs] | traverse))
 
   
 # ================================================================
