@@ -236,6 +236,8 @@ class Subgrounds:
     )
 
     match (len(dfs), merge):
+      case (0, _):
+        return pd.DataFrame(columns=columns, data=[])
       case (1, _):
         return fmt_cols(dfs[0], col_map)
       case (_, False):
