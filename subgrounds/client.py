@@ -2,6 +2,9 @@ from typing import Any
 import requests
 from functools import reduce
 
+import logging
+logger = logging.getLogger('subgrounds')
+
 INTROSPECTION_QUERY: str = """
   query IntrospectionQuery {
     __schema {
@@ -107,6 +110,7 @@ def get_schema(url: str) -> dict[str, Any]:
 
 
 def query(url: str, query_str: str, variables: dict[str, Any] = {}) -> dict[str, Any]:
+  logger.debug(f'client.query: url = {url}, variables = {variables}\n{query_str}')
   resp = requests.post(
     url,
     json={'query': query_str} if variables == {} else {'query': query_str, 'variables': variables},

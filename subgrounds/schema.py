@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Optional
 
+from pipe import where
+
 
 # ================================================================
 # Schema definitions, data structures and types
@@ -124,6 +126,13 @@ class TypeMeta:
   class FieldMeta(T):
     arguments: list[TypeMeta.ArgumentMeta]
     type_: TypeRef.T
+
+    def has_arg(self, argname: str) -> bool:
+      try:
+        next(self.arguments | where(lambda arg: arg.name == argname))
+        return True
+      except StopIteration:
+        return False
 
   @dataclass
   class ScalarMeta(T):
