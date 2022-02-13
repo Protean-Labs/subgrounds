@@ -1,17 +1,14 @@
 from dataclasses import dataclass, field
 from functools import partial, reduce
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 from pipe import map, groupby, traverse, where, dedup
 import os
 import json
 
 import warnings
-
-from subgrounds.utils import union
 warnings.simplefilter('default')
 
 import logging
-# logging.basicConfig(format='%(asctime)s %(message)s')
 logger = logging.getLogger('subgrounds')
 
 import pandas as pd
@@ -21,6 +18,7 @@ from subgrounds.schema import mk_schema
 from subgrounds.subgraph import FieldPath, Subgraph
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, DEFAULT_SUBGRAPH_TRANSFORMS, DocumentTransform, RequestTransform
 import subgrounds.client as client
+import subgrounds.pagination as pagination
 
 
 @dataclass
@@ -83,14 +81,7 @@ class Subgrounds:
         list[dict]: The reponse data
     """
     def execute_document(doc: Document) -> dict:
-      logger.debug(f'execute.execute_document: variables = {doc.variables}, doc = \n{doc.graphql}')
-      match doc.variables:
-        case []:
-          return client.query(doc.url, doc.graphql)
-        case [args]:
-          return client.query(doc.url, doc.graphql, args)
-        case args_list:
-          return client.repeat(doc.url, doc.graphql, args_list)
+      return pagination.paginate(doc)
     
     def transform_doc(transforms: list[DocumentTransform], doc: Document) -> dict:
       logger.debug(f'execute.transform_doc: doc = \n{doc.graphql}')
@@ -375,6 +366,7 @@ class Subgrounds:
     #     tmin
 
     raise NotImplementedError
+
 
 def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:
   """ Formats the dictionary `data` into a pandas DataFrame using some

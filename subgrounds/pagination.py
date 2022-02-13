@@ -10,28 +10,30 @@ from typing import Any, Optional, Tuple
 
 from subgrounds.query import Argument, Document, InputValue, Selection, Query, VariableDefinition
 import subgrounds.client as client
-from subgrounds.schema import TypeRef
+from subgrounds.schema import TypeMeta, TypeRef
+from subgrounds.utils import extract_data, union
 
 DEFAULT_NUM_ENTITIES = 100
-PAGE_SIZE = 200
+PAGE_SIZE = 900
 
 
 @dataclass(frozen=True)
 class PaginationNode:
   first_name: str
   skip_name: str
+  key_path: list[str]
   first_value: Optional[InputValue.T] = None
   skip_value: Optional[InputValue.T] = None
   inner: list[PaginationNode] = field(default_factory=list)
 
   def args(self, page_size: int, inner_size: int = 0) -> list[dict[str, int]]:
-    num_entities = self.first_value.value if self.first_value is not None else 100
+    num_entities = self.first_value.value if self.first_value is not None else DEFAULT_NUM_ENTITIES
     num_pages = math.ceil(num_entities / page_size)
     skip0 = self.skip_value.value if self.skip_value is not None else 0
 
     return [
       # If we are at the last page and there is a remainder
-      {self.first_name: num_entities % page_size, self.skip_name: skip0 + i * page_size} 
+      {self.first_name: num_entities % page_size, self.skip_name: skip0 + i * page_size}
       if (i == num_pages - 1 and num_entities % page_size != 0)
 
       # If we are not at the last page or there is no remainder
@@ -45,24 +47,37 @@ def preprocess_document(
 ) -> Tuple[Document, list[PaginationNode]]:
   counter = count(0)
 
-  def preprocess_selection(select: Selection) -> Tuple[Selection, PaginationNode]:
+  def preprocess_selection(
+    select: Selection,
+    key_path: list[str] = []
+  ) -> Tuple[Selection, PaginationNode]:
     def preprocess_arg(arg: Argument, n: int) -> Argument:
       match arg.name:
         case 'first' | 'skip' as argname:
           return Argument(name=argname, value=InputValue.Variable(f'{argname}{n}'))
         case _:
           return arg
-    
+
     def fold(
       acc: Tuple[list[Selection], list[PaginationNode]],
-      select: Selection
+      select_: Selection
     ) -> Tuple[list[Selection], list[PaginationNode]]:
-      new_select, pagination_node = preprocess_selection(select)
+      new_select, pagination_node = preprocess_selection(select_, [*key_path, select.alias if select.alias is not None else select.fmeta.name])
       return ([*acc[0], new_select], [*acc[1], pagination_node])
 
     new_selections, pagination_nodes = reduce(fold, select.selection, ([], []))
 
-    if select.fmeta.type_.is_list:
+    if (
+      select.fmeta.type_.is_list
+      and select.fmeta.has_arg('first')
+      and select.fmeta.has_arg('skip')
+    ):
+      # Add id to selection if not already present
+      try:
+        next(new_selections | where(lambda select: select.fmeta.name == 'id'))
+      except StopIteration:
+        new_selections.append(Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))))
+
       n = next(counter)
       new_arguments = list(select.arguments | map(partial(preprocess_arg, n=n)))
 
@@ -88,6 +103,7 @@ def preprocess_document(
         PaginationNode(
           first_name=f'first{n}',
           skip_name=f'skip{n}',
+          key_path=[*key_path, select.alias if select.alias is not None else select.fmeta.name],
           first_value=first_arg_value,
           skip_value=skip_arg_value,
           inner=list(pagination_nodes | traverse)
@@ -155,21 +171,72 @@ def flatten(l: list[list | dict]) -> list[dict]:
       return l
 
 
-def pagination_args(node: PaginationNode) -> list[dict]:
-  match node.inner:
-    case []:
-      return node.args(PAGE_SIZE)
+def pagination_args(node: PaginationNode | list[PaginationNode], page_size: int = PAGE_SIZE) -> list[dict]:
+  if type(node) == list:
+    return flatten(list(node | map(partial(pagination_args, page_size=page_size))))
+  else:
+    match node.inner:
+      case []:
+        return node.args(page_size)
 
-    case l:
-      return flatten(list(
-        range(0, node.first_value.value if node.first_value is not None else DEFAULT_NUM_ENTITIES)
-        | map(lambda i: list(
-          l | map(lambda nested_pagination: list(
-            pagination_args(nested_pagination)
-            | map(lambda nested_args: {node.first_name: 1, node.skip_name: i} | nested_args)
+      case l:
+        return flatten(list(
+          range(0, node.first_value.value if node.first_value is not None else DEFAULT_NUM_ENTITIES)
+          | map(lambda i: list(
+            l | map(lambda nested_pagination: list(
+              pagination_args(nested_pagination, page_size)
+              | map(lambda nested_args: {node.first_name: 1, node.skip_name: i} | nested_args)
+            ))
           ))
         ))
-      ))
+
+
+class Empty(Exception):
+  pass
+
+
+class PaginationArgsGenerator:
+  nodes: list[PaginationNode]
+  skip_key_path: Optional[list[str]] = None
+
+  def skip(self, key_path: list[str]):
+    self.skip_key_path = key_path
+
+  def check_empty(self):
+    if self.skip_key_path is not None:
+      path = self.skip_key_path
+      self.skip_key_path = None
+      raise Empty(path)
+
+  def generator(
+    self: PaginationArgsGenerator,
+    node: PaginationNode | list[PaginationNode],
+    page_size: int = PAGE_SIZE,
+    args_acc: dict = {},
+    nodes_acc: list[PaginationNode] = []
+  ) -> list[dict]:
+    # print(f'node = {node}, args_acc = {args_acc}')
+    if type(node) == list:
+      for node in node:
+        yield from self.generator(node, page_size, args_acc, nodes_acc)
+
+    else:
+      try:
+        match node.inner:
+          case []:
+            for args in node.args(page_size):
+              self.check_empty()
+              yield ([*nodes_acc, node], args_acc | args)
+
+          case l:
+            for i in range(0, node.first_value.value if node.first_value is not None else DEFAULT_NUM_ENTITIES):
+              self.check_empty()
+              yield from self.generator(l, page_size, args_acc | {node.first_name: 1, node.skip_name: i}, [*nodes_acc, node])
+
+      except Empty as empty:
+        path = empty.args[0]
+        if node.key_path != path:
+          raise empty
 
 
 def trim_document(document: Document, pagination_args: dict[str, int]) -> Query:
@@ -209,20 +276,16 @@ def trim_document(document: Document, pagination_args: dict[str, int]) -> Query:
   )
 
 
-def execute(doc: Document) -> dict[str, Any]:
-  match doc.variables:
-    case []:
-      return client.query(doc.url, doc.graphql)
-    case [args]:
-      return client.query(doc.url, doc.graphql, args)
-    case args_list:
-      return client.repeat(doc.url, doc.graphql, args_list)
-
-
 def merge(data1, data2):
   match (data1, data2):
     case (list(), list()):
-      return data1 + data2
+      return union(
+        data1,
+        data2,
+        lambda data: data['id'],
+        combine=merge
+      )
+      # return data1 + data2
 
     case (dict(), dict()):
       data = {}
@@ -241,18 +304,27 @@ def merge(data1, data2):
     case (val1, _):
       return val1
 
-
+# TODO: If selection of pagination node returns nothing, skip rest of node
 def paginate(doc: Document) -> dict[str, Any]:
   new_doc, pagination_nodes = preprocess_document(doc)
 
   if pagination_nodes == []:
-    return execute(doc)
+    return client.query(doc.url, doc.graphql, variables=doc.variables)
   else:
-    return reduce(merge, flatten(list(
-      pagination_nodes
-      | map(lambda node: list(
-        pagination_args(node)
-        | map(lambda args: client.query(new_doc.url, new_doc.graphql, variables=new_doc.variables[0] | args if new_doc.variables else args))
-      ))
-    )))
-    
+    gen = PaginationArgsGenerator()
+
+    def fold(data: dict, nodesargs: Tuple[list[PaginationNode], dict]) -> dict:
+      nodes, args = nodesargs
+      trimmed_doc = trim_document(new_doc, args)
+      new_data = client.query(trimmed_doc.url, trimmed_doc.graphql, variables=trimmed_doc.variables | args)
+
+      for node in nodes:
+        if extract_data(node.key_path, new_data) == []:
+          gen.skip(node.key_path)
+          break
+
+      return merge(data, new_data)
+
+    argsgen = gen.generator(pagination_nodes, page_size=PAGE_SIZE)
+
+    return reduce(fold, argsgen, {})

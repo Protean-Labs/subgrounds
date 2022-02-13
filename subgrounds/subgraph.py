@@ -20,7 +20,7 @@ import subgrounds.schema as schema
 from subgrounds.query import Selection, arguments_of_field_args, selection_of_path
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, LocalSyntheticField, DocumentTransform
-from subgrounds.utils import identity
+from subgrounds.utils import extract_data, identity
 
 
 @dataclass
@@ -359,34 +359,7 @@ class FieldPath(FieldOperatorMixin):
     return 'x' + h.hexdigest()
 
   def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
-    # print(f'path = {self.data_path}')
-    def f(data_path: list[str], data: dict | list | Any):
-      match data_path:
-        case []:
-          return data
-        case [name, *rest]:
-          match data:
-            case dict():
-              return f(rest, data[name])
-            case list():
-              return list(data | map(lambda row: f(rest, row[name])))
-            case None:
-              return None
-            case _:
-              raise Exception(f"extract_data: unexpected state! path = {data_path}, data = {data}")
-
-    match data:
-      case dict():
-        return f(self.data_path, data)
-      case list():
-        for doc_data in data:
-          try:
-            return f(self.data_path, doc_data)
-          except KeyError:
-            continue
-        raise Exception('extract_data: not found')
-      case _:
-        raise Exception('extract_data: data is not dict or list')
+    return extract_data(self.data_path, data)
 
   def split_args(self, kwargs: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     query_args = {}
