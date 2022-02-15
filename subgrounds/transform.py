@@ -268,6 +268,6 @@ class SplitTransform(RequestTransform):
 DEFAULT_GLOBAL_TRANSFORMS: list[RequestTransform] = []
 
 DEFAULT_SUBGRAPH_TRANSFORMS: list[DocumentTransform] = [
-  TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal)),
-  TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint)),
+  TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal) if bigdecimal is not None else None),
+  TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint) if bigint is not None else None),
 ]
