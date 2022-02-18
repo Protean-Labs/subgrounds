@@ -72,6 +72,7 @@ class TestColumnsOfSelection(unittest.TestCase):
 class TestDFOfJSON(unittest.TestCase):
   sg = Subgrounds()
   carbon_offsets = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/cujowolf/polygon-bridged-carbon')
+  uniswapV2 = sg.load_subgraph("https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2")
 
   univ3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', save_schema=True)
   univ3.Swap.tx_type = SyntheticField.constant('SWAP')
@@ -818,3 +819,81 @@ class TestDFOfJSON(unittest.TestCase):
     ]
 
     assert_frame_equal(df_of_json(json, fpaths), expected)
+
+  def test_df_of_json_aliases(self):
+    expected = [
+      pd.DataFrame(data={
+        'mints_timestamp': [1643940402, 1643940022, 1643940004, 1643939765, 1643939339],
+        'mints_pair_id': [
+          '0x4b5ab61593a2401b1075b90c04cbcdd3f87ce011',
+          '0x369bca127b8858108536b71528ab3befa1deb6fc',
+          '0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8',
+          '0x3416cf6c708da44db2624d63ea0aaef7113527c6',
+          '0x4b5ab61593a2401b1075b90c04cbcdd3f87ce011'
+        ],
+        'mints_pair_token0_symbol': ['WETH', 'DOC', 'DAI', 'USDC', 'WETH'],
+        'mints_pair_token1_symbol': ['LOOKS', 'TOS', 'WETH', 'USDT', 'LOOKS'],
+      }),
+      pd.DataFrame(data={
+        'burns_timestamp': [1643940402, 1643940402, 1643940402, 1643940402, 1643940402],
+        'burns_pair_id': [
+          '0x512011c2573e0ecbd66be051b9a1c0fd097f2092',
+          '0x223203a27dfc1b6f9687e57b9ec7ed68298bb59c',
+          '0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640',
+          '0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640',
+          '0xd34e4855146ac0c6d0e4a652bd5fb54830f91ba8'
+        ],
+        'burns_pair_token0_symbol': ['WETH', 'WETH', 'USDC', 'USDC', 'STRONG'],
+        'burns_pair_token1_symbol': ['CMB', 'LOOMI', 'WETH', 'WETH', 'WETH'],
+      }),
+    ]
+
+    json = [{
+      'x7d5c9285fb80ec53': [
+        {'pair': {'id': '0x4b5ab61593a2401b1075b90c04cbcdd3f87ce011', 'token0': {'symbol': 'WETH'}, 'token1': {'symbol': 'LOOKS'}}, 'timestamp': 1643940402},
+        {'pair': {'id': '0x369bca127b8858108536b71528ab3befa1deb6fc', 'token0': {'symbol': 'DOC'}, 'token1': {'symbol': 'TOS'}}, 'timestamp': 1643940022},
+        {'pair': {'id': '0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8', 'token0': {'symbol': 'DAI'}, 'token1': {'symbol': 'WETH'}}, 'timestamp': 1643940004},
+        {'pair': {'id': '0x3416cf6c708da44db2624d63ea0aaef7113527c6', 'token0': {'symbol': 'USDC'}, 'token1': {'symbol': 'USDT'}}, 'timestamp': 1643939765},
+        {'pair': {'id': '0x4b5ab61593a2401b1075b90c04cbcdd3f87ce011', 'token0': {'symbol': 'WETH'}, 'token1': {'symbol': 'LOOKS'}}, 'timestamp': 1643939339}
+      ],
+      'x08e600d65ccd5771': [
+        {'pair': {'id': '0x512011c2573e0ecbd66be051b9a1c0fd097f2092', 'token0': {'symbol': 'WETH'}, 'token1': {'symbol': 'CMB'}}, 'timestamp': 1643940402},
+        {'pair': {'id': '0x223203a27dfc1b6f9687e57b9ec7ed68298bb59c', 'token0': {'symbol': 'WETH'}, 'token1': {'symbol': 'LOOMI'}}, 'timestamp': 1643940402},
+        {'pair': {'id': '0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640', 'token0': {'symbol': 'USDC'}, 'token1': {'symbol': 'WETH'}}, 'timestamp': 1643940402},
+        {'pair': {'id': '0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640', 'token0': {'symbol': 'USDC'}, 'token1': {'symbol': 'WETH'}}, 'timestamp': 1643940402},
+        {'pair': {'id': '0xd34e4855146ac0c6d0e4a652bd5fb54830f91ba8', 'token0': {'symbol': 'STRONG'}, 'token1': {'symbol': 'WETH'}}, 'timestamp': 1643940402}
+      ]
+    }]
+
+    mints = self.uniswapV2.Query.mints(
+      orderBy=self.uniswapV2.Mint.timestamp,
+      orderDirection='desc',
+      first=10,
+      where=[
+        self.uniswapV2.Mint.pair == '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
+      ]
+    )
+
+    burns = self.uniswapV2.Query.burns(
+      orderBy=self.uniswapV2.Burn.timestamp,
+      orderDirection='desc',
+      first=10,
+      where=[
+        self.uniswapV2.Burn.pair == '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
+      ]
+    )
+
+    fpaths = [
+      mints.timestamp,
+      mints.pair.id,
+      mints.pair.token0.symbol,
+      mints.pair.token1.symbol,
+
+      burns.timestamp,
+      burns.pair.id,
+      burns.pair.token0.symbol,
+      burns.pair.token1.symbol,
+    ]
+
+    for df in zip(df_of_json(json, fpaths), expected):
+      assert_frame_equal(df[0], df[1])

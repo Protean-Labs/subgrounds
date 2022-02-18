@@ -108,7 +108,7 @@ def extract_data(keys: list[str], data: dict[str, Any] | list[dict[str, Any]]) -
           return f(keys, doc_data)
         except KeyError:
           continue
-      raise Exception('extract_data: not found')
+      raise Exception(f'extract_data: not found! path = {keys}, data = {data}')
     case _:
       raise Exception('extract_data: data is not dict or list')
 
