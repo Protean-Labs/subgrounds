@@ -757,4 +757,38 @@ class TestQueryFunctions(unittest.TestCase):
     )
 
     self.assertEqual(Query.contains(query, q), True)
-  
+
+
+class TestContainsList(unittest.TestCase):
+  def test_contains_list_1(self):
+    selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    self.assertEqual(selection.contains_list(), True)
+
+  def test_contains_list_2(self):
+    selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.non_null_list('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    self.assertEqual(selection.contains_list(), True)
+
+  def test_contains_list_3(self):
+    selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.Named('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    self.assertEqual(selection.contains_list(), False)

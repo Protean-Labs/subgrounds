@@ -17,7 +17,7 @@ logger = logging.getLogger('subgrounds')
 
 import subgrounds.client as client
 import subgrounds.schema as schema
-from subgrounds.query import Selection, arguments_of_field_args, selection_of_path
+from subgrounds.query import Query, Selection, arguments_of_field_args, selection_of_path
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, LocalSyntheticField, DocumentTransform
 from subgrounds.utils import extract_data, identity
@@ -357,6 +357,20 @@ class FieldPath(FieldOperatorMixin):
     h = blake2b(digest_size=8)
     h.update(msg.encode('UTF-8'))
     return 'x' + h.hexdigest()
+
+  @staticmethod
+  def merge(fpaths: list[FieldPath]) -> list[Selection]:
+    """ Returns a Selection tree containing all selection paths in `fpaths`.
+    This function assumes that all fieldpaths in `fpaths` belong to the same subgraph
+
+    Args:
+        fpaths (list[FieldPath]): _description_
+
+    Returns:
+        list[Selection]: _description_
+    """
+    query = reduce(Query.add_selection, fpaths | map(FieldPath.selection), Query())
+    return query.selection
 
   def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
     return extract_data(self.data_path, data)

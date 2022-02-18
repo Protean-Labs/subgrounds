@@ -20,12 +20,12 @@ class TypeRef:
 
     @property
     @abstractmethod
-    def is_list(self) -> str:
+    def is_list(self) -> bool:
       raise NotImplementedError
 
     @property
     @abstractmethod
-    def is_non_null(self) -> str:
+    def is_non_null(self) -> bool:
       raise NotImplementedError
 
   @dataclass
@@ -37,11 +37,11 @@ class TypeRef:
       return self.name_
 
     @property
-    def is_list(self) -> str:
+    def is_list(self) -> bool:
       return False
 
     @property
-    def is_non_null(self) -> str:
+    def is_non_null(self) -> bool:
       return False
 
   @dataclass
@@ -53,11 +53,11 @@ class TypeRef:
       return self.inner.name
 
     @property
-    def is_list(self) -> str:
+    def is_list(self) -> bool:
       return self.inner.is_list
 
     @property
-    def is_non_null(self) -> str:
+    def is_non_null(self) -> bool:
       return True
 
   @dataclass
@@ -69,11 +69,11 @@ class TypeRef:
       return self.inner.name
 
     @property
-    def is_list(self) -> str:
+    def is_list(self) -> bool:
       return True
 
     @property
-    def is_non_null(self) -> str:
+    def is_non_null(self) -> bool:
       return self.inner.is_non_null
 
   @staticmethod

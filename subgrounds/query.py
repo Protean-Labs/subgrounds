@@ -213,7 +213,24 @@ class Selection:
         return [name]
       case Selection(TypeMeta.FieldMeta(name), None, _, [inner_select, *_]) | Selection(TypeMeta.FieldMeta(_), name, _, [inner_select, *_]):
         return [name] + inner_select.data_path
-    # return list(self.path | map(lambda ele: FieldPath.hash(ele[1].name + str(ele[0])) if ele[0] != {} and ele[0] is not None else ele[1].name))
+
+  @property
+  def data_paths(self) -> list[list[str]]:
+    def f(select: Selection, keys: list[str] = []):
+      match select:
+        case Selection(TypeMeta.FieldMeta(name), None, _, []) | Selection(TypeMeta.FieldMeta(_), name, _, []):
+          yield [*keys, name]
+        case Selection(TypeMeta.FieldMeta(name), None, _, inner) | Selection(TypeMeta.FieldMeta(_), name, _, inner):
+          for select in inner:
+            yield from f(select, keys=[*keys, name])
+
+    return list(f(self))
+
+  def contains_list(self: Selection) -> bool:
+    if self.fmeta.type_.is_list:
+      return True
+    else:
+      return any(self.selection | map(Selection.contains_list))
 
   @staticmethod
   def split(select: Selection) -> list[Selection]:

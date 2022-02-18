@@ -2,7 +2,7 @@ import operator
 import unittest
 from dataclasses import dataclass
 
-from subgrounds.utils import extract_data, intersection, rel_complement, union
+from subgrounds.utils import extract_data, flatten_dict, intersection, rel_complement, union
 
 
 class TestSetUtils(unittest.TestCase):
@@ -119,3 +119,29 @@ class TestExtractData(unittest.TestCase):
     path = ['a']
 
     self.assertEqual(extract_data(path, data), expected)
+
+class TestFlattenDict(unittest.TestCase):
+  def tests_flatten_dict_1(self):
+    expected = {
+      'x': 1,
+      'a_b_c': 10,
+      'd_e': 'hello',
+      'd_f': 'world',
+      'foo': True
+    }
+
+    data = {
+      'x': 1,
+      'a': {
+        'b': {
+          'c': 10
+        }
+      },
+      'd': {
+        'e': 'hello',
+        'f': 'world'
+      },
+      'foo': True
+    }
+
+    self.assertEqual(flatten_dict(data), expected)

@@ -44,7 +44,7 @@ app.layout = html.Div(
           subgrounds=sg,
           data=[
             mints.timestamp,
-            mints.transaction,
+            mints.transaction.id,
             mints.to,
             mints.amountUSD
           ]
@@ -56,7 +56,7 @@ app.layout = html.Div(
           subgrounds=sg,
           data=[
             burns.timestamp,
-            burns.transaction,
+            burns.transaction.id,
             burns.to,
             burns.amountUSD
           ]
