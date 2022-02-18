@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
   name="subgrounds",
-  version="0.0.6",
+  version="0.0.7",
   author="Protean Labs",
   author_email="info@protean.so",
   description="A framework for integrating The Graph data with dash components.",
