@@ -1,15 +1,29 @@
 import dash
 from dash import html
 
-from subgrounds.components import BarChart
-from subgrounds.subgraph import Subgraph
+from subgrounds.plotly_wrappers import Bar, Figure
+from subgrounds.dash_wrappers import Graph
+from subgrounds.subgrounds import Subgrounds
 
-aaveV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/aave/protocol-v2")
 
-# Not necessary, but nice for brevity
-Query = aaveV2.Query
-Borrow = aaveV2.Borrow
-Repay = aaveV2.Repay
+sg = Subgrounds()
+aaveV2 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/aave/protocol-v2')
+
+# Define formatted token amounts on Borrow and Repay entities
+aaveV2.Borrow.adjusted_amount = aaveV2.Borrow.amount / 10 ** aaveV2.Borrow.reserve.decimals
+aaveV2.Repay.adjusted_amount = aaveV2.Repay.amount / 10 ** aaveV2.Repay.reserve.decimals
+
+borrows = aaveV2.Query.borrows(
+  orderBy=aaveV2.Borrow.timestamp,
+  orderDirection='desc',
+  first=100
+)
+
+repays = aaveV2.Query.repays(
+  orderBy=aaveV2.Repay.timestamp,
+  orderDirection='desc',
+  first=100
+)
 
 # Dashboard
 app = dash.Dash(__name__)
@@ -17,18 +31,14 @@ app = dash.Dash(__name__)
 app.layout = html.Div(
   html.Div([
     html.H4('Entities'),
-    html.Div(id='step-display'),
     html.Div([
-      BarChart(
-        Query.repays,
-        orderBy=Repay.timestamp,
-        orderDirection="desc",
-        first=100,
-        x=Repay.reserve.symbol,
-        y=Repay.amount,
-
-        component_id='bar-chart'
-      )
+      Graph(Figure(
+        subgrounds=sg,
+        traces=[
+          Bar(x=borrows.reserve.symbol, y=borrows.adjusted_amount),
+          Bar(x=repays.reserve.symbol, y=repays.adjusted_amount)
+        ]
+      ))
     ])
   ])
 )

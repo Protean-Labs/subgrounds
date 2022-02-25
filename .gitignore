@@ -1,1 +1,7 @@
 /*.py
+notes/
+*.json
+*.md
+__pycache__/
+
+!README.md

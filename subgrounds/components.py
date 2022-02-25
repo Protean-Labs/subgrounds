@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from dash import dcc
 from dash import html
@@ -7,7 +7,8 @@ from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 
 from subgrounds.schema import TypeRef
-from subgrounds.subgraph import Filter, Subgraph, FieldPath
+from subgrounds.subgraph import Filter, FieldPath
+from subgrounds.subgrounds import Subgrounds
 
 
 def columns(row):
@@ -36,10 +37,10 @@ class EntityTable(dash_table.DataTable):
     entrypoint: FieldPath,
     component_id: str,
     first: int = 10,
-    selection: List[FieldPath] = [],
+    selection: list[FieldPath] = [],
     orderBy: Optional[FieldPath] = None,
     orderDirection: Optional[str] = None,
-    where: Optional[List[Filter]] = None,
+    where: Optional[list[Filter]] = None,
     **kwargs
   ) -> None:
     entrypoint = entrypoint(
@@ -48,6 +49,7 @@ class EntityTable(dash_table.DataTable):
       orderDirection=orderDirection,
       where=where
     )
+    
     selection = [FieldPath.extend(entrypoint, s) for s in selection]
 
     query = entrypoint.subgraph.mk_request(selection)
@@ -92,7 +94,7 @@ class BarChart(Component):
     entrypoint: FieldPath,
     component_id: str,
     x: FieldPath,
-    y: Union[FieldPath, List[FieldPath]],
+    y: Union[FieldPath, list[FieldPath]],
     **kwargs
   ) -> None:
     self.x = x
@@ -124,7 +126,7 @@ class LinePlot(Component):
     entrypoint: FieldPath,
     component_id: str,
     x: FieldPath,
-    y: Union[FieldPath, List[FieldPath]],
+    y: Union[FieldPath, list[FieldPath]],
     **kwargs
   ) -> None:
     self.x = x
@@ -255,3 +257,15 @@ class AutoUpdate(html.Div):
       ),
       component
     ])
+
+
+
+# class LinePlot:
+#   def __init__(
+#     self,
+#     app: Subgrounds,
+#     field: FieldPath,
+#     x: FieldPath,
+#     y: FieldPath | list[FieldPath]
+#   ) -> None:
+    

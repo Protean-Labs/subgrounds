@@ -2,9 +2,13 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial, reduce
+from re import L
 from typing import Any, Callable, Optional, Tuple
-from pipe import map, traverse, where, take
+from pipe import map, traverse, where, take, take_while
 import math
+
+import logging
+logger = logging.getLogger('subgrounds')
 
 from subgrounds.schema import (
   TypeMeta,
@@ -12,8 +16,7 @@ from subgrounds.schema import (
   TypeRef,
   typeref_of_input_field
 )
-from subgrounds.utils import filter_none, identity, rel_complement, union
-import subgrounds.client as client
+from subgrounds.utils import extract_data, filter_none, identity, rel_complement, union
 
 
 # ================================================================
@@ -24,7 +27,7 @@ class InputValue:
   class T(ABC):
     @property
     @abstractmethod
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       """ Returns a GraphQL string representation of the input value
 
       Returns:
@@ -53,7 +56,7 @@ class InputValue:
   @dataclass(frozen=True)
   class Null(T):
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return "null"
 
   @dataclass(frozen=True)
@@ -61,7 +64,7 @@ class InputValue:
     value: int
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return str(self.value)
 
     @property
@@ -73,7 +76,7 @@ class InputValue:
     value: float
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return str(self.value)
 
     @property
@@ -85,7 +88,7 @@ class InputValue:
     value: str
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return f"\"{self.value}\""
 
   @dataclass(frozen=True)
@@ -93,7 +96,7 @@ class InputValue:
     value: bool
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return str(self.value).lower()
 
   @dataclass(frozen=True)
@@ -101,7 +104,7 @@ class InputValue:
     value: str
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return self.value
 
   @dataclass(frozen=True)
@@ -109,7 +112,7 @@ class InputValue:
     name: str
 
     @property
-    def graphql_string(self) -> str:
+    def graphql(self) -> str:
       return f'${self.name}'
 
     @property
@@ -121,16 +124,16 @@ class InputValue:
     value: list[InputValue.T]
 
     @property
-    def graphql_string(self) -> str:
-      return f"[{', '.join([val.graphql_string for val in self.value])}]"
+    def graphql(self) -> str:
+      return f"[{', '.join([val.graphql for val in self.value])}]"
 
   @dataclass(frozen=True)
   class Object(T):
     value: dict[str, InputValue.T]
 
     @property
-    def graphql_string(self) -> str:
-      return f"{{{', '.join([f'{key}: {value.graphql_string}' for key, value in self.value.items()])}}}"
+    def graphql(self) -> str:
+      return f"{{{', '.join([f'{key}: {value.graphql}' for key, value in self.value.items()])}}}"
 
 
 @dataclass(frozen=True)
@@ -140,11 +143,11 @@ class VariableDefinition:
   default: Optional[InputValue.T] = None
 
   @property
-  def graphql_string(self) -> str:
+  def graphql(self) -> str:
     if self.default is None:
-      return f'${self.name}: {TypeRef.graphql_string(self.type_)}'
+      return f'${self.name}: {TypeRef.graphql(self.type_)}'
     else:
-      return f'${self.name}: {TypeRef.graphql_string(self.type_)} = {self.default.graphql_string}'
+      return f'${self.name}: {TypeRef.graphql(self.type_)} = {self.default.graphql}'
 
 
 @dataclass(frozen=True)
@@ -153,8 +156,8 @@ class Argument:
   value: InputValue.T
 
   @property
-  def graphql_string(self) -> str:
-    return f"{self.name}: {self.value.graphql_string}"
+  def graphql(self) -> str:
+    return f"{self.name}: {self.value.graphql}"
 
 
 @dataclass(frozen=True)
@@ -173,40 +176,87 @@ class Selection:
   selection: list[Selection] = field(default_factory=list)
 
   @property
-  def args_graphql_string(self) -> str:
+  def key(self):
+    if self.alias:
+      return self.alias
+    else:
+      return self.fmeta.name
+
+  @property
+  def args_graphql(self) -> str:
     if self.arguments:
-      return f'({", ".join([arg.graphql_string for arg in self.arguments])})'
+      return f'({", ".join([arg.graphql for arg in self.arguments])})'
     else:
       return ""
 
-  def graphql_string(self, level: int = 0) -> str:
+  def graphql(self, level: int = 0) -> str:
     indent = "  " * level
+
+    if self.alias:
+      alias_str = f'{self.alias}: '
+    else:
+      alias_str = ''
 
     match (self.selection):
       case None | []:
-        return f"{indent}{self.fmeta.name}{self.args_graphql_string}"
+        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql}"
       case inner_selection:
         inner_str = "\n".join(
-          [f.graphql_string(level=level + 1) for f in inner_selection]
+          [f.graphql(level=level + 1) for f in inner_selection]
         )
-        return f"{indent}{self.fmeta.name}{self.args_graphql_string} {{\n{inner_str}\n{indent}}}"
+        return f"{indent}{alias_str}{self.fmeta.name}{self.args_graphql} {{\n{inner_str}\n{indent}}}"
+
+  @property
+  def data_path(self) -> list[str]:
+    match self:
+      case Selection(TypeMeta.FieldMeta(name), None, _, []) | Selection(TypeMeta.FieldMeta(_), name, _, []):
+        return [name]
+      case Selection(TypeMeta.FieldMeta(name), None, _, [inner_select, *_]) | Selection(TypeMeta.FieldMeta(_), name, _, [inner_select, *_]):
+        return [name] + inner_select.data_path
+
+  @property
+  def data_paths(self) -> list[list[str]]:
+    def f(select: Selection, keys: list[str] = []):
+      match select:
+        case Selection(TypeMeta.FieldMeta(name), None, _, []) | Selection(TypeMeta.FieldMeta(_), name, _, []):
+          yield [*keys, name]
+        case Selection(TypeMeta.FieldMeta(name), None, _, inner) | Selection(TypeMeta.FieldMeta(_), name, _, inner):
+          for select in inner:
+            yield from f(select, keys=[*keys, name])
+
+    return list(f(self))
+
+  def contains_list(self: Selection) -> bool:
+    if self.fmeta.type_.is_list:
+      return True
+    else:
+      return any(self.selection | map(Selection.contains_list))
 
   @staticmethod
-  def add_selections(select: Selection, new_selections: list[Selection]) -> Selection:
+  def split(select: Selection) -> list[Selection]:
+    match select:
+      case Selection(_, _, _, [] | None):
+        return [select]
+      case Selection(fmeta, alias, args, inner_select):       
+        return list(inner_select | map(Selection.split) | traverse | map(lambda inner_select: Selection(fmeta, alias, args, inner_select)))
+
+  def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
+    return extract_data(self.data_path, data)
+
+  def add_selections(self: Selection, new_selections: list[Selection]) -> Selection:
     return Selection(
-      fmeta=select.fmeta,
-      alias=select.alias,
+      fmeta=self.fmeta,
+      alias=self.alias,
       selection=union(
-        select.selection,
+        self.selection,
         new_selections,
         key=lambda select: select.fmeta.name,
         combine=Selection.combine
       )
     )
 
-  @staticmethod
-  def add_selection(select: Selection, new_selection: Selection) -> Selection:
-    return Selection.add_selections(select, [new_selection])
+  def add_selection(self: Selection, new_selection: Selection) -> Selection:
+    return self.add_selections([new_selection])
 
   @staticmethod
   def remove_selections(select: Selection, selections_to_remove: list[Selection]) -> Selection:
@@ -234,8 +284,8 @@ class Selection:
 
   @staticmethod
   def combine(select: Selection, other: Selection) -> Selection:
-    if select.fmeta != other.fmeta:
-      raise Exception(f"Selection.combine: {select.fmeta} != {other.fmeta}")
+    if select.key != select.key:
+      raise Exception(f"Selection.combine: {select.key} != {select.key}")
 
     return Selection(
       fmeta=select.fmeta,
@@ -248,6 +298,17 @@ class Selection:
         combine=Selection.combine
       ))
     )
+
+  @staticmethod
+  def consolidate(selections: list[Selection]) -> list[Selection]:
+    def f(selections: list[Selection], other: Selection) -> list[Selection]:
+      try:
+        next(selections | where(lambda select: select.key == other.key))
+        return list(selections | map(lambda select: Selection.combine(select, other) if select.key == other.key else select))
+      except StopIteration:
+        return selections + [other]
+
+    return reduce(f, selections, [])
 
   @staticmethod
   def contains(select: Selection, other: Selection) -> bool:
@@ -268,16 +329,24 @@ class Selection:
       return any(select.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
 
   @staticmethod
-  def get_argument(select: Selection, arg_name: str) -> Optional[Argument]:
+  def get_argument(select: Selection, target: str) -> Optional[Argument]:
     try:
-      return next(filter(lambda arg: arg.name == arg_name, select.arguments))
+      return next(select.arguments | where(lambda arg: arg.name == target))
     except StopIteration:
-      return next(select.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
+      try:
+        return next(
+          select.selection 
+          | map(partial(Selection.get_argument, target=target))
+          | where(lambda x: x is not None)
+        )
+      except StopIteration:
+        return None
 
   @staticmethod
   def substitute_arg(select: Selection, arg_name: str, replacement: Argument | list[Argument]) -> Selection:
     return Selection(
       fmeta=select.fmeta,
+      alias=select.alias,
       arguments=list(
         select.arguments
         | map(lambda arg: replacement if arg.name == arg_name else arg)
@@ -289,19 +358,18 @@ class Selection:
       )
     )
 
-  @staticmethod
-  def select(select: Selection, other: Selection) -> Selection:
+  def select(self: Selection, other: Selection) -> Selection:
     if other.selection == []:
-      return select
+      return self
     else:
       return Selection(
-        fmeta=select.fmeta,
-        alias=select.alias,
-        arguments=select.arguments,
+        fmeta=self.fmeta,
+        alias=self.alias,
+        arguments=self.arguments,
         selection=list(
           other.selection
           | map(lambda s: next(
-            select.selection
+            self.selection
             | where(lambda s_: s_.fmeta.name == s.fmeta.name)
             | map(lambda s_: Selection.select(s_, s))
             | take(1)
@@ -325,41 +393,40 @@ class Query:
   variables: list[VariableDefinition] = field(default_factory=list)
 
   @property
-  def graphql_string(self) -> str:
+  def graphql(self) -> str:
     """ Returns a string containing a GraphQL query matching the current query
 
     Returns:
       str: The string containing the GraphQL query
     """
     selection_str = "\n".join(
-      [select.graphql_string(level=1) for select in self.selection]
+      [select.graphql(level=1) for select in self.selection]
     )
 
     if len(self.variables) > 0:
-      args_str = f'({", ".join([vardef.graphql_string for vardef in self.variables])})'
+      args_str = f'({", ".join([vardef.graphql for vardef in self.variables])})'
     else:
-      args_str = ""
+      args_str = ''
 
-    return f"""query{args_str} {{\n{selection_str}\n}}"""
+    return f'query{args_str} {{\n{selection_str}\n}}'
 
-  @staticmethod
-  def add_selections(query: Query, new_selections: list[Selection]) -> Query:
+  def add_selections(self: Query, new_selections: list[Selection]) -> Query:
     """ Returns a new Query containing all selections in 'query' along with
     the new selections in `new_selections`
 
     Args:
-      query (Query): The query to which new selections are to be added
+      self (Query): The query to which new selections are to be added
       new_selections (list[Selection]): The new selections to be added to the query
 
     Returns:
       Query: A new `Query` objects containing all selections
     """
     return Query(
-      name=query.name,
+      name=self.name,
       selection=union(
-        query.selection,
+        self.selection,
         new_selections,
-        key=lambda select: select.fmeta.name,
+        key=lambda select: select.key,
         combine=Selection.combine
       )
     )
@@ -479,7 +546,7 @@ class Query:
       selection=union(
         query.selection,
         other.selection,
-        key=lambda select: select.fmeta.name,
+        key=lambda select: select.key,
         combine=Selection.combine
       )
     )
@@ -490,11 +557,10 @@ class Query:
     variable_f: Callable[[VariableDefinition], VariableDefinition] = identity,
     selection_f: Callable[[Selection], Selection] = identity
   ) -> Query:
-    return Query(
+    return reduce(Query.add_selection, query.selection | map(selection_f) | traverse, Query(
       name=query.name,
-      selection=list(query.selection | map(selection_f)),
-      variables=list(query.variables | map(variable_f))
-    )
+      variables=list(query.variables | map(variable_f) | traverse)
+    ))
 
   @staticmethod
   def contains_selection(query: Query, selection: Selection) -> bool:
@@ -517,8 +583,15 @@ class Query:
     return any(query.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
 
   @staticmethod
-  def get_argument(query: Selection, arg_name: str) -> Optional[Argument]:
-    return next(query.selection | map(partial(Selection.get_argument, arg_name=arg_name)))
+  def get_argument(query: Query, target: str) -> Optional[Argument]:
+    try:
+      return next(
+        query.selection
+        | map(partial(Selection.get_argument, target=target))
+        | where(lambda x: x is not None)
+      )
+    except StopIteration:
+      return None
 
   @staticmethod
   def substitute_arg(query: Query, arg_name: str, replacement: Argument | list[Argument]) -> Query:
@@ -584,9 +657,9 @@ class Fragment:
   variables: list[VariableDefinition] = field(default_factory=list)
 
   @property
-  def graphql_string(self):
+  def graphql(self):
     selection_str = "\n".join(
-      [select.graphql_string(level=1) for select in self.selection]
+      [select.graphql(level=1) for select in self.selection]
     )
     return f"""fragment {self.name} on {TypeRef.root_type_name(self.type_)} {{\n{selection_str}\n}}"""
 
@@ -611,11 +684,11 @@ class Document:
 
   # A list of variable assignments. For non-repeating queries
   # the list would be of length 1 (i.e.: only one set of query variable assignments)
-  variables: list[dict[str, Any]] = field(default_factory=list)
+  variables: dict[str, Any] = field(default_factory=dict)
 
   @property
-  def graphql_string(self):
-    return '\n'.join([self.query.graphql_string, *list(self.fragments | map(lambda frag: frag.graphql_string))])
+  def graphql(self):
+    return '\n'.join([self.query.graphql, *list(self.fragments | map(lambda frag: frag.graphql))])
 
   @staticmethod
   def mk_single_query(url: str, query: Query) -> Document:
@@ -643,13 +716,18 @@ class Document:
     return Document(
       url=doc.url,
       query=query_f(doc.query),
-      fragments=list(doc.fragments | map(fragment_f))
+      fragments=list(doc.fragments | map(fragment_f)),
+      variables=doc.variables
     )
 
 
 @dataclass(frozen=True)
 class DataRequest:
   documents: list[Document] = field(default_factory=list)
+
+  @property
+  def graphql(self):
+    return '\n'.join(list(self.documents | map(lambda doc: doc.graphql)))
 
   @staticmethod
   def combine(req: DataRequest, other: DataRequest) -> None:
@@ -678,18 +756,9 @@ class DataRequest:
   def single_document(doc: Document) -> DataRequest:
     return DataRequest([doc])
 
-
-def execute(request: DataRequest) -> list:
-  def f(doc: Document) -> dict:
-    match doc.variables:
-      case []:
-        return client.query(doc.url, doc.graphql_string)
-      case [args]:
-        return client.query(doc.url, doc.graphql_string, args)
-      case args_list:
-        return client.repeat(doc.url, doc.graphql_string, args_list)
-
-  return list(request.documents | map(f))
+  @staticmethod
+  def add_documents(self: DataRequest, docs: Document | list[Document]) -> DataRequest:
+    return DataRequest(list([self.documents, docs] | traverse))
 
   
 # ================================================================

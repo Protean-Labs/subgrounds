@@ -1,8 +1,9 @@
 import unittest
 
-from subgrounds.query import Argument, DataRequest, Document, Query, Selection, InputValue, VariableDefinition, execute
+from subgrounds.query import Argument, DataRequest, Document, Query, Selection, InputValue, VariableDefinition
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.subgraph import Subgraph, SyntheticField
+from subgrounds.subgrounds import Subgrounds
 
 from tests.utils import schema
 
@@ -15,7 +16,7 @@ class TestQueryString(unittest.TestCase):
   def tearDown(self) -> None:
     SyntheticField.counter = 0
 
-  def test_graphql_string_1(self):
+  def test_graphql_1(self):
     expected = """query {
   pairs(first: 100, where: {reserveUSD_lt: "10.0"}, orderBy: reserveUSD, orderDirection: desc) {
     id
@@ -58,11 +59,11 @@ class TestQueryString(unittest.TestCase):
       )
     ])
 
-    self.assertEqual(query.graphql_string, expected)
+    self.assertEqual(query.graphql, expected)
 
-  def test_graphql_string_2(self):
+  def test_graphql_2(self):
     expected = """query {
-  pairs(first: 100, where: {reserveUSD_lt: "10.0"}, orderBy: reserveUSD, orderDirection: desc) {
+  xab8f96f0e14a4db3: pairs(first: 100, where: {reserveUSD_lt: "10.0"}, orderBy: reserveUSD, orderDirection: desc) {
     id
     token0 {
       name
@@ -75,6 +76,8 @@ class TestQueryString(unittest.TestCase):
   }
 }"""
 
+    app = Subgrounds()
+
     pairs = self.subgraph.Query.pairs(
       first=100,
       where=[
@@ -84,7 +87,7 @@ class TestQueryString(unittest.TestCase):
       orderDirection='desc'
     )
 
-    req = self.subgraph.mk_request([
+    req = app.mk_request([
       pairs.id,
       pairs.token0.name,
       pairs.token0.symbol,
@@ -92,9 +95,9 @@ class TestQueryString(unittest.TestCase):
       pairs.token1.symbol,
     ])
 
-    self.assertEqual(req.documents[0].query.graphql_string, expected)
+    self.assertEqual(req.documents[0].query.graphql, expected)
 
-  def test_graphql_string_3(self):
+  def test_graphql_3(self):
     expected = """query($tokenId: String!) {
   token(id: $tokenId) {
     id
@@ -117,53 +120,53 @@ class TestQueryString(unittest.TestCase):
       ]
     )
 
-    self.assertEqual(query.graphql_string, expected)
+    self.assertEqual(query.graphql, expected)
 
 
-class TestExecution(unittest.TestCase):
-  def test_execute_1(self):
-    expected = [
-      {
-        'token': [
-          {
-            'id': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-            'name': 'USD//C',
-            'symbol': 'USDC'
-          },
-          {
-            'id': '0x6b175474e89094c44da98b954eedeac495271d0f',
-            'name': 'Dai Stablecoin',
-            'symbol': 'DAI'
-          }
-        ]
-      }
-    ]
+# class TestExecution(unittest.TestCase):
+#   def test_execute_1(self):
+#     expected = [
+#       {
+#         'token': [
+#           {
+#             'id': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+#             'name': 'USD//C',
+#             'symbol': 'USDC'
+#           },
+#           {
+#             'id': '0x6b175474e89094c44da98b954eedeac495271d0f',
+#             'name': 'Dai Stablecoin',
+#             'symbol': 'DAI'
+#           }
+#         ]
+#       }
+#     ]
 
-    req = DataRequest(documents=[
-      Document(
-        'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
-        Query(None, [
-          Selection(
-            TypeMeta.FieldMeta('token', '', [], TypeRef.non_null_list('Token')),
-            None,
-            [
-              Argument('id', InputValue.Variable('tokenId')),
-            ],
-            [
-              Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
-              Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
-              Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
-            ]
-          )
-        ], [VariableDefinition('tokenId', TypeRef.non_null('String'))]),
-        variables=[
-          {'tokenId': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'},
-          {'tokenId': '0x6b175474e89094c44da98b954eedeac495271d0f'}
-        ]
-      )
-    ])
+#     req = DataRequest(documents=[
+#       Document(
+#         'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
+#         Query(None, [
+#           Selection(
+#             TypeMeta.FieldMeta('token', '', [], TypeRef.non_null_list('Token')),
+#             None,
+#             [
+#               Argument('id', InputValue.Variable('tokenId')),
+#             ],
+#             [
+#               Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+#               Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+#               Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+#             ]
+#           )
+#         ], [VariableDefinition('tokenId', TypeRef.non_null('String'))]),
+#         variables=[
+#           {'tokenId': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'},
+#           {'tokenId': '0x6b175474e89094c44da98b954eedeac495271d0f'}
+#         ]
+#       )
+#     ])
 
-    self.assertEqual(execute(req), expected)
+#     self.assertEqual(execute(req), expected)
 
 
 class TestSelectionFunctions(unittest.TestCase):
@@ -316,6 +319,27 @@ class TestSelectionFunctions(unittest.TestCase):
 
     self.assertEqual(Selection.contains(selection, s2), False)
 
+  def test_contains_3(self):
+    selection = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [
+      Argument('first', InputValue.Int(100)),
+    ], [
+      Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    s2 = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+      Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
+    ])
+
+    self.assertEqual(Selection.contains(selection, s2), True)
+
+  def test_contains_4(self):
+    selection = Selection(fmeta=TypeMeta.FieldMeta(name='log', description='', arguments=[], type_=TypeRef.Named(name_='String')), alias=None, arguments=[], selection=[])
+
+    s2 = Selection(fmeta=TypeMeta.FieldMeta(name='log', description='', arguments=[], type_=TypeRef.Named(name_='String')), alias=None, arguments=[], selection=[])
+
+    self.assertEqual(Selection.contains(selection, s2), True)
+
   def test_select_1(self):
     expected = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
       Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
@@ -354,6 +378,74 @@ class TestSelectionFunctions(unittest.TestCase):
     ])
 
     self.assertEqual(Selection.select(selection, s2), expected)
+
+  def test_consolidate_1(self):
+    expected = [
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+          Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+          Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ])
+    ]
+
+    selections = [
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ]),
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ]),
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ])
+    ]
+
+    self.assertEqual(Selection.consolidate(selections), expected)
+
+  def test_consolidate_2(self):
+    expected = [
+      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+      ]),
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+          Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+          Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ])
+    ]
+
+    selections = [
+      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+      ]),
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ]),
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ]),
+      Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+        Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+          Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+        ])
+      ])
+    ]
+
+    self.assertEqual(Selection.consolidate(selections), expected)
 
 
 class TestQueryFunctions(unittest.TestCase):
@@ -665,4 +757,38 @@ class TestQueryFunctions(unittest.TestCase):
     )
 
     self.assertEqual(Query.contains(query, q), True)
-    
+
+
+class TestContainsList(unittest.TestCase):
+  def test_contains_list_1(self):
+    selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    self.assertEqual(selection.contains_list(), True)
+
+  def test_contains_list_2(self):
+    selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.non_null_list('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    self.assertEqual(selection.contains_list(), True)
+
+  def test_contains_list_3(self):
+    selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.Named('Pair')), None, [], [
+      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+      ])
+    ])
+
+    self.assertEqual(selection.contains_list(), False)

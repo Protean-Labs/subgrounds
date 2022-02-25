@@ -1,7 +1,9 @@
 from __future__ import annotations
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Optional
+
+from pipe import where
 
 
 # ================================================================
@@ -11,25 +13,68 @@ class TypeRef:
   class T(ABC):
     pass
 
+    @property
+    @abstractmethod
+    def name(self) -> str:
+      raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def is_list(self) -> bool:
+      raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def is_non_null(self) -> bool:
+      raise NotImplementedError
+
   @dataclass
   class Named(T):
-    name: str
+    name_: str
+
+    @property
+    def name(self) -> str:
+      return self.name_
+
+    @property
+    def is_list(self) -> bool:
+      return False
+
+    @property
+    def is_non_null(self) -> bool:
+      return False
 
   @dataclass
   class NonNull(T):
     inner: TypeRef.T
 
+    @property
+    def name(self) -> str:
+      return self.inner.name
+
+    @property
+    def is_list(self) -> bool:
+      return self.inner.is_list
+
+    @property
+    def is_non_null(self) -> bool:
+      return True
+
   @dataclass
   class List(T):
     inner: TypeRef.T
 
-  @staticmethod
-  def root_type_name(type_: TypeRef.T) -> str:
-    match type_:
-      case TypeRef.NonNull(inner) | TypeRef.List(inner):
-        return TypeRef.root_type_name(inner)
-      case TypeRef.Named(name):
-        return name
+    @property
+    def name(self) -> str:
+      return self.inner.name
+
+    @property
+    def is_list(self) -> bool:
+      return True
+
+    @property
+    def is_non_null(self) -> bool:
+      return self.inner.is_non_null
 
   @staticmethod
   def non_null(name: str) -> TypeRef.T:
@@ -40,30 +85,26 @@ class TypeRef:
     return TypeRef.NonNull(TypeRef.List(TypeRef.NonNull(TypeRef.Named(name))))
 
   @staticmethod
+  def root_type_name(type_: TypeRef.T) -> str:
+    return type_.name
+
+  @staticmethod
   def is_non_null(type_: TypeRef.T) -> bool:
-    match type_:
-      case TypeRef.NonNull():
-        return True
-      case _:
-        return False
+    return type_.is_non_null
 
   @staticmethod
   def is_list(type_: TypeRef.T) -> bool:
-    match type_:
-      case TypeRef.List() | TypeRef.NonNull(TypeRef.List()):
-        return True
-      case _:
-        return False
+    return type_.is_list
 
   @staticmethod
-  def graphql_string(type_: TypeRef.T) -> str:
+  def graphql(type_: TypeRef.T) -> str:
     match type_:
       case TypeRef.Named(name):
         return name
       case TypeRef.NonNull(t):
-        return f'{TypeRef.graphql_string(t)}!'
+        return f'{TypeRef.graphql(t)}!'
       case TypeRef.List(t):
-        return f'[{TypeRef.graphql_string(t)}]'
+        return f'[{TypeRef.graphql(t)}]'
 
 
 class TypeMeta:
@@ -71,6 +112,10 @@ class TypeMeta:
   class T(ABC):
     name: str
     description: str
+
+    @property
+    def is_object(self) -> bool:
+      return False
 
   @dataclass
   class ArgumentMeta(T):
@@ -82,6 +127,13 @@ class TypeMeta:
     arguments: list[TypeMeta.ArgumentMeta]
     type_: TypeRef.T
 
+    def has_arg(self, argname: str) -> bool:
+      try:
+        next(self.arguments | where(lambda arg: arg.name == argname))
+        return True
+      except StopIteration:
+        return False
+
   @dataclass
   class ScalarMeta(T):
     pass
@@ -90,6 +142,10 @@ class TypeMeta:
   class ObjectMeta(T):
     fields: list[TypeMeta.FieldMeta]
     interfaces: list[str] = field(default_factory=list)
+
+    @property
+    def is_object(self) -> bool:
+      return True
 
   @dataclass
   class EnumValueMeta(T):
@@ -102,6 +158,10 @@ class TypeMeta:
   @dataclass
   class InterfaceMeta(T):
     fields: list[TypeMeta.FieldMeta]
+
+    @property
+    def is_object(self) -> bool:
+      return False
 
   @dataclass
   class UnionMeta(T):

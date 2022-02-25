@@ -15,24 +15,34 @@ uniswapV2 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/un
 
 # This is unecessary, but nice for brevity
 Query = uniswapV2.Query
-Swap = uniswapV2.Swap
+PairDayData = uniswapV2.PairDayData
 
 # This is a synthetic field
-Swap.price1 = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
+
+PairDayData.exchange_rate = PairDayData.reserve0 / PairDayData.reserve1
 
 # This is a synthetic field
-Swap.datetime = SyntheticField(
+PairDayData.datetime = SyntheticField(
   lambda timestamp: str(datetime.fromtimestamp(timestamp)),
   TypeRef.Named('String'),
-  Swap.timestamp,
+  PairDayData.date
 )
 
-swaps = Query.swaps(
-  orderBy=Swap.timestamp,
+uni_eth = Query.pairDayDatas(
+  orderBy=PairDayData.date,
   orderDirection='desc',
-  first=500,
+  first=100,
   where=[
-    Swap.pair == '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc'
+    PairDayData.pairAddress == '0xd3d2e2692501a5c9ca623199d38826e513033a17'
+  ]
+)
+
+toke_eth = Query.pairDayDatas(
+  orderBy=PairDayData.date,
+  orderDirection='desc',
+  first=100,
+  where=[
+    PairDayData.pairAddress == '0x5fa464cefe8901d66c09b85d5fcdc55b3738c688'
   ]
 )
 
@@ -45,7 +55,16 @@ app.layout = html.Div(
       Graph(Figure(
         subgrounds=sg,
         traces=[
-          Scatter(x=swaps.datetime, y=swaps.price1)
+          Scatter(
+            x=uni_eth.datetime,
+            y=uni_eth.exchange_rate,
+            mode='lines'
+          ),
+          Scatter(
+            x=toke_eth.datetime,
+            y=toke_eth.exchange_rate,
+            mode='lines'
+          ),
         ]
       ))
     ])

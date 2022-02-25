@@ -2,10 +2,10 @@ import operator
 import unittest
 from dataclasses import dataclass
 
-from subgrounds.utils import intersection, rel_complement, union
+from subgrounds.utils import extract_data, flatten_dict, intersection, rel_complement, union
 
 
-class TestSet(unittest.TestCase):
+class TestSetUtils(unittest.TestCase):
   def test_rel_complement_1(self):
     l1 = [1, 2, 3]
     l2 = [3, 4, 5]
@@ -80,3 +80,68 @@ class TestSet(unittest.TestCase):
     ]
 
     self.assertEqual(union(l1, l2, key=lambda x: x.id, combine=lambda x, y: X(x.id, f'{x.txt} {y.txt}')), expected)
+
+
+class TestExtractData(unittest.TestCase):
+  def test_extract_data_1(self):
+    expected = [1, 2, 3]
+
+    data = {
+      'a': [
+        {'b': {'c': 1}},
+        {'b': {'c': 2}},
+        {'b': {'c': 3}},
+      ]
+    }
+
+    path = ['a', 'b', 'c']
+
+    self.assertEqual(extract_data(path, data), expected)
+
+  def test_extract_data_2(self):
+    expected = []
+
+    data = {
+      'a': []
+    }
+
+    path = ['a', 'b', 'c']
+
+    self.assertEqual(extract_data(path, data), expected)
+
+  def test_extract_data_3(self):
+    expected = []
+
+    data = {
+      'a': []
+    }
+
+    path = ['a']
+
+    self.assertEqual(extract_data(path, data), expected)
+
+class TestFlattenDict(unittest.TestCase):
+  def tests_flatten_dict_1(self):
+    expected = {
+      'x': 1,
+      'a_b_c': 10,
+      'd_e': 'hello',
+      'd_f': 'world',
+      'foo': True
+    }
+
+    data = {
+      'x': 1,
+      'a': {
+        'b': {
+          'c': 10
+        }
+      },
+      'd': {
+        'e': 'hello',
+        'f': 'world'
+      },
+      'foo': True
+    }
+
+    self.assertEqual(flatten_dict(data), expected)
