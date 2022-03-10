@@ -1,6 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Optional
+from datetime import datetime
+from enum import Enum
+import math
+from typing import Any, Optional
 from functools import partial, reduce
 
 from pipe import dedup, groupby, map, traverse, where
@@ -202,3 +205,94 @@ def df_of_json(
     case (_, True):
       dfs = list(dfs | map(lambda df: fmt_cols(df, col_map)))
       return pd.concat(dfs, ignore_index=True)
+
+
+class TimeseriesInterval(str, Enum):
+  HOUR = 'H'
+  DAY = 'D'
+  WEEK = 'W-SUN'
+  MONTH = 'MS'
+
+
+class AggregateMethod(str, Enum):
+  MEAN = 'mean'
+  SUM = 'sum'
+  FIRST = 'first'
+  LAST = 'last'
+  MEDIAN = 'median'
+  MIN = 'min'
+  MAX = 'max'
+  COUNT = 'count'
+
+
+class NaInterpolationMethod(str, Enum):
+  FORDWARD_FILL = 'ffill'
+  BACKWARD_FILL = 'bfill'
+
+
+def timeseries_of_df(
+  df: pd.DataFrame,
+  x: FieldPath,
+  y: FieldPath | list[FieldPath],
+  interval: TimeseriesInterval,
+  aggregation: AggregateMethod | list[AggregateMethod],
+  na_fill: Optional[NaInterpolationMethod | Any | list[NaInterpolationMethod | Any]] = None,
+):
+  def _last_day_of_month(any_day):
+    next_month = any_day.replace(day=28) + datetime.timedelta(days=4)
+    return next_month - datetime.timedelta(days=next_month.day)
+
+  if len(df) == 0:
+    return df
+
+  tmin = df.index.min()
+  tmax = df.index.max()
+
+  match interval:
+    case TimeseriesInterval.HOUR:
+      tmin = pd.to_datetime(math.floor(tmin / 3600) * 3600, unit='s')
+      tmax = pd.to_datetime(math.ceil(tmax / 3600) * 3600, unit='s')
+
+    case TimeseriesInterval.DAY:
+      tmin = pd.to_datetime(math.floor(tmin / 86400) * 86400, unit='s')
+      tmax = pd.to_datetime(math.ceil(tmax / 86400) * 86400, unit='s')
+
+    case TimeseriesInterval.WEEK:
+      tmin = pd.to_datetime(math.floor(tmin / 86400) * 86400, unit='s')
+      tmax = pd.to_datetime(math.ceil(tmax / 86400) * 86400, unit='s')
+      if tmin.weekday() != 0:
+        tmin += pd.offsets.Day(6 - tmin.weekday())
+      if tmax.weekday() != 0:
+        tmax += pd.offsets.Day(6 - tmax.weekday())
+
+    case TimeseriesInterval.MONTH:
+      tmin = pd.to_datetime(math.floor(tmin / 86400) * 86400, unit='s')
+      tmax = pd.to_datetime(math.ceil(tmax / 86400) * 86400, unit='s')
+      tmin = tmin.replace(day=1)
+      tmax = _last_day_of_month(tmax)
+
+  df.index = pd.to_datetime(df.index, unit='s')
+
+  ts = pd.DataFrame()
+  idx = pd.date_range(start=tmin, end=tmax, freq=interval, inclusive='left')
+  for i in range(len(y)):
+    resampler = df[y[i].longname].resample(interval)
+
+    agg = aggregation[i] if type(aggregation) == list else aggregation
+    col: pd.DataFrame = getattr(resampler, agg)()
+
+    na_fill = na_fill[i] if type(na_fill) == list else na_fill
+
+    match na_fill:
+      case None:
+        pass
+      case NaInterpolationMethod() as fill_method:
+        col.fillna(method=fill_method, inplace=True)
+        col = col.reindex(idx, method=fill_method)
+      case fill_value:
+        col.fillna(fill_value, inplace=True)
+        col = col.reindex(idx, fill_value=fill_value)
+
+    ts[y[i].longname] = col
+
+  return ts

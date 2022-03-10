@@ -9,7 +9,7 @@ import math
 from datetime import datetime
 
 import warnings
-from subgrounds.dataframe_utils import df_of_json
+from subgrounds.dataframe_utils import df_of_json, timeseries_of_df
 
 from subgrounds.utils import flatten_dict
 warnings.simplefilter('default')
@@ -270,9 +270,6 @@ class Subgrounds:
     if type(na_fill) == list and len(na_fill) != len(y):
       raise Exception(f'query_timeseries: len(na_fill) != len(y), {len(na_fill)} != {len(y)}')
 
-    # if type(na_fill_value) == list and len(na_fill_value) != len(y):
-    #   raise Exception(f'query_timeseries: len(na_fill_value) != len(y), {len(na_fill_value)} != {len(y)}')
-
     def _last_day_of_month(any_day):
       next_month = any_day.replace(day=28) + datetime.timedelta(days=4)
       return next_month - datetime.timedelta(days=next_month.day)
@@ -280,62 +277,15 @@ class Subgrounds:
     fpaths = list([x, y] | traverse)
     dfs = self.query_df(fpaths)
     df = dfs[0] if type(dfs) == list else dfs
-    df.set_index(x.longname, inplace=True)
 
-    if len(df) == 0:
-      return df
-
-    tmin = df.index.min()
-    tmax = df.index.max()
-
-    match interval:
-      case TimeseriesInterval.HOUR:
-        tmin = pd.to_datetime(math.floor(tmin / 3600) * 3600, unit='s')
-        tmax = pd.to_datetime(math.ceil(tmax / 3600) * 3600, unit='s')
-
-      case TimeseriesInterval.DAY:
-        tmin = pd.to_datetime(math.floor(tmin / 86400) * 86400, unit='s')
-        tmax = pd.to_datetime(math.ceil(tmax / 86400) * 86400, unit='s')
-
-      case TimeseriesInterval.WEEK:
-        tmin = pd.to_datetime(math.floor(tmin / 86400) * 86400, unit='s')
-        tmax = pd.to_datetime(math.ceil(tmax / 86400) * 86400, unit='s')
-        if tmin.weekday() != 0:
-          tmin += pd.offsets.Day(6 - tmin.weekday())
-        if tmax.weekday() != 0:
-          tmax += pd.offsets.Day(6 - tmax.weekday())
-
-      case TimeseriesInterval.MONTH:
-        tmin = pd.to_datetime(math.floor(tmin / 86400) * 86400, unit='s')
-        tmax = pd.to_datetime(math.ceil(tmax / 86400) * 86400, unit='s')
-        tmin = tmin.replace(day=1)
-        tmax = _last_day_of_month(tmax)
-
-    df.index = pd.to_datetime(df.index, unit='s')
-
-    ts = pd.DataFrame()
-    idx = pd.date_range(start=tmin, end=tmax, freq=interval, inclusive='left')
-    for i in range(len(y)):
-      resampler = df[y[i].longname].resample(interval)
-
-      agg = aggregation[i] if type(aggregation) == list else aggregation
-      col: pd.DataFrame = getattr(resampler, agg)()
-
-      na_fill = na_fill[i] if type(na_fill) == list else na_fill
-
-      match na_fill:
-        case None:
-          pass
-        case NaInterpolationMethod() as fill_method:
-          col.fillna(method=fill_method, inplace=True)
-          col = col.reindex(idx, method=fill_method)
-        case fill_value:
-          col.fillna(fill_value, inplace=True)
-          col = col.reindex(idx, fill_value=fill_value)
-
-      ts[y[i].longname] = col
-
-    return ts
+    return timeseries_of_df(
+      df,
+      x,
+      y,
+      interval,
+      aggregation,
+      na_fill
+    )
 
 
 def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:

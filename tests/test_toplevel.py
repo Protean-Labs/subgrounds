@@ -6,3 +6,10 @@ from subgrounds.subgraph import SyntheticField
 
 from subgrounds.subgrounds import Subgrounds
 
+
+class TimeseriesTests(unittest):
+  def test_timeseries_(self):
+    pass
+
+
+  # pass
