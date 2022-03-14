@@ -19,7 +19,9 @@ class TestQueryTransform(unittest.TestCase):
         'amount0In': 0.25,
         'amount0Out': 0.0,
         'amount1In': 0.0,
-        'amount1Out': 89820.904371079570860909
+        'amount1Out': 89820.904371079570860909,
+        'id': '0xf457e61e2aa310c8a7f01570bf96f24323fc317925c42f2a33d2061e1944df4d-0',
+        'timestamp': '1638554699'
       }]
     }]
 
@@ -30,7 +32,13 @@ class TestQueryTransform(unittest.TestCase):
         url='https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
         query=Query(None, [
           Selection(
-            fmeta=TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+            fmeta=TypeMeta.FieldMeta('swaps', '', [
+              TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+              TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+              TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+            ], TypeRef.non_null_list('Swap')),
             alias=None,
             arguments=[
               Argument('first', InputValue.Int(1)),
@@ -63,11 +71,13 @@ class TestQueryTransform(unittest.TestCase):
   def test_roundtrip2(self):
     expected = [{
       'swaps': [{
-        'price0': 359283.61748431827,
         'amount0In': 0.25,
         'amount0Out': 0.0,
         'amount1In': 0.0,
-        'amount1Out': 89820.904371079570860909
+        'amount1Out': 89820.904371079570860909,
+        'price0': 359283.61748431827,
+        'id': '0xf457e61e2aa310c8a7f01570bf96f24323fc317925c42f2a33d2061e1944df4d-0',
+        'timestamp': '1638554699'
       }]
     }]
 
@@ -98,7 +108,13 @@ class TestQueryTransform(unittest.TestCase):
 
     query = Query(name=None, selection=[
       Selection(
-        TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+        TypeMeta.FieldMeta('swaps', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+        ], TypeRef.non_null_list('Swap')),
         None,
         [
           Argument('first', InputValue.Int(1)),
@@ -131,19 +147,21 @@ class TestQueryTransform(unittest.TestCase):
     expected = [{
       'x5847f08709be4c59': [
         {
-          'id': '0xf7b4c5bfaa6194720d984785827a2b325bd4851cc1735550664ce8d50bf40cf4:2',
           'amount': 52627231563,
           'reserve': {
             'decimals': 6
           },
+          'id': '0xf7b4c5bfaa6194720d984785827a2b325bd4851cc1735550664ce8d50bf40cf4:2',
+          'timestamp': 1642019921,
           'adjusted_amount': 52627.231563
         },
         {
-          'id': '0x4f05a63d43d0654d4649eafd319040b688ac4805aca0341f587e77db112875e2:2',
           'amount': 9000000000,
           'reserve': {
             'decimals': 6
           },
+          'id': '0x4f05a63d43d0654d4649eafd319040b688ac4805aca0341f587e77db112875e2:2',
+          'timestamp': 1642019909,
           'adjusted_amount': 9000.0
         },
       ]
@@ -174,21 +192,23 @@ class TestQueryTransform(unittest.TestCase):
     expected = [{
       'x5847f08709be4c59': [
         {
-          'id': '0xf7b4c5bfaa6194720d984785827a2b325bd4851cc1735550664ce8d50bf40cf4:2',
           'amount': 52627231563,
           'reserve': {
             'decimals': 6,
             'symbol': 'USDC'
           },
+          'id': '0xf7b4c5bfaa6194720d984785827a2b325bd4851cc1735550664ce8d50bf40cf4:2',
+          'timestamp': 1642019921,
           'adjusted_amount': 52627.231563
         },
         {
-          'id': '0x4f05a63d43d0654d4649eafd319040b688ac4805aca0341f587e77db112875e2:2',
           'amount': 9000000000,
           'reserve': {
             'decimals': 6,
             'symbol': 'USDC'
           },
+          'id': '0x4f05a63d43d0654d4649eafd319040b688ac4805aca0341f587e77db112875e2:2',
+          'timestamp': 1642019909,
           'adjusted_amount': 9000.0
         },
       ]

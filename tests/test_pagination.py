@@ -234,10 +234,10 @@ class TestPreprocessDocument(unittest.TestCase):
         ]
       )),
       [
-        PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('Int'), ['pairs'], [
-          PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('Int'), ['pairs', 'swaps'], [])
+        PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [
+          PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'swaps'], [])
         ]),
-        PaginationNode(2, 'id', 100, 0, None, TypeRef.Named('Int'), ['swaps'], [])
+        PaginationNode(2, 'id', 100, 0, None, TypeRef.Named('String'), ['swaps'], [])
       ]
     )
 
@@ -255,6 +255,7 @@ class TestPreprocessDocument(unittest.TestCase):
               fmeta=TypeMeta.FieldMeta('swaps', '', [
                 TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
                 TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
               ], TypeRef.non_null_list('Swap')),
               selection=[
                 Selection(

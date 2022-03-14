@@ -33,11 +33,18 @@ class TestAddType(unittest.TestCase):
       'Query': TypeMeta.ObjectMeta('Query', '', fields=[
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
-        TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+        TypeMeta.FieldMeta('swaps', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+        ], TypeRef.non_null_list('Swap')),
       ]),
       'Swap': TypeMeta.ObjectMeta('Swap', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
@@ -63,6 +70,8 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float'))
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
@@ -75,7 +84,18 @@ class TestAddType(unittest.TestCase):
       'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
         TypeMeta.EnumValueMeta('id', ''),
         TypeMeta.EnumValueMeta('reserveUSD', '')
-      ])
+      ]),
+      'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('amount0In', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount0Out', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount1In', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount1Out', '', TypeRef.Named('BigDecimal'), None),
+      ]),
     })
 
     Pair = self.subgraph.Pair
@@ -97,11 +117,18 @@ class TestAddType(unittest.TestCase):
       'Query': TypeMeta.ObjectMeta('Query', '', fields=[
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
-        TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+        TypeMeta.FieldMeta('swaps', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+        ], TypeRef.non_null_list('Swap')),
       ]),
       'Swap': TypeMeta.ObjectMeta('Swap', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
@@ -127,6 +154,8 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float'))
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
@@ -139,7 +168,18 @@ class TestAddType(unittest.TestCase):
       'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
         TypeMeta.EnumValueMeta('id', ''),
         TypeMeta.EnumValueMeta('reserveUSD', '')
-      ])
+      ]),
+      'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('amount0In', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount0Out', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount1In', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount1Out', '', TypeRef.Named('BigDecimal'), None),
+      ]),
     })
 
     Pair = self.subgraph.Pair
@@ -161,11 +201,18 @@ class TestAddType(unittest.TestCase):
       'Query': TypeMeta.ObjectMeta('Query', '', fields=[
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
-        TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+        TypeMeta.FieldMeta('swaps', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+        ], TypeRef.non_null_list('Swap')),
       ]),
       'Swap': TypeMeta.ObjectMeta('Swap', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
@@ -192,6 +239,8 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveEUR', '', [], TypeRef.Named('Float')),
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
@@ -204,7 +253,18 @@ class TestAddType(unittest.TestCase):
       'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
         TypeMeta.EnumValueMeta('id', ''),
         TypeMeta.EnumValueMeta('reserveUSD', '')
-      ])
+      ]),
+      'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('amount0In', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount0Out', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount1In', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount1Out', '', TypeRef.Named('BigDecimal'), None),
+      ]),
     })
 
     Pair = self.subgraph.Pair
@@ -227,11 +287,18 @@ class TestAddType(unittest.TestCase):
       'Query': TypeMeta.ObjectMeta('Query', '', fields=[
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
         ], TypeRef.non_null_list('Pair')),
-        TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+        TypeMeta.FieldMeta('swaps', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+        ], TypeRef.non_null_list('Swap')),
       ]),
       'Swap': TypeMeta.ObjectMeta('Swap', '', fields=[
         TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
@@ -257,6 +324,8 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('tokenString', '', [], TypeRef.Named('String')),
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
@@ -269,7 +338,18 @@ class TestAddType(unittest.TestCase):
       'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
         TypeMeta.EnumValueMeta('id', ''),
         TypeMeta.EnumValueMeta('reserveUSD', '')
-      ])
+      ]),
+      'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('amount0In', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount0Out', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount1In', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('amount1Out', '', TypeRef.Named('BigDecimal'), None),
+      ]),
     })
 
     Pair = self.subgraph.Pair
@@ -464,6 +544,7 @@ class TestFieldPath(unittest.TestCase):
           },
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -498,10 +579,11 @@ class TestFieldPath(unittest.TestCase):
           },
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair'))
+          ], TypeRef.non_null_list('Pair')),
         )
       ]
     )
@@ -542,6 +624,7 @@ class TestFieldPath(unittest.TestCase):
           # ],
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -576,10 +659,11 @@ class TestFieldPath(unittest.TestCase):
           None,
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair'))
+          ], TypeRef.non_null_list('Pair')),
         ),
         (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
         (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
@@ -608,6 +692,7 @@ class TestQueryBuilding(unittest.TestCase):
       Selection(
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -641,6 +726,7 @@ class TestQueryBuilding(unittest.TestCase):
       Selection(
         TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
           TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
           TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -674,7 +760,13 @@ class TestQueryBuilding(unittest.TestCase):
 
   def test_mk_request_3(self):
     expected = DataRequest.single_query("", Query(selection=[
-      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), selection=[
+      Selection(TypeMeta.FieldMeta('swaps', '', [
+        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+        TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+        TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+      ], TypeRef.non_null_list('Swap')), selection=[
         Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
         Selection(TypeMeta.FieldMeta('price', '', [], TypeRef.Named('Float')))
       ])
@@ -696,7 +788,13 @@ class TestQueryBuilding(unittest.TestCase):
 
   def test_mk_request_4(self):
     expected = DataRequest.single_query("", Query(selection=[
-      Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), selection=[
+      Selection(TypeMeta.FieldMeta('swaps', '', [
+        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+        TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+        TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+      ], TypeRef.non_null_list('Swap')), selection=[
         Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
         Selection(TypeMeta.FieldMeta('my_value', '', [], TypeRef.Named('Float')))
       ])

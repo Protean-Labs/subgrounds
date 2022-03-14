@@ -21,11 +21,18 @@ def schema():
     'Query': TypeMeta.ObjectMeta('Query', '', fields=[
       TypeMeta.FieldMeta('pairs', '', [
         TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
         TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
         TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
         TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
       ], TypeRef.non_null_list('Pair')),
-      TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+      TypeMeta.FieldMeta('swaps', '', [
+        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+        TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+        TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+      ], TypeRef.non_null_list('Swap')),
     ]),
     'Swap': TypeMeta.ObjectMeta('Swap', '', fields=[
       TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
@@ -68,9 +75,9 @@ def schema():
     'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
       TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
       TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('String'), None),
+      TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
+      TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
+      TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
       TypeMeta.ArgumentMeta('amount0In', '', TypeRef.Named('BigDecimal'), None),
       TypeMeta.ArgumentMeta('amount0Out', '', TypeRef.Named('BigDecimal'), None),
       TypeMeta.ArgumentMeta('amount1In', '', TypeRef.Named('BigDecimal'), None),

@@ -2,13 +2,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial, reduce
-from re import L
 from typing import Any, Callable, Optional, Tuple
 from pipe import map, traverse, where, take, take_while
 import math
-
-import logging
-logger = logging.getLogger('subgrounds')
 
 from subgrounds.schema import (
   TypeMeta,
@@ -18,12 +14,15 @@ from subgrounds.schema import (
 )
 from subgrounds.utils import extract_data, filter_none, identity, rel_complement, union
 
+import logging
+logger = logging.getLogger('subgrounds')
+
 
 # ================================================================
 # Query definitions, data structures and types
 # ================================================================
 class InputValue:
-  @dataclass(frozen=True)
+  # @dataclass(frozen=True)
   class T(ABC):
     @property
     @abstractmethod
@@ -209,18 +208,19 @@ class Selection:
   @property
   def data_path(self) -> list[str]:
     match self:
-      case Selection(TypeMeta.FieldMeta(name), None, _, []) | Selection(TypeMeta.FieldMeta(_), name, _, []):
+      case Selection(TypeMeta.FieldMeta(name), None, _, []) | Selection(TypeMeta.FieldMeta(_), str() as name, _, []):
         return [name]
-      case Selection(TypeMeta.FieldMeta(name), None, _, [inner_select, *_]) | Selection(TypeMeta.FieldMeta(_), name, _, [inner_select, *_]):
+      case Selection(TypeMeta.FieldMeta(name), None, _, [inner_select, *_]) | Selection(TypeMeta.FieldMeta(_), str() as name, _, [inner_select, *_]):
         return [name] + inner_select.data_path
+    assert False
 
   @property
   def data_paths(self) -> list[list[str]]:
     def f(select: Selection, keys: list[str] = []):
       match select:
-        case Selection(TypeMeta.FieldMeta(name), None, _, []) | Selection(TypeMeta.FieldMeta(_), name, _, []):
+        case Selection(TypeMeta.FieldMeta(name), None, _, []) | Selection(TypeMeta.FieldMeta(_), str() as name, _, []):
           yield [*keys, name]
-        case Selection(TypeMeta.FieldMeta(name), None, _, inner) | Selection(TypeMeta.FieldMeta(_), name, _, inner):
+        case Selection(TypeMeta.FieldMeta(name), None, _, inner) | Selection(TypeMeta.FieldMeta(_), str() as name, _, inner):
           for select in inner:
             yield from f(select, keys=[*keys, name])
 

@@ -98,7 +98,7 @@ def preprocess_selection(
   Returns:
       Tuple[Selection, PaginationNode]: _description_
   """
-  
+
   # 'Folding' function to recursively apply `preprocess_selection` to `select`'s inner selections
   def fold(
     acc: Tuple[list[Selection], list[PaginationNode]],
@@ -108,7 +108,8 @@ def preprocess_selection(
     return ([*acc[0], new_select], [*acc[1], pagination_node])
 
   # Compute nested nromalized selections and pagination nodes
-  new_selections, pagination_nodes = reduce(fold, select.selection, ([], []))
+  acc0: Tuple[list[Selection], list[PaginationNode]] = ([], [])
+  new_selections, pagination_nodes = reduce(fold, select.selection, acc0)
 
   if select.fmeta.type_.is_list:
     # Add id to selection if not already present
@@ -145,6 +146,14 @@ def preprocess_selection(
       order_by_val = 'id'
     else:
       order_by_val = order_by_arg.value.value
+
+      # Add `order_by_val` field to selection if not already present
+      try:
+        next(new_selections | where(lambda select: select.fmeta.name == order_by_val))
+      except StopIteration:
+        select_type: TypeMeta.ObjectMeta = schema.type_of_typeref(select.fmeta.type_)        
+        new_selections.append(Selection(fmeta=TypeMeta.FieldMeta(order_by_val, '', [], select_type.type_of_field(order_by_val))))
+
     new_args.append(order_by_arg)
 
     # Check if `orderDirection` argument is provided. If not, set it to `asc`.
@@ -161,7 +170,7 @@ def preprocess_selection(
     # E.g.: if `orderBy` is `foo` and `orderDirection` is `asc`, then `filtering_arg` will be `foo_gt`
     filtering_arg = '{}_{}'.format(order_by_val, 'gt' if order_direction_val == 'asc' else 'lt')
 
-    where_arg = select.get_argument('where', recurse=False)
+    where_arg: Argument | None = select.get_argument('where', recurse=False)
     if where_arg is None:
       where_arg = Argument(name='where', value=InputValue.Object({
         filtering_arg: InputValue.Variable(f'lastOrderingValue{n}')
@@ -182,7 +191,7 @@ def preprocess_selection(
     # Find type of filter argument
     t: TypeRef.T = select.fmeta.type_of_arg('where')
     where_arg_type: TypeMeta.InputObjectMeta = schema.type_of_typeref(t)
-    filtering_arg_type: TypeRef.T = where_arg_type.type_of_arg(filtering_arg)
+    filtering_arg_type: TypeRef.T = where_arg_type.type_of_input_field(filtering_arg)
 
     return (
       Selection(
@@ -428,7 +437,7 @@ def trim_document(document: Document, pagination_args: dict[str, int]) -> Docume
         selection.arguments,
         list(selection.selection | map(trim_selection) | where(lambda val: val is not None))
       )
-  
+
   return Document(
     url=document.url,
     query=Query(

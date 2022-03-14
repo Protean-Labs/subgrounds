@@ -134,12 +134,15 @@ class TypeMeta:
       except StopIteration:
         return False
 
-    def type_of_arg(self: TypeMeta.FieldMeta, argname: str) -> Optional[TypeRef.T]:
+    def type_of_arg(self: TypeMeta.FieldMeta, argname: str) -> TypeRef.T:
       try:
-        arg = next(self.arguments | where(lambda argmeta: argmeta.name == argname))
-        return arg.type_
+        return next(
+          self.arguments
+          | where(lambda argmeta: argmeta.name == argname)
+          | map(lambda arg: arg.type_)
+        )
       except StopIteration:
-        None
+        raise Exception(f'TypeMeta.FieldMeta.type_of_arg: no argument named {argname} for field {self.name}')
 
   @dataclass
   class ScalarMeta(T):
@@ -153,6 +156,16 @@ class TypeMeta:
     @property
     def is_object(self) -> bool:
       return True
+
+    def type_of_field(self: TypeMeta.ObjectMeta, fname: str) -> TypeRef.T:
+      try:
+        return next(
+          self.fields
+          | where(lambda fmeta: fmeta.name == fname)
+          | map(lambda fmeta: fmeta.type_)
+        )
+      except StopIteration:
+        raise Exception(f'TypeMeta.ObjectMeta.type_of_field: no field named {fname} for object {self.name}')
 
   @dataclass
   class EnumValueMeta(T):
@@ -170,6 +183,16 @@ class TypeMeta:
     def is_object(self) -> bool:
       return False
 
+    def type_of_field(self: TypeMeta.InterfaceMeta, fname: str) -> TypeRef.T:
+      try:
+        return next(
+          self.fields
+          | where(lambda fmeta: fmeta.name == fname)
+          | map(lambda fmeta: fmeta.type_)
+        )
+      except StopIteration:
+        raise Exception(f'TypeMeta.InterfaceMeta.type_of_field: no field named {fname} for interface {self.name}')
+
   @dataclass
   class UnionMeta(T):
     types: list[str]
@@ -178,11 +201,16 @@ class TypeMeta:
   class InputObjectMeta(T):
     input_fields: list[TypeMeta.ArgumentMeta]
 
-    def type_of_arg(self: TypeMeta.InputObjectMeta, argname: str) -> Optional[TypeRef.T]:
+    def type_of_input_field(self: TypeMeta.InputObjectMeta, fname: str) -> TypeRef.T:
       try:
-        return next(self.input_fields | where(lambda arg: arg.name == argname) | map(lambda arg: arg.type_))
+        return next(
+          self.input_fields
+          | where(lambda infield: infield.name == fname)
+          | map(lambda infield: infield.type_)
+        )
       except StopIteration:
-        return None
+        raise Exception(f'TypeMeta.InputObjectMeta.type_of_input_field: no input field named {fname} for input object {self.name}')
+
 
 @dataclass
 class SchemaMeta:
