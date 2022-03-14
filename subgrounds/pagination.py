@@ -414,18 +414,41 @@ def trim_document(document: Document, pagination_args: dict[str, int]) -> Docume
   Returns:
       Query: _description_
   """
+
+  def trim_where_input_object(input_object: InputValue.Object) -> InputValue.Object:
+    def f(keyval):
+      (key, value) = keyval
+      match value:
+        case InputValue.Variable(name) if name in pagination_args and pagination_args[name] is None:
+          return None
+        case _:
+          return (key, value)
+
+    return InputValue.Object(dict(
+      list(input_object.value.items())
+      | map(f)
+      | where(lambda keyval: keyval is not None)
+    ))
+
   def trim_selection(selection: Selection) -> Optional[Selection]:
     try:
       # Check if pagination node by checking for `first` argument
       arg = next(selection.arguments | where(lambda arg: arg.name == 'first'))
 
-      # Return selection if argument in curren page variables
+      # Return selection if argument in current page variables
       if arg.value.name in pagination_args:
         return Selection(
           selection.fmeta,
           selection.alias,
-          selection.arguments,
-          list(selection.selection | map(trim_selection) | where(lambda val: val is not None))
+          list(
+            selection.arguments
+            | map(lambda arg: Argument(name=arg.name, value=trim_where_input_object(arg.value)) if arg.name == 'where' else arg)
+          ),
+          list(
+            selection.selection
+            | map(trim_selection)
+            | where(lambda val: val is not None)
+          )
         )
       else:
         return None
@@ -435,7 +458,11 @@ def trim_document(document: Document, pagination_args: dict[str, int]) -> Docume
         selection.fmeta,
         selection.alias,
         selection.arguments,
-        list(selection.selection | map(trim_selection) | where(lambda val: val is not None))
+        list(
+          selection.selection
+          | map(trim_selection)
+          | where(lambda val: val is not None)
+        )
       )
 
   return Document(
