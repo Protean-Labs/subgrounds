@@ -67,11 +67,13 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float'))
+        TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')),
+        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float')),
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
@@ -80,14 +82,18 @@ class TestAddType(unittest.TestCase):
         TypeMeta.ArgumentMeta('priceToken0_gt', '', TypeRef.Named('BigDecimal'), None),
         TypeMeta.ArgumentMeta('priceToken1_lt', '', TypeRef.Named('BigDecimal'), None),
         TypeMeta.ArgumentMeta('priceToken1_gt', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('createdAtTimestamp_lt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('createdAtTimestamp_gt', '', TypeRef.Named('BigInt'), None),
       ]),
       'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
         TypeMeta.EnumValueMeta('id', ''),
-        TypeMeta.EnumValueMeta('reserveUSD', '')
+        TypeMeta.EnumValueMeta('reserveUSD', ''),
+        TypeMeta.EnumValueMeta('createdAtTimestamp', ''),
       ]),
       'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
         TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
         TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
         TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
@@ -151,11 +157,13 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float'))
+        TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')),
+        TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float')),
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
@@ -164,14 +172,18 @@ class TestAddType(unittest.TestCase):
         TypeMeta.ArgumentMeta('priceToken0_gt', '', TypeRef.Named('BigDecimal'), None),
         TypeMeta.ArgumentMeta('priceToken1_lt', '', TypeRef.Named('BigDecimal'), None),
         TypeMeta.ArgumentMeta('priceToken1_gt', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('createdAtTimestamp_lt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('createdAtTimestamp_gt', '', TypeRef.Named('BigInt'), None),
       ]),
       'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
         TypeMeta.EnumValueMeta('id', ''),
-        TypeMeta.EnumValueMeta('reserveUSD', '')
+        TypeMeta.EnumValueMeta('reserveUSD', ''),
+        TypeMeta.EnumValueMeta('createdAtTimestamp', ''),
       ]),
       'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
         TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
         TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
         TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
@@ -235,12 +247,14 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
+        TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')),
         TypeMeta.FieldMeta('reserveCAD', '', [], TypeRef.Named('Float')),
         TypeMeta.FieldMeta('reserveEUR', '', [], TypeRef.Named('Float')),
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
@@ -249,14 +263,18 @@ class TestAddType(unittest.TestCase):
         TypeMeta.ArgumentMeta('priceToken0_gt', '', TypeRef.Named('BigDecimal'), None),
         TypeMeta.ArgumentMeta('priceToken1_lt', '', TypeRef.Named('BigDecimal'), None),
         TypeMeta.ArgumentMeta('priceToken1_gt', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('createdAtTimestamp_lt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('createdAtTimestamp_gt', '', TypeRef.Named('BigInt'), None),
       ]),
       'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
         TypeMeta.EnumValueMeta('id', ''),
-        TypeMeta.EnumValueMeta('reserveUSD', '')
+        TypeMeta.EnumValueMeta('reserveUSD', ''),
+        TypeMeta.EnumValueMeta('createdAtTimestamp', ''),
       ]),
       'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
         TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
         TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
         TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
@@ -321,11 +339,13 @@ class TestAddType(unittest.TestCase):
         TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
         TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
+        TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')),
         TypeMeta.FieldMeta('tokenString', '', [], TypeRef.Named('String')),
       ]),
       'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
         TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
@@ -334,14 +354,18 @@ class TestAddType(unittest.TestCase):
         TypeMeta.ArgumentMeta('priceToken0_gt', '', TypeRef.Named('BigDecimal'), None),
         TypeMeta.ArgumentMeta('priceToken1_lt', '', TypeRef.Named('BigDecimal'), None),
         TypeMeta.ArgumentMeta('priceToken1_gt', '', TypeRef.Named('BigDecimal'), None),
+        TypeMeta.ArgumentMeta('createdAtTimestamp_lt', '', TypeRef.Named('BigInt'), None),
+        TypeMeta.ArgumentMeta('createdAtTimestamp_gt', '', TypeRef.Named('BigInt'), None),
       ]),
       'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
         TypeMeta.EnumValueMeta('id', ''),
-        TypeMeta.EnumValueMeta('reserveUSD', '')
+        TypeMeta.EnumValueMeta('reserveUSD', ''),
+        TypeMeta.EnumValueMeta('createdAtTimestamp', ''),
       ]),
       'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
         TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+        TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
         TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
         TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
         TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
@@ -374,6 +398,7 @@ class TestFieldPath(unittest.TestCase):
       TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
       TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
       TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
+      TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')),
     ])
 
     expected = Object(self.subgraph, object_)

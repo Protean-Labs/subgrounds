@@ -3,6 +3,7 @@ import unittest
 from subgrounds.client import query
 
 from subgrounds.pagination import (
+  ArgGeneratorFSM,
   PaginationNode,
   preprocess_document,
   trim_document,
@@ -15,7 +16,7 @@ from tests.utils import schema
 
 
 class TestPreprocessDocument(unittest.TestCase):
-  def test_pp_doc_no_args(self):
+  def test_normalize_doc_no_args(self):
     expected = (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
@@ -69,7 +70,7 @@ class TestPreprocessDocument(unittest.TestCase):
 
     self.assertEqual(preprocess_document(schema(), doc), expected)
 
-  def test_pp_doc_no_args_nested_1(self):
+  def test_normalize_doc_no_args_nested_1(self):
     expected = (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
@@ -154,7 +155,7 @@ class TestPreprocessDocument(unittest.TestCase):
 
     self.assertEqual(preprocess_document(schema(), doc), expected)
 
-  def test_pp_doc_no_args_nested_2(self):
+  def test_normalize_doc_no_args_nested_2(self):
     expected = (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
@@ -282,7 +283,7 @@ class TestPreprocessDocument(unittest.TestCase):
 
     self.assertEqual(preprocess_document(schema(), doc), expected)
 
-  def test_pp_doc_with_args_1(self):
+  def test_normalize_doc_first_arg(self):
     expected = (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
@@ -337,7 +338,7 @@ class TestPreprocessDocument(unittest.TestCase):
 
     self.assertEqual(preprocess_document(schema(), doc), expected)
 
-  def test_pp_doc_with_args_2(self):
+  def test_normalize_doc_skip_arg(self):
     expected = (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
@@ -392,7 +393,169 @@ class TestPreprocessDocument(unittest.TestCase):
 
     self.assertEqual(preprocess_document(schema(), doc), expected)
 
-  def test_pp_doc_key_path(self):
+  def test_normalize_doc_orderby_arg(self):
+    expected = (
+      Document(url='www.abc.xyz/graphql', query=Query(
+        name=None,
+        selection=[Selection(
+          fmeta=TypeMeta.FieldMeta('pairs', '', [
+            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+          ], TypeRef.non_null_list('Pair')),
+          arguments=[
+            Argument('first', InputValue.Variable('first0')),
+            Argument('skip', InputValue.Variable('skip0')),
+            Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
+            Argument('orderDirection', InputValue.Enum('asc')),
+            Argument('where', InputValue.Object({
+              'createdAtTimestamp_gt': InputValue.Variable('lastOrderingValue0')
+            })),
+          ],
+          selection=[
+            Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+            Selection(fmeta=TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')))
+          ]
+        )],
+        variables=[
+          VariableDefinition('first0', TypeRef.Named('Int')),
+          VariableDefinition('skip0', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue0', TypeRef.Named('BigInt')),
+        ]
+      )),
+      [PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])]
+    )
+
+    doc = Document(url='www.abc.xyz/graphql', query=Query(
+      name=None,
+      selection=[Selection(
+        fmeta=TypeMeta.FieldMeta('pairs', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+        ], TypeRef.non_null_list('Pair')),
+        arguments=[
+          Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
+        ],
+        selection=[
+          Selection(
+            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          )
+        ]
+      )]
+    ))
+
+    self.assertEqual(preprocess_document(schema(), doc), expected)
+
+  def test_normalize_doc_orderdir_arg(self):
+    expected = (
+      Document(url='www.abc.xyz/graphql', query=Query(
+        name=None,
+        selection=[Selection(
+          fmeta=TypeMeta.FieldMeta('pairs', '', [
+            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+          ], TypeRef.non_null_list('Pair')),
+          arguments=[
+            Argument('first', InputValue.Variable('first0')),
+            Argument('skip', InputValue.Variable('skip0')),
+            Argument('orderBy', InputValue.Enum('id')),
+            Argument('orderDirection', InputValue.Enum('desc')),
+            Argument('where', InputValue.Object({
+              'id_lt': InputValue.Variable('lastOrderingValue0')
+            })),
+          ],
+          selection=[
+            Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+          ]
+        )],
+        variables=[
+          VariableDefinition('first0', TypeRef.Named('Int')),
+          VariableDefinition('skip0', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        ]
+      )),
+      [PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])]
+    )
+
+    doc = Document(url='www.abc.xyz/graphql', query=Query(
+      name=None,
+      selection=[Selection(
+        fmeta=TypeMeta.FieldMeta('pairs', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+        ], TypeRef.non_null_list('Pair')),
+        arguments=[
+          Argument('orderDirection', InputValue.Enum('desc')),
+        ],
+        selection=[
+          Selection(
+            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          )
+        ]
+      )]
+    ))
+
+    self.assertEqual(preprocess_document(schema(), doc), expected)
+
+  def test_normalize_doc_orderby_orderdir_arg(self):
+    expected = (
+      Document(url='www.abc.xyz/graphql', query=Query(
+        name=None,
+        selection=[Selection(
+          fmeta=TypeMeta.FieldMeta('pairs', '', [
+            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+          ], TypeRef.non_null_list('Pair')),
+          arguments=[
+            Argument('first', InputValue.Variable('first0')),
+            Argument('skip', InputValue.Variable('skip0')),
+            Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
+            Argument('orderDirection', InputValue.Enum('desc')),
+            Argument('where', InputValue.Object({
+              'createdAtTimestamp_lt': InputValue.Variable('lastOrderingValue0')
+            })),
+          ],
+          selection=[
+            Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+            Selection(fmeta=TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')))
+          ]
+        )],
+        variables=[
+          VariableDefinition('first0', TypeRef.Named('Int')),
+          VariableDefinition('skip0', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue0', TypeRef.Named('BigInt')),
+        ]
+      )),
+      [PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])]
+    )
+
+    doc = Document(url='www.abc.xyz/graphql', query=Query(
+      name=None,
+      selection=[Selection(
+        fmeta=TypeMeta.FieldMeta('pairs', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+        ], TypeRef.non_null_list('Pair')),
+        arguments=[
+          Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
+          Argument('orderDirection', InputValue.Enum('desc')),
+        ],
+        selection=[
+          Selection(
+            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          )
+        ]
+      )]
+    ))
+
+    self.assertEqual(preprocess_document(schema(), doc), expected)
+
+  def test_normalize_doc_key_path(self):
     expected = (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
@@ -490,86 +653,256 @@ class TestPreprocessDocument(unittest.TestCase):
     self.assertEqual(preprocess_document(schema(), doc), expected)
 
 
-# class TestPaginationArgs(unittest.TestCase):
-#   def test_pagination_args_1(self):
-#     expected = [
-#       {'first0': 20, 'skip0': 0},
-#       {'first0': 20, 'skip0': 20},
-#       {'first0': 20, 'skip0': 40},
-#       {'first0': 20, 'skip0': 60},
-#       {'first0': 20, 'skip0': 80},
-#     ]
+class TestPaginationArgs(unittest.TestCase):
+  @staticmethod
+  def swaps_gen(pair_id, n):
+    for i in range(n):
+      yield {'id': f'swap_{pair_id}{i}', 'timestamp': i}
 
-#     page_nodes = [
-#       PaginationNode('first0', 'skip0', [], None, None, [])
-#     ]
+  @staticmethod
+  def users_gen(pair_id, n):
+    for i in range(n):
+      yield {'id': f'user_{pair_id}{i}', 'volume': i}
 
-#     self.assertEqual(pagination_args(page_nodes, 20), expected)
+  def __test_args(self, arg_gen, expected, data_and_fails):
+    for args, (data, fails) in zip(expected, data_and_fails):
+      self.assertEqual(arg_gen.args(), args)
 
-#   def test_pagination_args_2(self):
-#     expected = [
-#       {'first0': 20, 'skip0': 0},
-#       {'first0': 20, 'skip0': 20},
-#       {'first0': 20, 'skip0': 40},
-#       {'first0': 20, 'skip0': 60},
-#       {'first0': 20, 'skip0': 80},
-#       {'first1': 20, 'skip1': 0},
-#       {'first1': 20, 'skip1': 20},
-#       {'first1': 20, 'skip1': 40},
-#       {'first1': 20, 'skip1': 60},
-#       {'first1': 20, 'skip1': 80},
-#     ]
+      if fails:
+        with self.assertRaises(StopIteration):
+          arg_gen.step(data)
+      else:
+        arg_gen.step(data)
 
-#     page_nodes = [
-#       PaginationNode('first0', 'skip0', [], None, None, []),
-#       PaginationNode('first1', 'skip1', [], None, None, [])
-#     ]
+  def test_pagination_args_single_node_no_args_2pages(self):
+    expected = [
+      {'first0': 900, 'skip0': 0, 'lastOrderingValue0': None},
+      {'first0': 200, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'}
+    ]
 
-#     self.assertEqual(pagination_args(page_nodes, 20), expected)
+    data_and_fails = [
+      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}, False),
+      ({'swaps': []}, True)
+    ]
 
-#   def test_pagination_args_nested(self):
-#     expected = [
-#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 0},
-#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 20},
-#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 40},
-#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 60},
-#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 80},
-#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 0},
-#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 20},
-#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 40},
-#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 60},
-#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 80},
-#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 0},
-#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 20},
-#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 40},
-#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 60},
-#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 80},
-#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 0},
-#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 20},
-#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 40},
-#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 60},
-#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 80},
-#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 0},
-#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 20},
-#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 40},
-#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 60},
-#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 80},
-#       {'first2': 20, 'skip2': 0},
-#       {'first2': 20, 'skip2': 20},
-#       {'first2': 20, 'skip2': 40},
-#       {'first2': 20, 'skip2': 60},
-#       {'first2': 20, 'skip2': 80},
-#     ]
+    page_node = PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=1100,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    )
 
-#     page_nodes = [
-#       PaginationNode('first1', 'skip1', [], InputValue.Int(5), None, [
-#         PaginationNode('first0', 'skip0', [], None, None, [])
-#       ]),
-#       PaginationNode('first2', 'skip2', [], None, None, [])
-#     ]
+    arg_gen = ArgGeneratorFSM(page_node)
 
-#     self.assertEqual(pagination_args(page_nodes, 20), expected)
+    self.__test_args(arg_gen, expected, data_and_fails)
 
+  def test_pagination_args_single_node_no_args_1page(self):
+    expected = [
+      {'first0': 900, 'skip0': 0, 'lastOrderingValue0': None},
+    ]
+
+    data_and_fails = [
+      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 10))}, True),
+    ]
+
+    page_node = PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=1100,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    )
+
+    arg_gen = ArgGeneratorFSM(page_node)
+
+    self.__test_args(arg_gen, expected, data_and_fails)
+
+  def test_pagination_args_single_node_no_args_1page_below_limit(self):
+    expected = [
+      {'first0': 100, 'skip0': 0, 'lastOrderingValue0': None},
+    ]
+
+    data_and_fails = [
+      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 100))}, True),
+    ]
+
+    page_node = PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=100,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    )
+
+    arg_gen = ArgGeneratorFSM(page_node)
+
+    self.__test_args(arg_gen, expected, data_and_fails)
+
+  def test_pagination_args_nested_no_args(self):
+    expected = [
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
+    ]
+
+    data_and_fails = [
+      ({'pairs': [{'id': 'a', 'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}]}, False),
+      ({'pairs': [{'id': 'a', 'swaps': list(TestPaginationArgs.swaps_gen('a', 100))}]}, False),
+      ({'pairs': [{'id': 'b', 'swaps': list(TestPaginationArgs.swaps_gen('b', 100))}]}, False),
+      ({'pairs': [{'id': 'c', 'swaps': list(TestPaginationArgs.swaps_gen('c', 10))}]}, False),
+      ({'pairs': [{'id': 'd', 'swaps': list(TestPaginationArgs.swaps_gen('d', 0))}]}, True),
+    ]
+
+    page_node = PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=4,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['pairs'],
+      inner=[
+        PaginationNode(
+          node_idx=1,
+          filter_field='timestamp',
+          first_value=7000,
+          skip_value=0,
+          filter_value=None,
+          filter_value_type=TypeRef.Named('BigInt'),
+          key_path=['pairs', 'swaps'],
+          inner=[]
+        )
+      ]
+    )
+
+    arg_gen = ArgGeneratorFSM(page_node)
+
+    self.__test_args(arg_gen, expected, data_and_fails)
+
+  def test_pagination_args_nested_no_args_2(self):
+    expected = [
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first2': 10, 'skip2': 0, 'lastOrderingValue2': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first2': 10, 'skip2': 0, 'lastOrderingValue2': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first2': 10, 'skip2': 0, 'lastOrderingValue2': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first2': 10, 'skip2': 0, 'lastOrderingValue2': None},
+    ]
+
+    data_and_fails = [
+      ({'pairs': [{'id': 'a', 'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}]}, False),
+      ({'pairs': [{'id': 'a', 'swaps': list(TestPaginationArgs.swaps_gen('a', 100))}]}, False),
+      ({'pairs': [{'id': 'a', 'users': list(TestPaginationArgs.users_gen('a', 9))}]}, False),
+      ({'pairs': [{'id': 'b', 'swaps': list(TestPaginationArgs.swaps_gen('b', 100))}]}, False),
+      ({'pairs': [{'id': 'b', 'users': list(TestPaginationArgs.users_gen('b', 9))}]}, False),
+      ({'pairs': [{'id': 'c', 'swaps': list(TestPaginationArgs.swaps_gen('c', 10))}]}, False),
+      ({'pairs': [{'id': 'c', 'users': list(TestPaginationArgs.users_gen('c', 10))}]}, False),
+      ({'pairs': [{'id': 'd', 'swaps': list(TestPaginationArgs.swaps_gen('d', 0))}]}, False),
+      ({'pairs': [{'id': 'd', 'users': list(TestPaginationArgs.users_gen('d', 5))}]}, True),
+    ]
+
+    page_node = PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=4,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['pairs'],
+      inner=[
+        PaginationNode(
+          node_idx=1,
+          filter_field='timestamp',
+          first_value=7000,
+          skip_value=0,
+          filter_value=None,
+          filter_value_type=TypeRef.Named('BigInt'),
+          key_path=['pairs', 'swaps'],
+          inner=[],
+        ),
+        PaginationNode(
+          node_idx=2,
+          filter_field='volume',
+          first_value=10,
+          skip_value=0,
+          filter_value=None,
+          filter_value_type=TypeRef.Named('BigInt'),
+          key_path=['pairs', 'users'],
+          inner=[],
+        ),
+      ]
+    )
+
+    arg_gen = ArgGeneratorFSM(page_node)
+
+    self.__test_args(arg_gen, expected, data_and_fails)
+
+  def test_pagination_args_single_node_skip_arg(self):
+    expected = [
+      {'first0': 900, 'skip0': 10, 'lastOrderingValue0': None},
+      {'first0': 600, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'},
+    ]
+
+    data_and_fails = [
+      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}, False),
+      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 500))}, True),
+    ]
+
+    page_node = PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=1500,
+      skip_value=10,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    )
+
+    arg_gen = ArgGeneratorFSM(page_node)
+
+    self.__test_args(arg_gen, expected, data_and_fails)
+
+  def test_pagination_args_single_node_filter_arg(self):
+    expected = [
+      {'first0': 900, 'skip0': 0, 'lastOrderingValue0': '0'},
+      {'first0': 600, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'},
+    ]
+
+    data_and_fails = [
+      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}, False),
+      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 500))}, True),
+    ]
+
+    page_node = PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=1500,
+      skip_value=0,
+      filter_value='0',
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    )
+
+    arg_gen = ArgGeneratorFSM(page_node)
+
+    self.__test_args(arg_gen, expected, data_and_fails)
 
 # class TestTrimDocument(unittest.TestCase):
 #   def test_trim_docs_1(self):
