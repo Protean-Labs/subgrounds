@@ -50,6 +50,8 @@ def schema():
       TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
     ]),
     'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
+      TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+      TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
       TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
       TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
       TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
@@ -62,7 +64,18 @@ def schema():
     'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
       TypeMeta.EnumValueMeta('id', ''),
       TypeMeta.EnumValueMeta('reserveUSD', '')
-    ])
+    ]),
+    'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
+      TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+      TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
+      TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('String'), None),
+      TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('String'), None),
+      TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('String'), None),
+      TypeMeta.ArgumentMeta('amount0In', '', TypeRef.Named('BigDecimal'), None),
+      TypeMeta.ArgumentMeta('amount0Out', '', TypeRef.Named('BigDecimal'), None),
+      TypeMeta.ArgumentMeta('amount1In', '', TypeRef.Named('BigDecimal'), None),
+      TypeMeta.ArgumentMeta('amount1Out', '', TypeRef.Named('BigDecimal'), None),
+    ]),
   })
 
 

@@ -177,7 +177,7 @@ class Selection:
 
   @property
   def key(self):
-    if self.alias:
+    if self.alias is not None:
       return self.alias
     else:
       return self.fmeta.name
@@ -237,7 +237,7 @@ class Selection:
     match select:
       case Selection(_, _, _, [] | None):
         return [select]
-      case Selection(fmeta, alias, args, inner_select):       
+      case Selection(fmeta, alias, args, inner_select):
         return list(inner_select | map(Selection.split) | traverse | map(lambda inner_select: Selection(fmeta, alias, args, inner_select)))
 
   def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
@@ -277,6 +277,31 @@ class Selection:
         combine=combine
       ))
     )
+
+  def variable_args(self: Selection, recurse: bool = True) -> list[Argument]:
+    var_args = list(self.arguments | where(lambda arg: type(arg.value) == InputValue.Variable))
+    return list(self.selection | map(Selection.variable_args) | traverse) + var_args
+
+  def infer_variable_definitions(self: Selection) -> list[VariableDefinition]:
+    def vardef_of_arg(arg):
+      match arg:
+        case Argument(name=argname, value=InputValue.Variable(name=varname)):
+          return VariableDefinition(varname, self.fmeta.type_of(argname))
+
+        case Argument(name=argname, value=InputValue.Object(fields)):
+          return list(
+            fields.values()
+            | where(lambda iv: type(iv) == InputValue.Variable)
+            | map(lambda iv: VariableDefinition(iv.name, self.fmeta.type_of(argname)))
+          )
+
+        case _:
+          return []
+
+    var_defs = list(self.arguments | map(vardef_of_arg) | traverse)
+
+    return list(self.selection | map(Selection.infer_variable_definitions) | traverse) + var_defs
+
 
   @staticmethod
   def remove_selection(select: Selection, selection_to_remove: Selection) -> Selection:
@@ -320,42 +345,116 @@ class Selection:
     else:
       return False
 
-  @staticmethod
-  def contains_argument(select: Selection, arg_name: str) -> bool:
+  def contains_argument(self: Selection, arg_name: str) -> bool:
     try:
-      next(filter(lambda arg: arg.name == arg_name, select.arguments))
+      next(filter(lambda arg: arg.name == arg_name, self.arguments))
       return True
     except StopIteration:
-      return any(select.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
+      return any(
+        self.selection
+        | map(partial(Selection.contains_argument, arg_name=arg_name))
+      )
 
-  @staticmethod
-  def get_argument(select: Selection, target: str) -> Optional[Argument]:
+  def get_argument(
+    self: Selection,
+    argname: str,
+    recurse: bool = True
+  ) -> Optional[Argument]:
+    """ Returns an Argument object corresponding to the argument in the Selection object 
+    `select` with name `argname`. If `select` does not contain such an argument and `recurse` 
+    is True, then the function is called recursively on `select`'s inner selections. If 
+    no such argument is found in `select` or its inner selections, then the function 
+    returns `None`
+
+    Args:
+      select (Selection): The selection to scan
+      argname (str): The name of the argument to find
+      recurse (bool, optional): Flag indicating whether or not the function should be run recursively. Defaults to True.
+
+    Returns:
+      Optional[Argument]: The argument in `select` with name `argname` ir it exists, otherwise None
+    """
     try:
-      return next(select.arguments | where(lambda arg: arg.name == target))
+      return next(self.arguments | where(lambda arg: arg.name == argname))
     except StopIteration:
-      try:
-        return next(
-          select.selection 
-          | map(partial(Selection.get_argument, target=target))
-          | where(lambda x: x is not None)
-        )
-      except StopIteration:
+      if recurse:
+        try:
+          return next(
+            self.selection
+            | map(partial(Selection.get_argument, argname=argname))
+            | where(lambda x: x is not None)
+          )
+        except StopIteration:
+          return None
+      else:
+        return None
+
+  def get_argument_by_variable(
+    self: Selection,
+    varname: str,
+    recurse: bool = True
+  ) -> Optional[Argument]:
+    """ Returns an Argument object corresponding to the argument in the Selection object 
+    `select` whose value is a variable named `varname`. If `select` does not contain such 
+    an argument and `recurse` is True, then the function is called recursively on `select`'s 
+    inner selections. If no such argument is found in `select` or its inner selections, then 
+    the function returns `None`
+
+    Args:
+      select (Selection): The selection to scan
+      argname (str): The name of the argument to find
+      recurse (bool, optional): Flag indicating whether or not the function should be run recursively. Defaults to True.
+
+    Returns:
+      Optional[Argument]: The argument in `select` with name `argname` ir it exists, otherwise None
+    """
+    try:
+      return next(self.arguments | where(lambda arg: arg.value.name == varname))
+    except StopIteration | AttributeError:
+      if recurse:
+        try:
+          return next(
+            self.selection
+            | map(partial(Selection.get_argument, varname=varname))
+            | where(lambda x: x is not None)
+          )
+        except StopIteration:
+          return None
+      else:
         return None
 
   @staticmethod
-  def substitute_arg(select: Selection, arg_name: str, replacement: Argument | list[Argument]) -> Selection:
+  def substitute_arg(
+    select: Selection,
+    argname: str,
+    replacement: Argument | list[Argument],
+    recurse: bool = True
+  ) -> Selection:
+    """ Returns a new Selection object containing the same data as `select` with the argument
+    named `argname` replaced with `replacement`. The function is recursive and the substitution
+    is also applied to `select`'s inner selection.
+
+    Args:
+      select (Selection): _description_
+      argname (str): _description_
+      replacement (Argument | list[Argument]): _description_
+      recurse (bool, optional): Flag indicating whether or not the function should be run recursively. Defaults to True.
+
+    Returns:
+      Selection: _description_
+    """
     return Selection(
       fmeta=select.fmeta,
       alias=select.alias,
       arguments=list(
         select.arguments
-        | map(lambda arg: replacement if arg.name == arg_name else arg)
+        | map(lambda arg: replacement if arg.name == argname else arg)
         | traverse
       ),
       selection=list(
         select.selection
-        | map(partial(Selection.substitute_arg, arg_name=arg_name, replacement=replacement))
-      )
+        | map(partial(Selection.substitute_arg, argname=argname, replacement=replacement))
+      ) if recurse else select.selection
     )
 
   def select(self: Selection, other: Selection) -> Selection:
@@ -409,6 +508,9 @@ class Query:
       args_str = ''
 
     return f'query{args_str} {{\n{selection_str}\n}}'
+
+  def infer_variable_definitions(self: Selection) -> list[VariableDefinition]:
+    return list(self.selection | map(Selection.infer_variable_definitions) | traverse)
 
   def add_selections(self: Query, new_selections: list[Selection]) -> Query:
     """ Returns a new Query containing all selections in 'query' along with

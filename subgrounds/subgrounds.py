@@ -84,7 +84,8 @@ class Subgrounds:
         list[dict]: The reponse data
     """
     def execute_document(doc: Document) -> dict:
-      return pagination.paginate(doc)
+      schema = next(self.subgraphs.values() | where(lambda sg: sg.url == doc.url) | map(lambda sg: sg.schema))
+      return pagination.paginate(schema, doc)
     
     def transform_doc(transforms: list[DocumentTransform], doc: Document) -> dict:
       logger.debug(f'execute.transform_doc: doc = \n{doc.graphql}')

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Optional
 
-from pipe import where
+from pipe import where, map
 
 
 # ================================================================
@@ -134,6 +134,13 @@ class TypeMeta:
       except StopIteration:
         return False
 
+    def type_of_arg(self: TypeMeta.FieldMeta, argname: str) -> Optional[TypeRef.T]:
+      try:
+        arg = next(self.arguments | where(lambda argmeta: argmeta.name == argname))
+        return arg.type_
+      except StopIteration:
+        None
+
   @dataclass
   class ScalarMeta(T):
     pass
@@ -171,6 +178,11 @@ class TypeMeta:
   class InputObjectMeta(T):
     input_fields: list[TypeMeta.ArgumentMeta]
 
+    def type_of_arg(self: TypeMeta.InputObjectMeta, argname: str) -> Optional[TypeRef.T]:
+      try:
+        return next(self.input_fields | where(lambda arg: arg.name == argname) | map(lambda arg: arg.type_))
+      except StopIteration:
+        return None
 
 @dataclass
 class SchemaMeta:
@@ -178,6 +190,10 @@ class SchemaMeta:
   type_map: dict[str, TypeMeta.T]
   mutation_type: Optional[str] = None
   subscription_type: Optional[str] = None
+
+  def type_of_typeref(self: SchemaMeta, typeref: TypeRef.T) -> TypeMeta.T:
+    tname = TypeRef.root_type_name(typeref)
+    return self.type_map[tname]
 
 
 # ================================================================

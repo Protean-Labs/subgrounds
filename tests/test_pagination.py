@@ -1,77 +1,20 @@
+from pprint import pp
 import unittest
 from subgrounds.client import query
 
 from subgrounds.pagination import (
   PaginationNode,
   preprocess_document,
-  pagination_args,
   trim_document,
   merge
 )
 from subgrounds.query import Argument, Document, InputValue, Query, Selection, VariableDefinition
 from subgrounds.schema import TypeMeta, TypeRef
 
-
-class TestPagintationNode(unittest.TestCase):
-  def test_page_node_args_1(self):
-    expected = [
-      {'first0': 20, 'skip0': 0},
-      {'first0': 20, 'skip0': 20},
-      {'first0': 20, 'skip0': 40},
-      {'first0': 20, 'skip0': 60},
-      {'first0': 20, 'skip0': 80},
-    ]
-
-    node = PaginationNode('first0', 'skip0', [], None, None, [])
-
-    self.assertEqual(node.args(20), expected)
-
-  def test_page_node_args_2(self):
-    expected = [
-      {'first0': 17, 'skip0': 0},
-      {'first0': 17, 'skip0': 17},
-      {'first0': 17, 'skip0': 34},
-      {'first0': 17, 'skip0': 51},
-      {'first0': 17, 'skip0': 68},
-      {'first0': 15, 'skip0': 85},
-    ]
-
-    node = PaginationNode('first0', 'skip0', [], None, None, [])
-
-    self.assertEqual(node.args(17), expected)
-
-  def test_page_node_args_nonzero_first(self):
-    expected = [
-      {'first0': 20, 'skip0': 0},
-      {'first0': 20, 'skip0': 20},
-      {'first0': 20, 'skip0': 40},
-      {'first0': 20, 'skip0': 60},
-      {'first0': 20, 'skip0': 80},
-      {'first0': 20, 'skip0': 100},
-      {'first0': 20, 'skip0': 120},
-      {'first0': 20, 'skip0': 140},
-      {'first0': 11, 'skip0': 160},
-    ]
-
-    node = PaginationNode('first0', 'skip0', [], InputValue.Int(171), None, [])
-
-    self.assertEqual(node.args(20), expected)
-
-  def test_page_node_args_nonzero_skip(self):
-    expected = [
-      {'first0': 20, 'skip0': 35},
-      {'first0': 20, 'skip0': 55},
-      {'first0': 20, 'skip0': 75},
-      {'first0': 20, 'skip0': 95},
-      {'first0': 20, 'skip0': 115},
-    ]
-
-    node = PaginationNode('first0', 'skip0', [], None, InputValue.Int(35), [])
-
-    self.assertEqual(node.args(20), expected)
+from tests.utils import schema
 
 
-class TestProprocessDocument(unittest.TestCase):
+class TestPreprocessDocument(unittest.TestCase):
   def test_pp_doc_no_args(self):
     expected = (
       Document(url='www.abc.xyz/graphql', query=Query(
@@ -80,20 +23,31 @@ class TestProprocessDocument(unittest.TestCase):
           fmeta=TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
           ], TypeRef.non_null_list('Pair')),
           arguments=[
             Argument('first', InputValue.Variable('first0')),
             Argument('skip', InputValue.Variable('skip0')),
+            Argument('orderBy', InputValue.Enum('id')),
+            Argument('orderDirection', InputValue.Enum('asc')),
+            Argument('where', InputValue.Object({
+              'id_gt': InputValue.Variable('lastOrderingValue0')
+            })),
           ],
           selection=[
             Selection(
               fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
             )
           ]
-        )]
+        )],
+        variables=[
+          VariableDefinition('first0', TypeRef.Named('Int')),
+          VariableDefinition('skip0', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        ]
       )),
       [
-        PaginationNode('first0', 'skip0', ['pairs'], None, None, [])
+        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
       ]
     )
 
@@ -103,6 +57,7 @@ class TestProprocessDocument(unittest.TestCase):
         fmeta=TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
         selection=[
           Selection(
@@ -112,7 +67,7 @@ class TestProprocessDocument(unittest.TestCase):
       )]
     ))
 
-    self.assertEqual(preprocess_document(doc), expected)
+    self.assertEqual(preprocess_document(schema(), doc), expected)
 
   def test_pp_doc_no_args_nested_1(self):
     expected = (
@@ -122,20 +77,32 @@ class TestProprocessDocument(unittest.TestCase):
           fmeta=TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
           ], TypeRef.non_null_list('Pair')),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
+            Argument('orderBy', InputValue.Enum('id')),
+            Argument('orderDirection', InputValue.Enum('asc')),
+            Argument('where', InputValue.Object({
+              'id_gt': InputValue.Variable('lastOrderingValue1')
+            })),
           ],
           selection=[
             Selection(
               fmeta=TypeMeta.FieldMeta('swaps', '', [
                 TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
                 TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
               ], TypeRef.non_null_list('Swap')),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
+                Argument('orderBy', InputValue.Enum('id')),
+                Argument('orderDirection', InputValue.Enum('asc')),
+                Argument('where', InputValue.Object({
+                  'id_gt': InputValue.Variable('lastOrderingValue0')
+                })),
               ],
               selection=[
                 Selection(
@@ -145,10 +112,18 @@ class TestProprocessDocument(unittest.TestCase):
             ),
             Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
           ]
-        )]
+        )],
+        variables=[
+          VariableDefinition('first0', TypeRef.Named('Int')),
+          VariableDefinition('skip0', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+          VariableDefinition('first1', TypeRef.Named('Int')),
+          VariableDefinition('skip1', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue1', TypeRef.Named('String')),
+        ]
       )),
-      [PaginationNode('first1', 'skip1', ['pairs'], None, None, [
-        PaginationNode('first0', 'skip0', ['pairs', 'swaps'], None, None, [])
+      [PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [
+        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'swaps'], [])
       ])]
     )
 
@@ -158,12 +133,14 @@ class TestProprocessDocument(unittest.TestCase):
         fmeta=TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
         selection=[
           Selection(
             fmeta=TypeMeta.FieldMeta('swaps', '', [
               TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
               TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
             ], TypeRef.non_null_list('Swap')),
             selection=[
               Selection(
@@ -175,7 +152,7 @@ class TestProprocessDocument(unittest.TestCase):
       )]
     ))
 
-    self.assertEqual(preprocess_document(doc), expected)
+    self.assertEqual(preprocess_document(schema(), doc), expected)
 
   def test_pp_doc_no_args_nested_2(self):
     expected = (
@@ -186,20 +163,32 @@ class TestProprocessDocument(unittest.TestCase):
             fmeta=TypeMeta.FieldMeta('pairs', '', [
               TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
               TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
             ], TypeRef.non_null_list('Pair')),
             arguments=[
               Argument('first', InputValue.Variable('first1')),
               Argument('skip', InputValue.Variable('skip1')),
+              Argument('orderBy', InputValue.Enum('id')),
+              Argument('orderDirection', InputValue.Enum('asc')),
+              Argument('where', InputValue.Object({
+                'id_gt': InputValue.Variable('lastOrderingValue1')
+              })),
             ],
             selection=[
               Selection(
                 fmeta=TypeMeta.FieldMeta('swaps', '', [
                   TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
                   TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+                  TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
                 ], TypeRef.non_null_list('Swap')),
                 arguments=[
                   Argument('first', InputValue.Variable('first0')),
                   Argument('skip', InputValue.Variable('skip0')),
+                  Argument('orderBy', InputValue.Enum('id')),
+                  Argument('orderDirection', InputValue.Enum('asc')),
+                  Argument('where', InputValue.Object({
+                    'id_gt': InputValue.Variable('lastOrderingValue0')
+                  })),
                 ],
                 selection=[
                   Selection(
@@ -214,10 +203,16 @@ class TestProprocessDocument(unittest.TestCase):
             fmeta=TypeMeta.FieldMeta('swaps', '', [
               TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
               TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
             ], TypeRef.non_null_list('Swap')),
             arguments=[
               Argument('first', InputValue.Variable('first2')),
               Argument('skip', InputValue.Variable('skip2')),
+              Argument('orderBy', InputValue.Enum('id')),
+              Argument('orderDirection', InputValue.Enum('asc')),
+              Argument('where', InputValue.Object({
+                'id_gt': InputValue.Variable('lastOrderingValue2')
+              })),
             ],
             selection=[
               Selection(
@@ -225,13 +220,24 @@ class TestProprocessDocument(unittest.TestCase):
               )
             ]
           ),
+        ],
+        variables=[
+          VariableDefinition('first0', TypeRef.Named('Int')),
+          VariableDefinition('skip0', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+          VariableDefinition('first1', TypeRef.Named('Int')),
+          VariableDefinition('skip1', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue1', TypeRef.Named('String')),
+          VariableDefinition('first2', TypeRef.Named('Int')),
+          VariableDefinition('skip2', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue2', TypeRef.Named('String')),
         ]
       )),
       [
-        PaginationNode('first1', 'skip1', ['pairs'], None, None, [
-          PaginationNode('first0', 'skip0', ['pairs', 'swaps'], None, None, [])
+        PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('Int'), ['pairs'], [
+          PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('Int'), ['pairs', 'swaps'], [])
         ]),
-        PaginationNode('first2', 'skip2', ['swaps'], None, None, [])
+        PaginationNode(2, 'id', 100, 0, None, TypeRef.Named('Int'), ['swaps'], [])
       ]
     )
 
@@ -242,6 +248,7 @@ class TestProprocessDocument(unittest.TestCase):
           fmeta=TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
           ], TypeRef.non_null_list('Pair')),
           selection=[
             Selection(
@@ -261,6 +268,7 @@ class TestProprocessDocument(unittest.TestCase):
           fmeta=TypeMeta.FieldMeta('swaps', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
           ], TypeRef.non_null_list('Swap')),
           selection=[
             Selection(
@@ -271,7 +279,7 @@ class TestProprocessDocument(unittest.TestCase):
       ]
     ))
 
-    self.assertEqual(preprocess_document(doc), expected)
+    self.assertEqual(preprocess_document(schema(), doc), expected)
 
   def test_pp_doc_with_args_1(self):
     expected = (
@@ -281,19 +289,30 @@ class TestProprocessDocument(unittest.TestCase):
           fmeta=TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
           ], TypeRef.non_null_list('Pair')),
           arguments=[
             Argument('first', InputValue.Variable('first0')),
             Argument('skip', InputValue.Variable('skip0')),
+            Argument('orderBy', InputValue.Enum('id')),
+            Argument('orderDirection', InputValue.Enum('asc')),
+            Argument('where', InputValue.Object({
+              'id_gt': InputValue.Variable('lastOrderingValue0')
+            })),
           ],
           selection=[
             Selection(
               fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
             )
           ]
-        )]
+        )],
+        variables=[
+          VariableDefinition('first0', TypeRef.Named('Int')),
+          VariableDefinition('skip0', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        ]
       )),
-      [PaginationNode('first0', 'skip0', ['pairs'], InputValue.Int(455), None, [])]
+      [PaginationNode(0, 'id', 455, 0, None, TypeRef.Named('String'), ['pairs'], [])]
     )
 
     doc = Document(url='www.abc.xyz/graphql', query=Query(
@@ -302,6 +321,7 @@ class TestProprocessDocument(unittest.TestCase):
         fmeta=TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Int(455)),
@@ -314,7 +334,7 @@ class TestProprocessDocument(unittest.TestCase):
       )]
     ))
 
-    self.assertEqual(preprocess_document(doc), expected)
+    self.assertEqual(preprocess_document(schema(), doc), expected)
 
   def test_pp_doc_with_args_2(self):
     expected = (
@@ -324,19 +344,30 @@ class TestProprocessDocument(unittest.TestCase):
           fmeta=TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
           ], TypeRef.non_null_list('Pair')),
           arguments=[
-            Argument('skip', InputValue.Variable('skip0')),
             Argument('first', InputValue.Variable('first0')),
+            Argument('skip', InputValue.Variable('skip0')),
+            Argument('orderBy', InputValue.Enum('id')),
+            Argument('orderDirection', InputValue.Enum('asc')),
+            Argument('where', InputValue.Object({
+              'id_gt': InputValue.Variable('lastOrderingValue0')
+            })),
           ],
           selection=[
             Selection(
               fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
             )
           ]
-        )]
+        )],
+        variables=[
+          VariableDefinition('first0', TypeRef.Named('Int')),
+          VariableDefinition('skip0', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        ]
       )),
-      [PaginationNode('first0', 'skip0', ['pairs'], None, InputValue.Int(10), [])]
+      [PaginationNode(0, 'id', 100, 10, None, TypeRef.Named('String'), ['pairs'], [])]
     )
 
     doc = Document(url='www.abc.xyz/graphql', query=Query(
@@ -345,6 +376,7 @@ class TestProprocessDocument(unittest.TestCase):
         fmeta=TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('skip', InputValue.Int(10)),
@@ -357,7 +389,7 @@ class TestProprocessDocument(unittest.TestCase):
       )]
     ))
 
-    self.assertEqual(preprocess_document(doc), expected)
+    self.assertEqual(preprocess_document(schema(), doc), expected)
 
   def test_pp_doc_key_path(self):
     expected = (
@@ -367,10 +399,16 @@ class TestProprocessDocument(unittest.TestCase):
           fmeta=TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
           ], TypeRef.non_null_list('Pair')),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
+            Argument('orderBy', InputValue.Enum('id')),
+            Argument('orderDirection', InputValue.Enum('asc')),
+            Argument('where', InputValue.Object({
+              'id_gt': InputValue.Variable('lastOrderingValue1')
+            })),
           ],
           selection=[
             Selection(
@@ -380,10 +418,16 @@ class TestProprocessDocument(unittest.TestCase):
                   fmeta=TypeMeta.FieldMeta('swaps', '', [
                     TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
                     TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+                    TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
                   ], TypeRef.non_null_list('Swap')),
                   arguments=[
                     Argument('first', InputValue.Variable('first0')),
                     Argument('skip', InputValue.Variable('skip0')),
+                    Argument('orderBy', InputValue.Enum('id')),
+                    Argument('orderDirection', InputValue.Enum('asc')),
+                    Argument('where', InputValue.Object({
+                      'id_gt': InputValue.Variable('lastOrderingValue0')
+                    })),
                   ],
                   selection=[
                     Selection(
@@ -395,11 +439,19 @@ class TestProprocessDocument(unittest.TestCase):
             ),
             Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
           ]
-        )]
+        )],
+        variables=[
+          VariableDefinition('first0', TypeRef.Named('Int')),
+          VariableDefinition('skip0', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+          VariableDefinition('first1', TypeRef.Named('Int')),
+          VariableDefinition('skip1', TypeRef.Named('Int')),
+          VariableDefinition('lastOrderingValue1', TypeRef.Named('String')),
+        ]
       )),
       [
-        PaginationNode('first1', 'skip1', ['pairs'], None, None, [
-          PaginationNode('first0', 'skip0', ['pairs', 'foo', 'swaps'], None, None, [])
+        PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [
+          PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'foo', 'swaps'], [])
         ])
       ]
     )
@@ -410,6 +462,7 @@ class TestProprocessDocument(unittest.TestCase):
         fmeta=TypeMeta.FieldMeta('pairs', '', [
           TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
         selection=[
           Selection(
@@ -419,6 +472,7 @@ class TestProprocessDocument(unittest.TestCase):
                 fmeta=TypeMeta.FieldMeta('swaps', '', [
                   TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
                   TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+                  TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
                 ], TypeRef.non_null_list('Swap')),
                 selection=[
                   Selection(
@@ -432,177 +486,177 @@ class TestProprocessDocument(unittest.TestCase):
       )]
     ))
 
-    self.assertEqual(preprocess_document(doc), expected)
+    self.assertEqual(preprocess_document(schema(), doc), expected)
 
 
-class TestPaginationArgs(unittest.TestCase):
-  def test_pagination_args_1(self):
-    expected = [
-      {'first0': 20, 'skip0': 0},
-      {'first0': 20, 'skip0': 20},
-      {'first0': 20, 'skip0': 40},
-      {'first0': 20, 'skip0': 60},
-      {'first0': 20, 'skip0': 80},
-    ]
+# class TestPaginationArgs(unittest.TestCase):
+#   def test_pagination_args_1(self):
+#     expected = [
+#       {'first0': 20, 'skip0': 0},
+#       {'first0': 20, 'skip0': 20},
+#       {'first0': 20, 'skip0': 40},
+#       {'first0': 20, 'skip0': 60},
+#       {'first0': 20, 'skip0': 80},
+#     ]
 
-    page_nodes = [
-      PaginationNode('first0', 'skip0', [], None, None, [])
-    ]
+#     page_nodes = [
+#       PaginationNode('first0', 'skip0', [], None, None, [])
+#     ]
 
-    self.assertEqual(pagination_args(page_nodes, 20), expected)
+#     self.assertEqual(pagination_args(page_nodes, 20), expected)
 
-  def test_pagination_args_2(self):
-    expected = [
-      {'first0': 20, 'skip0': 0},
-      {'first0': 20, 'skip0': 20},
-      {'first0': 20, 'skip0': 40},
-      {'first0': 20, 'skip0': 60},
-      {'first0': 20, 'skip0': 80},
-      {'first1': 20, 'skip1': 0},
-      {'first1': 20, 'skip1': 20},
-      {'first1': 20, 'skip1': 40},
-      {'first1': 20, 'skip1': 60},
-      {'first1': 20, 'skip1': 80},
-    ]
+#   def test_pagination_args_2(self):
+#     expected = [
+#       {'first0': 20, 'skip0': 0},
+#       {'first0': 20, 'skip0': 20},
+#       {'first0': 20, 'skip0': 40},
+#       {'first0': 20, 'skip0': 60},
+#       {'first0': 20, 'skip0': 80},
+#       {'first1': 20, 'skip1': 0},
+#       {'first1': 20, 'skip1': 20},
+#       {'first1': 20, 'skip1': 40},
+#       {'first1': 20, 'skip1': 60},
+#       {'first1': 20, 'skip1': 80},
+#     ]
 
-    page_nodes = [
-      PaginationNode('first0', 'skip0', [], None, None, []),
-      PaginationNode('first1', 'skip1', [], None, None, [])
-    ]
+#     page_nodes = [
+#       PaginationNode('first0', 'skip0', [], None, None, []),
+#       PaginationNode('first1', 'skip1', [], None, None, [])
+#     ]
 
-    self.assertEqual(pagination_args(page_nodes, 20), expected)
+#     self.assertEqual(pagination_args(page_nodes, 20), expected)
 
-  def test_pagination_args_nested(self):
-    expected = [
-      {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 0},
-      {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 20},
-      {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 40},
-      {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 60},
-      {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 80},
-      {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 0},
-      {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 20},
-      {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 40},
-      {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 60},
-      {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 80},
-      {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 0},
-      {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 20},
-      {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 40},
-      {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 60},
-      {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 80},
-      {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 0},
-      {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 20},
-      {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 40},
-      {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 60},
-      {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 80},
-      {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 0},
-      {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 20},
-      {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 40},
-      {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 60},
-      {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 80},
-      {'first2': 20, 'skip2': 0},
-      {'first2': 20, 'skip2': 20},
-      {'first2': 20, 'skip2': 40},
-      {'first2': 20, 'skip2': 60},
-      {'first2': 20, 'skip2': 80},
-    ]
+#   def test_pagination_args_nested(self):
+#     expected = [
+#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 0},
+#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 20},
+#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 40},
+#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 60},
+#       {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 80},
+#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 0},
+#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 20},
+#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 40},
+#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 60},
+#       {'first1': 1, 'skip1': 1, 'first0': 20, 'skip0': 80},
+#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 0},
+#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 20},
+#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 40},
+#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 60},
+#       {'first1': 1, 'skip1': 2, 'first0': 20, 'skip0': 80},
+#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 0},
+#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 20},
+#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 40},
+#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 60},
+#       {'first1': 1, 'skip1': 3, 'first0': 20, 'skip0': 80},
+#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 0},
+#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 20},
+#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 40},
+#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 60},
+#       {'first1': 1, 'skip1': 4, 'first0': 20, 'skip0': 80},
+#       {'first2': 20, 'skip2': 0},
+#       {'first2': 20, 'skip2': 20},
+#       {'first2': 20, 'skip2': 40},
+#       {'first2': 20, 'skip2': 60},
+#       {'first2': 20, 'skip2': 80},
+#     ]
 
-    page_nodes = [
-      PaginationNode('first1', 'skip1', [], InputValue.Int(5), None, [
-        PaginationNode('first0', 'skip0', [], None, None, [])
-      ]),
-      PaginationNode('first2', 'skip2', [], None, None, [])
-    ]
+#     page_nodes = [
+#       PaginationNode('first1', 'skip1', [], InputValue.Int(5), None, [
+#         PaginationNode('first0', 'skip0', [], None, None, [])
+#       ]),
+#       PaginationNode('first2', 'skip2', [], None, None, [])
+#     ]
 
-    self.assertEqual(pagination_args(page_nodes, 20), expected)
+#     self.assertEqual(pagination_args(page_nodes, 20), expected)
 
 
-class TestTrimDocument(unittest.TestCase):
-  def test_trim_docs_1(self):
-    expected = Document(url='www.abc.xyz/graphql', query=Query(
-      name=None,
-      selection=[
-        Selection(
-          fmeta=TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          ], TypeRef.non_null_list('Pair')),
-          arguments=[
-            Argument('first', InputValue.Variable('first1')),
-            Argument('skip', InputValue.Variable('skip1')),
-          ],
-          selection=[
-            Selection(
-              fmeta=TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
-              arguments=[
-                Argument('first', InputValue.Variable('first0')),
-                Argument('skip', InputValue.Variable('skip0')),
-              ],
-              selection=[
-                Selection(
-                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-                )
-              ]
-            )
-          ]
-        ),
-      ],
-      variables=[
-        VariableDefinition('first1', TypeRef.Named('Int')),
-        VariableDefinition('skip1', TypeRef.Named('Int')),
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-      ]
-    ), variables={'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 0})
+# class TestTrimDocument(unittest.TestCase):
+#   def test_trim_docs_1(self):
+#     expected = Document(url='www.abc.xyz/graphql', query=Query(
+#       name=None,
+#       selection=[
+#         Selection(
+#           fmeta=TypeMeta.FieldMeta('pairs', '', [
+#             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+#             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+#           ], TypeRef.non_null_list('Pair')),
+#           arguments=[
+#             Argument('first', InputValue.Variable('first1')),
+#             Argument('skip', InputValue.Variable('skip1')),
+#           ],
+#           selection=[
+#             Selection(
+#               fmeta=TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+#               arguments=[
+#                 Argument('first', InputValue.Variable('first0')),
+#                 Argument('skip', InputValue.Variable('skip0')),
+#               ],
+#               selection=[
+#                 Selection(
+#                   fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+#                 )
+#               ]
+#             )
+#           ]
+#         ),
+#       ],
+#       variables=[
+#         VariableDefinition('first1', TypeRef.Named('Int')),
+#         VariableDefinition('skip1', TypeRef.Named('Int')),
+#         VariableDefinition('first0', TypeRef.Named('Int')),
+#         VariableDefinition('skip0', TypeRef.Named('Int')),
+#       ]
+#     ), variables={'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 0})
 
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
-      name=None,
-      selection=[
-        Selection(
-          fmeta=TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          ], TypeRef.non_null_list('Pair')),
-          arguments=[
-            Argument('first', InputValue.Variable('first1')),
-            Argument('skip', InputValue.Variable('skip1')),
-          ],
-          selection=[
-            Selection(
-              fmeta=TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
-              arguments=[
-                Argument('first', InputValue.Variable('first0')),
-                Argument('skip', InputValue.Variable('skip0')),
-              ],
-              selection=[
-                Selection(
-                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-                )
-              ]
-            )
-          ]
-        ),
-        Selection(
-          fmeta=TypeMeta.FieldMeta('swaps', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          ], TypeRef.non_null_list('Swap')),
-          arguments=[
-            Argument('first', InputValue.Variable('first2')),
-            Argument('skip', InputValue.Variable('skip2')),
-          ],
-          selection=[
-            Selection(
-              fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-            )
-          ]
-        ),
-      ]
-    ))
+#     doc = Document(url='www.abc.xyz/graphql', query=Query(
+#       name=None,
+#       selection=[
+#         Selection(
+#           fmeta=TypeMeta.FieldMeta('pairs', '', [
+#             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+#             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+#           ], TypeRef.non_null_list('Pair')),
+#           arguments=[
+#             Argument('first', InputValue.Variable('first1')),
+#             Argument('skip', InputValue.Variable('skip1')),
+#           ],
+#           selection=[
+#             Selection(
+#               fmeta=TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
+#               arguments=[
+#                 Argument('first', InputValue.Variable('first0')),
+#                 Argument('skip', InputValue.Variable('skip0')),
+#               ],
+#               selection=[
+#                 Selection(
+#                   fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+#                 )
+#               ]
+#             )
+#           ]
+#         ),
+#         Selection(
+#           fmeta=TypeMeta.FieldMeta('swaps', '', [
+#             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+#             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+#           ], TypeRef.non_null_list('Swap')),
+#           arguments=[
+#             Argument('first', InputValue.Variable('first2')),
+#             Argument('skip', InputValue.Variable('skip2')),
+#           ],
+#           selection=[
+#             Selection(
+#               fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+#             )
+#           ]
+#         ),
+#       ]
+#     ))
 
-    self.assertEqual(
-      trim_document(doc, {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 0}),
-      expected
-    )
+#     self.assertEqual(
+#       trim_document(doc, {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 0}),
+#       expected
+#     )
 
 
 class TestMerge(unittest.TestCase):
