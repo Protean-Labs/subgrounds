@@ -458,8 +458,12 @@ app.layout = html.Div(
 Generates the following Dash dashboard (at time of writing):
 ![Alt text](https://raw.githubusercontent.com/Protean-Labs/subgrounds/main/img/bar-chart-example.png)
 
-# Examples
+# Examples and resources
 See the `examples/` directory for an evergrowing list of examples.
+
+Votium Bribes Analysis notebook: [link](https://github.com/RplusT/on-chain/blob/main/Votium%20Bribes%20Analysis.ipynb)
+
+Subgrounds demo (jump to 28:26): [link](https://youtu.be/SklIyKNg22U?t=1706)
 
 # Acknowledgments
 This software project would not be possible without the support of The Graph Foundation. You can learn more about The Graph and its mission [here](https://thegraph.com/en/).
