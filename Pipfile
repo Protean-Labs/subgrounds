@@ -19,6 +19,10 @@ pipe = "*"
 pandas = "*"
 ipykernel = "*"
 dash-bootstrap-components = "*"
+sphinx = "*"
+myst-parser = "*"
+mock = "*"
+sphinx-rtd-theme = "*"
 
 [dev-packages]
 

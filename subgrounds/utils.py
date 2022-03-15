@@ -23,6 +23,7 @@ def fst(tup: Tuple[T, U]) -> T:
 def snd(tup: Tuple[T, U]) -> U:
   return tup[1]
 
+
 # ================================================================
 # Set utility functions
 # ================================================================
@@ -78,6 +79,10 @@ def loop_generator(items: list):
   while True:
     for item in items:
       yield item
+
+
+def repeat(value: T, n: int) -> list[T]:
+  return [value for _ in range(n)]
 
 
 # ================================================================

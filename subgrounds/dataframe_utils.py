@@ -5,8 +5,8 @@ from functools import partial, reduce
 
 from pipe import dedup, groupby, map, traverse, where
 import pandas as pd
-from subgrounds.query import Query, Selection
 
+from subgrounds.query import Query, Selection
 from subgrounds.subgraph import FieldPath
 from subgrounds.utils import flatten_dict, contains_list, loop_generator, snd, union
 

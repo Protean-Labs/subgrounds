@@ -8,7 +8,7 @@ from subgrounds.subgrounds import Subgrounds
 from tests.utils import schema
 
 
-class TestQueryString(unittest.TestCase):
+class TestFieldPath(unittest.TestCase):
   def setUp(self):
     self.schema = schema()
     self.subgraph = Subgraph("", self.schema)
@@ -30,6 +30,7 @@ class TestQueryString(unittest.TestCase):
           },
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -70,6 +71,7 @@ class TestQueryString(unittest.TestCase):
             },
             TypeMeta.FieldMeta('pairs', '', [
               TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
               TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -96,6 +98,7 @@ class TestQueryString(unittest.TestCase):
             },
             TypeMeta.FieldMeta('pairs', '', [
               TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
               TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -140,6 +143,7 @@ class TestQueryString(unittest.TestCase):
             },
             TypeMeta.FieldMeta('pairs', '', [
               TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
               TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -166,6 +170,7 @@ class TestQueryString(unittest.TestCase):
             },
             TypeMeta.FieldMeta('pairs', '', [
               TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
               TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -201,11 +206,13 @@ class TestQueryString(unittest.TestCase):
     self.subgraph2 = Subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v1', self.schema)
 
   def test_mk_request_1(self):
-    expected = DataRequest.single_query('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', 
+    expected = DataRequest.single_query(
+      'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
       Query(selection=[
         Selection(
           TypeMeta.FieldMeta('pairs', '', [
             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
             TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
             TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
             TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -241,6 +248,7 @@ class TestQueryString(unittest.TestCase):
           Selection(
             TypeMeta.FieldMeta('pairs', '', [
               TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
               TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
@@ -262,6 +270,7 @@ class TestQueryString(unittest.TestCase):
           Selection(
             TypeMeta.FieldMeta('pairs', '', [
               TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
               TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
               TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
               TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
