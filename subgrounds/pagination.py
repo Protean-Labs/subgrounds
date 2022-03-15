@@ -42,6 +42,7 @@ If `skip` is provided, then use the skip value for the first query, then drop it
 
 """
 
+
 @dataclass(frozen=True)
 class PaginationNode:
   node_idx: int
@@ -55,7 +56,7 @@ class PaginationNode:
   key_path: list[str]
   inner: list[PaginationNode] = field(default_factory=list)
 
-  def variable_definitions(self) -> list[VariableDefinition]:
+  def variable_definitions(self: PaginationNode) -> list[VariableDefinition]:
     vardefs = [
       VariableDefinition(f'first{self.node_idx}', TypeRef.Named('Int')),
       VariableDefinition(f'skip{self.node_idx}', TypeRef.Named('Int')),
@@ -244,10 +245,12 @@ def preprocess_document(
         new_select, pagination_node = preprocess_selection(schema, select, [], counter)
         return ([*acc[0], new_select], [*acc[1], pagination_node])
       
-      new_selections, pagination_nodes = reduce(fold, query.selection, ([], []))
+      acc0: Tuple[list[Selection], list[PaginationNode]] = ([], [])
+      new_selections, pagination_nodes = reduce(fold, query.selection, acc0)
 
       variable_defs = list(
         pagination_nodes
+        | traverse
         | map(PaginationNode.variable_definitions)
         | traverse
       )
