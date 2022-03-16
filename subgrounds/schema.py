@@ -106,6 +106,8 @@ class TypeRef:
       case TypeRef.List(t):
         return f'[{TypeRef.graphql(t)}]'
 
+    assert False
+
 
 class TypeMeta:
   @dataclass

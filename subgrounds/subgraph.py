@@ -116,34 +116,34 @@ class FieldOperatorMixin:
   subgraph: Subgraph
   type_: TypeRef.T
 
-  def __add__(self, other: Any) -> SyntheticField:
+  def __add__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.add, typeref_of_binary_op('add', self.type_, other), [self, other])
 
-  def __radd__(self, other: Any) -> SyntheticField:
+  def __radd__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.add(y, x), typeref_of_binary_op('add', self.type_, other), [self, other])
 
-  def __sub__(self, other: Any) -> SyntheticField:
+  def __sub__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.sub, typeref_of_binary_op('sub', self.type_, other), [self, other])
 
-  def __rsub__(self, other: Any) -> SyntheticField:
+  def __rsub__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.sub(y, x), typeref_of_binary_op('sub', self.type_, other), [self, other])
 
-  def __mul__(self, other: Any) -> SyntheticField:
+  def __mul__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.mul, typeref_of_binary_op('mul', self.type_, other), [self, other])
 
-  def __rmul__(self, other: Any) -> SyntheticField:
+  def __rmul__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.mul(y, x), typeref_of_binary_op('mul', self.type_, other), [self, other])
 
-  def __truediv__(self, other: Any) -> SyntheticField:
+  def __truediv__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.truediv, typeref_of_binary_op('div', self.type_, other), [self, other])
 
-  def __rtruediv__(self, other: Any) -> SyntheticField:
+  def __rtruediv__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.truediv(y, x), typeref_of_binary_op('div', self.type_, other), [self, other])
 
-  def __floordiv__(self, other: Any) -> SyntheticField:
+  def __floordiv__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.floordiv, typeref_of_binary_op('div', self.type_, other), [self, other])
 
-  def __rfloordiv__(self, other: Any) -> SyntheticField:
+  def __rfloordiv__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.floordiv(y, x), typeref_of_binary_op('div', self.type_, other), [self, other])
 
   def __pow__(self, rhs: Any) -> SyntheticField:

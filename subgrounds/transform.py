@@ -9,30 +9,30 @@ logger = logging.getLogger('subgrounds')
 
 from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition, pagination_args
 from subgrounds.schema import TypeMeta, TypeRef
-
-if TYPE_CHECKING:
-  from subgrounds.subgraph import FieldPath, Subgraph
-
 from subgrounds.utils import flatten, union
 
+if TYPE_CHECKING:
+  from subgrounds.subgraph import Subgraph
 
-def transform_request(fmeta: TypeMeta.FieldMeta, replacement: list[Selection], req: DataRequest) -> DataRequest:
-  def transform(select: Selection) -> Selection:
-    match select:
-      case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == fmeta.name:
-        return replacement
-      case Selection(_, _, _, [] | None):
-        return [select]
-      case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
-        new_inner_select = list(inner_select | map(transform) | traverse)
-        return Selection(select_fmeta, alias, args, new_inner_select)
-      case _:
-        raise Exception(f"transform_request: unhandled selection {select}")
 
-  return DataRequest.transform(
-    req,
-    lambda doc: Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
-  )
+
+# def transform_request(fmeta: TypeMeta.FieldMeta, replacement: list[Selection], req: DataRequest) -> DataRequest:
+#   def transform(select: Selection) -> Selection:
+#     match select:
+#       case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == fmeta.name:
+#         return replacement
+#       case Selection(_, _, _, [] | None):
+#         return [select]
+#       case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
+#         new_inner_select = list(inner_select | map(transform) | traverse)
+#         return Selection(select_fmeta, alias, args, new_inner_select)
+#       case _:
+#         raise Exception(f"transform_request: unhandled selection {select}")
+
+#   return DataRequest.transform(
+#     req,
+#     lambda doc: Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
+#   )
 
 
 def select_data(select: Selection, data: dict) -> list[Any]:
@@ -63,7 +63,7 @@ class DocumentTransform(ABC):
     return req
 
   @abstractmethod
-  def transform_response(self, req: Document, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+  def transform_response(self, req: Document, data: dict[str, Any]) -> dict[str, Any]:
     return data
 
 
@@ -73,21 +73,26 @@ class TypeTransform(DocumentTransform):
     self.f = f
     super().__init__()
 
-  def transform_document(self, query: Query) -> Query:
-    return query
+  def transform_document(self: TypeTransform, doc: Document) -> Document:
+    return doc
 
-  def transform_response(self, doc: Document, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    def transform(select: Selection, data: dict) -> None:
+  def transform_response(self, doc: Document, data: dict[str, Any]) -> dict[str, Any]:
+    def transform(select: Selection, data: dict[str, Any]) -> None:
       # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
       match (select, data):
         case (
-          Selection(TypeMeta.FieldMeta(name, _, _, ftype), None, _, [] | None) | Selection(TypeMeta.FieldMeta(_, _, _, ftype), name, _, [] | None), 
+          Selection(TypeMeta.FieldMeta(name, _, _, ftype), None, _, [] | None) | Selection(TypeMeta.FieldMeta(_, _, _, ftype), str() as name, _, [] | None),
           dict() as data
         ) if TypeRef.root_type_name(self.type_) == TypeRef.root_type_name(ftype):
           data[name] = self.f(data[name])
+
         case (Selection(_, _, _, [] | None), dict()):
           pass
-        case (Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data):
+
+        case (
+          Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), str() as name, _, inner_select),
+          dict() as data
+        ):
           match data[name]:
             case list() as elts:
               for elt in elts:
@@ -131,6 +136,7 @@ class LocalSyntheticField(DocumentTransform):
 
   def transform_document(self, doc: Document) -> Document:
     logger.debug(f'LocalSyntheticField.transform_document: fmeta = {self.fmeta}, object = {self.type_}, fpath_selection = {self.fpath_selection}')
+
     def transform(select: Selection) -> Selection | list[Selection]:
       logger.debug(f'LocalSyntheticField.transform_document.transform: select = {select}, args = {self.args}')
       match select:
@@ -145,6 +151,8 @@ class LocalSyntheticField(DocumentTransform):
         case _:
           raise Exception(f"transform_document: unhandled selection {select}")
 
+      assert False
+
     def transform_on_type(select: Selection) -> Selection:
       match select:
         case Selection(TypeMeta.FieldMeta(_, _, _, type_) as select_fmeta, alias, args, inner_select) if type_.name == self.type_.name:
@@ -154,13 +162,16 @@ class LocalSyntheticField(DocumentTransform):
         case Selection(fmeta, alias, args, inner_select):
           return Selection(fmeta, alias, args, list(inner_select | map(transform_on_type)))
 
+      assert False
+
     if self.subgraph.url == doc.url:
       return Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform_on_type))
     else:
       return doc
 
-  def transform_response(self, doc: Document, data: dict[str, Any]) -> list[dict[str, Any]]:
+  def transform_response(self, doc: Document, data: dict[str, Any]) -> dict[str, Any]:
     logger.debug(f'LocalSyntheticField.transform_response: fmeta = {self.fmeta}, object = {self.type_}, fpath_selection = {self.fpath_selection}')
+    
     def transform(select: Selection, data: dict) -> None:
       logger.debug(f'LocalSyntheticField.transform_response.transform: select = {select}, data = {data}')
       match (select, data):
@@ -210,12 +221,12 @@ class LocalSyntheticField(DocumentTransform):
             case dict():
               list(inner_select | map(partial(transform_on_type, data=data[name])))
 
-
     if self.subgraph.url == doc.url:
       for select in doc.query.selection:
         transform_on_type(select, data)
 
     return data
+
 
 # TODO: Test split transform
 class SplitTransform(RequestTransform):
@@ -238,16 +249,17 @@ class SplitTransform(RequestTransform):
 
   # TODO: Fix transform_response
   def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    def merge_data(data1: dict | list | Any, data2: dict | list | Any) -> dict:
+
+    def merge_data(data1: dict | list | Any, data2: dict | list | Any) -> dict | list | Any:
       match (data1, data2):
-        case (dict(), dict()):
+        case (dict() as data1, dict() as data2):
           return dict(union(
             list(data1.items()),
             list(data2.items()),
             key=lambda item: item[0],
             combine=lambda item1, item2: (item1[0], merge_data(item1[1], item2[1]))
           ))
-        
+
         case (list(), list()):
           return list(
             zip(data1, data2)
@@ -257,6 +269,7 @@ class SplitTransform(RequestTransform):
         case (value, _):
           return value
 
+      assert False
 
     def transform(docs: list[Document], data: list[dict[str, Any]], acc: list[dict[str, Any]]) -> list[dict[str, Any]]:
       match (docs, data):

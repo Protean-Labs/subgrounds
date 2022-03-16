@@ -227,20 +227,36 @@ class Selection:
     return list(f(self))
 
   def contains_list(self: Selection) -> bool:
+    """ Returns True i.f.f. the selection `select` or any of its inner selections selects a
+    field of type list.
+
+    Args:
+        self (Selection): _description_
+
+    Returns:
+        bool: _description_
+    """
     if self.fmeta.type_.is_list:
       return True
     else:
       return any(self.selection | map(Selection.contains_list))
 
-  @staticmethod
-  def split(select: Selection) -> list[Selection]:
-    match select:
+  def split(self: Selection) -> list[Selection]:
+    """ Returns a list of selection each with only one inner selection until a leaf.
+
+    Args:
+        self (Selection): _description_
+
+    Returns:
+        list[Selection]: _description_
+    """
+    match self:
       case Selection(_, _, _, [] | None):
-        return [select]
+        return [self]
       case Selection(fmeta, alias, args, inner_select):
         return list(inner_select | map(Selection.split) | traverse | map(lambda inner_select: Selection(fmeta, alias, args, inner_select)))
 
-  def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
+  def extract_data(self: Selection, data: dict | list[dict]) -> list[Any] | Any:
     return extract_data(self.data_path, data)
 
   def add_selections(self: Selection, new_selections: list[Selection]) -> Selection:
@@ -781,7 +797,7 @@ class Fragment:
 @dataclass(frozen=True)
 class Document:
   url: str
-  query: Optional[Query]
+  query: Query
   fragments: list[Fragment] = field(default_factory=list)
 
   # A list of variable assignments. For non-repeating queries

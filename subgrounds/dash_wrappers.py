@@ -12,7 +12,7 @@ from dash.dependencies import Input, Output
 
 from subgrounds.plotly_wrappers import Figure
 from subgrounds.subgraph import FieldPath
-from subgrounds.subgrounds import Subgrounds, to_dataframe
+from subgrounds.subgrounds import Subgrounds
 
 
 class Refreshable(ABC):
