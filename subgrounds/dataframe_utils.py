@@ -207,6 +207,9 @@ def df_of_json(
       return pd.concat(dfs, ignore_index=True)
 
 
+# ================================================================
+# Timeseries
+# ================================================================
 class TimeseriesInterval(str, Enum):
   HOUR = 'H'
   DAY = 'D'
@@ -226,14 +229,14 @@ class AggregateMethod(str, Enum):
 
 
 class NaInterpolationMethod(str, Enum):
-  FORDWARD_FILL = 'ffill'
+  FORWARD_FILL = 'ffill'
   BACKWARD_FILL = 'bfill'
 
 
 def timeseries_of_df(
   df: pd.DataFrame,
   x: FieldPath,
-  y: FieldPath | list[FieldPath],
+  y: list[FieldPath],
   interval: TimeseriesInterval,
   aggregation: AggregateMethod | list[AggregateMethod],
   na_fill: Optional[NaInterpolationMethod | Any | list[NaInterpolationMethod | Any]] = None,
@@ -244,6 +247,8 @@ def timeseries_of_df(
 
   if len(df) == 0:
     return df
+
+  df.set_index(x.longname, inplace=True)
 
   tmin = df.index.min()
   tmax = df.index.max()

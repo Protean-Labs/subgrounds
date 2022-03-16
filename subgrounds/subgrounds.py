@@ -8,15 +8,13 @@ import json
 import math
 from datetime import datetime
 
-import warnings
-from subgrounds.dataframe_utils import df_of_json, timeseries_of_df
-
-from subgrounds.utils import flatten_dict
-warnings.simplefilter('default')
-
-import logging
-logger = logging.getLogger('subgrounds')
-
+from subgrounds.dataframe_utils import (
+  df_of_json,
+  timeseries_of_df,
+  NaInterpolationMethod,
+  AggregateMethod,
+  TimeseriesInterval
+)
 import pandas as pd
 
 from subgrounds.query import DataRequest, Document, Query
@@ -26,28 +24,11 @@ from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, DEFAULT_SUBGRAPH_TRA
 import subgrounds.client as client
 import subgrounds.pagination as pagination
 
+import logging
+import warnings
 
-class TimeseriesInterval(str, Enum):
-  HOUR = 'H'
-  DAY = 'D'
-  WEEK = 'W-SUN'
-  MONTH = 'MS'
-
-
-class AggregateMethod(str, Enum):
-  MEAN = 'mean'
-  SUM = 'sum'
-  FIRST = 'first'
-  LAST = 'last'
-  MEDIAN = 'median'
-  MIN = 'min'
-  MAX = 'max'
-  COUNT = 'count'
-
-
-class NaInterpolationMethod(str, Enum):
-  FORDWARD_FILL = 'ffill'
-  BACKWARD_FILL = 'bfill'
+logger = logging.getLogger('subgrounds')
+warnings.simplefilter('default')
 
 
 @dataclass
@@ -279,14 +260,7 @@ class Subgrounds:
     dfs = self.query_df(fpaths)
     df = dfs[0] if type(dfs) == list else dfs
 
-    return timeseries_of_df(
-      df,
-      x,
-      y,
-      interval,
-      aggregation,
-      na_fill
-    )
+    return timeseries_of_df(df, x, y, interval, aggregation, na_fill)
 
 
 def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:
