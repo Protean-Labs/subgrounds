@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Optional
 
-from pipe import where
+from pipe import where, map
 
 
 # ================================================================
@@ -134,6 +134,16 @@ class TypeMeta:
       except StopIteration:
         return False
 
+    def type_of_arg(self: TypeMeta.FieldMeta, argname: str) -> TypeRef.T:
+      try:
+        return next(
+          self.arguments
+          | where(lambda argmeta: argmeta.name == argname)
+          | map(lambda arg: arg.type_)
+        )
+      except StopIteration:
+        raise Exception(f'TypeMeta.FieldMeta.type_of_arg: no argument named {argname} for field {self.name}')
+
   @dataclass
   class ScalarMeta(T):
     pass
@@ -146,6 +156,16 @@ class TypeMeta:
     @property
     def is_object(self) -> bool:
       return True
+
+    def type_of_field(self: TypeMeta.ObjectMeta, fname: str) -> TypeRef.T:
+      try:
+        return next(
+          self.fields
+          | where(lambda fmeta: fmeta.name == fname)
+          | map(lambda fmeta: fmeta.type_)
+        )
+      except StopIteration:
+        raise Exception(f'TypeMeta.ObjectMeta.type_of_field: no field named {fname} for object {self.name}')
 
   @dataclass
   class EnumValueMeta(T):
@@ -163,6 +183,16 @@ class TypeMeta:
     def is_object(self) -> bool:
       return False
 
+    def type_of_field(self: TypeMeta.InterfaceMeta, fname: str) -> TypeRef.T:
+      try:
+        return next(
+          self.fields
+          | where(lambda fmeta: fmeta.name == fname)
+          | map(lambda fmeta: fmeta.type_)
+        )
+      except StopIteration:
+        raise Exception(f'TypeMeta.InterfaceMeta.type_of_field: no field named {fname} for interface {self.name}')
+
   @dataclass
   class UnionMeta(T):
     types: list[str]
@@ -171,6 +201,16 @@ class TypeMeta:
   class InputObjectMeta(T):
     input_fields: list[TypeMeta.ArgumentMeta]
 
+    def type_of_input_field(self: TypeMeta.InputObjectMeta, fname: str) -> TypeRef.T:
+      try:
+        return next(
+          self.input_fields
+          | where(lambda infield: infield.name == fname)
+          | map(lambda infield: infield.type_)
+        )
+      except StopIteration:
+        raise Exception(f'TypeMeta.InputObjectMeta.type_of_input_field: no input field named {fname} for input object {self.name}')
+
 
 @dataclass
 class SchemaMeta:
@@ -178,6 +218,10 @@ class SchemaMeta:
   type_map: dict[str, TypeMeta.T]
   mutation_type: Optional[str] = None
   subscription_type: Optional[str] = None
+
+  def type_of_typeref(self: SchemaMeta, typeref: TypeRef.T) -> TypeMeta.T:
+    tname = TypeRef.root_type_name(typeref)
+    return self.type_map[tname]
 
 
 # ================================================================

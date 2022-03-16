@@ -80,7 +80,10 @@ class TypeTransform(DocumentTransform):
     def transform(select: Selection, data: dict) -> None:
       # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
       match (select, data):
-        case (Selection(TypeMeta.FieldMeta(name, _, _, ftype), None, _, [] | None) | Selection(TypeMeta.FieldMeta(_, _, _, ftype), name, _, [] | None), dict() as data) if TypeRef.root_type_name(self.type_) == TypeRef.root_type_name(ftype):
+        case (
+          Selection(TypeMeta.FieldMeta(name, _, _, ftype), None, _, [] | None) | Selection(TypeMeta.FieldMeta(_, _, _, ftype), name, _, [] | None), 
+          dict() as data
+        ) if TypeRef.root_type_name(self.type_) == TypeRef.root_type_name(ftype):
           data[name] = self.f(data[name])
         case (Selection(_, _, _, [] | None), dict()):
           pass

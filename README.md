@@ -458,8 +458,12 @@ app.layout = html.Div(
 Generates the following Dash dashboard (at time of writing):
 ![Alt text](https://raw.githubusercontent.com/Protean-Labs/subgrounds/main/img/bar-chart-example.png)
 
-# Examples
+# Examples and resources
 See the `examples/` directory for an evergrowing list of examples.
+
+Votium Bribes Analysis notebook: [link](https://github.com/RplusT/on-chain/blob/main/Votium%20Bribes%20Analysis.ipynb)
+
+Subgrounds demo (jump to 28:26): [link](https://youtu.be/SklIyKNg22U?t=1706)
 
 # Acknowledgments
 This software project would not be possible without the support of The Graph Foundation. You can learn more about The Graph and its mission [here](https://thegraph.com/en/).
@@ -467,6 +471,9 @@ This software project would not be possible without the support of The Graph Fou
 This project also builds on the excellent work by the good folks over at Plotly. Lean more about Dash and Plotly [here](https://plotly.com/).
 
 # Notes
+## Non-subgraph GraphQL APIs
+Although Subgrounds has been developed with subgraph APIs in mind, most features will also work with any GraphQL API. However, Subgrounds has not been tested with non-subgraph GraphQL APIs and some features will definitely break if the non-subgraph APIs do not follow the same conventions as subgraph APIs (e.g.: automatic pagination relies on each entity having a unique `id` field). 
+
 ## GraphQL Aliases
 The use of the alias `xf608864358427cfb` in the query string is to prevent conflict when merging fieldpaths that select the same fields with different arguments. For example, in the following code, the `borrows` query field is selected twice with different arguments:
 ```python
