@@ -1,8 +1,8 @@
 from itertools import filterfalse
-from functools import reduce, partial
 from typing import Any, Callable, Optional, Tuple, TypeVar
 
 from pipe import map, traverse, where
+
 
 def flatten(t):
   return [item for sublist in t for item in sublist]

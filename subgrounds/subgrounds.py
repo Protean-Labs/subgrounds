@@ -1,27 +1,23 @@
 from dataclasses import dataclass, field
-from functools import partial, reduce
+from functools import reduce
 from typing import Any, Optional
-from pipe import map, groupby, traverse, where, dedup
+from pipe import map, groupby, traverse, where
 import os
 import json
-
-import warnings
-from subgrounds.dataframe_utils import df_of_json
-
-from subgrounds.utils import flatten_dict
-warnings.simplefilter('default')
-
-import logging
-logger = logging.getLogger('subgrounds')
-
 import pandas as pd
+import logging
+import warnings
 
+from subgrounds.dataframe_utils import df_of_json
 from subgrounds.query import DataRequest, Document, Query
 from subgrounds.schema import mk_schema
 from subgrounds.subgraph import FieldPath, Subgraph
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, DEFAULT_SUBGRAPH_TRANSFORMS, DocumentTransform, RequestTransform
 import subgrounds.client as client
 import subgrounds.pagination as pagination
+
+logger = logging.getLogger('subgrounds')
+warnings.simplefilter('default')
 
 
 @dataclass
@@ -30,8 +26,8 @@ class Subgrounds:
   subgraphs: dict[str, Subgraph] = field(default_factory=dict)
 
   def load_subgraph(self, url: str, save_schema: bool = False) -> Subgraph:
-    """Performs introspection on the provided GraphQL API `url` to get the schema, 
-    stores the schema if `save_schema` is `True` and returns a generated class representing 
+    """Performs introspection on the provided GraphQL API `url` to get the schema,
+    stores the schema if `save_schema` is `True` and returns a generated class representing
     the subgraph with all its entities.
 
     Args:

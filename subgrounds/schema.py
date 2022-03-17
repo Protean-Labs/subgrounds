@@ -5,6 +5,12 @@ from typing import Optional
 
 from pipe import where, map
 
+""" Schema data structure module
+
+This module contains various data structures in the form of dataclasses that
+are used to represent GraphQL schemas in Subgrounds.
+"""
+
 
 # ================================================================
 # Schema definitions, data structures and types

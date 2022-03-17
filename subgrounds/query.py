@@ -3,8 +3,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial, reduce
 from typing import Any, Callable, Optional, Tuple
-from pipe import map, traverse, where, take, take_while
+from pipe import map, traverse, where, take
 import math
+import warnings
 
 from subgrounds.schema import (
   TypeMeta,
@@ -16,6 +17,28 @@ from subgrounds.utils import extract_data, filter_none, identity, rel_complement
 
 import logging
 logger = logging.getLogger('subgrounds')
+warnings.simplefilter('default')
+
+""" Query data structure module
+
+This module contains various data structures in the form of dataclasses that
+are used to represent GraphQL queries in Subgrounds. To the extent possible,
+these dataclasses are immutable (i.e.: frozen=True) to enforce a functional
+programming style and reduce side-effects.
+
+A typical Subgrounds request will have the following dataclass hierarchy:
+```
+DataRequest
+  Document
+    Query
+      VariableDefinition
+        InputValue
+      Selection
+        Argument
+          InputValue
+        Selection
+```
+"""
 
 
 # ================================================================
@@ -137,12 +160,36 @@ class InputValue:
 
 @dataclass(frozen=True)
 class VariableDefinition:
+  """ Representation of a GraphQL variable definition
+
+  Attributes:
+    name (str): Name of the argument
+    type_ (TypeRef.T): GraphQL type of the argument
+    default (InputValue.T, optional): Default value of the variable. Defaults to None.
+  """
   name: str
   type_: TypeRef.T
   default: Optional[InputValue.T] = None
 
   @property
   def graphql(self) -> str:
+    """ Returns the GraphQL string representation of the variable definition
+
+    Example:
+    ```python
+    >>> vardef = VariableDefinition(
+    ...   name='foo',
+    ...   type_=TypeRef.NonNull(TypeRef.Named('Int')),
+    ...   default=InputValue.Int(100)
+    ... )
+
+    >>> print(vardef.graphql)
+    $foo: Int! = 100
+    ```
+
+    Returns:
+        str: The GraphQL string representation of the variable definition
+    """
     if self.default is None:
       return f'${self.name}: {TypeRef.graphql(self.type_)}'
     else:
@@ -161,13 +208,13 @@ class Argument:
 
 @dataclass(frozen=True)
 class Selection:
-  """ 
+  """ Represents a GraphQL field selection.
 
-  Raises:
-    Exception: [description]
-
-  Returns:
-    [type]: [description]
+  Attributes:
+    fmeta (TypeMeta.FieldMeta): The type definition of the field being selected.
+    alias (str, optional): The alias of the field selection. Defaults to None.
+    arguments (list[Argument]): The arguments, if any, of the field selection. Defaults to [].
+    selection (list[Selection]): The inner field selections, if any. Defaults to [].
   """
   fmeta: TypeMeta.FieldMeta
   alias: Optional[str] = None
@@ -244,6 +291,24 @@ class Selection:
   def split(self: Selection) -> list[Selection]:
     """ Returns a list of selection each with only one inner selection until a leaf.
 
+    Example (simplified):
+    ```python
+    >>> select = Selection('foo', inner=[
+    ...   Selection('bar', inner=[
+    ...     Selection('field0', inner=[]),
+    ...     Selection('field1', inner=[]),
+    ...   ]),
+    ...   Selection('x', inner=[])
+    ... ])
+
+    >>> split(select)
+    [
+      Selection('foo', inner=[Selection('bar', inner=[Selection('field0', inner=[])])]),
+      Selection('foo', inner=[Selection('bar', inner=[Selection('field1', inner=[])])]),
+      Selection('foo', inner=[Selection('x', inner=[])]),
+    ]
+    ```
+
     Args:
         self (Selection): _description_
 
@@ -259,40 +324,71 @@ class Selection:
   def extract_data(self: Selection, data: dict | list[dict]) -> list[Any] | Any:
     return extract_data(self.data_path, data)
 
-  def add_selections(self: Selection, new_selections: list[Selection]) -> Selection:
-    return Selection(
-      fmeta=self.fmeta,
-      alias=self.alias,
-      selection=union(
-        self.selection,
-        new_selections,
-        key=lambda select: select.fmeta.name,
-        combine=Selection.combine
-      )
-    )
+  def add_selections(self: Selection, new_selections: Selection | list[Selection]) -> Selection:
+    """ Returns a new selection consisting of a copy of `self` expanded with the selection(s)
+    `new_selections`. It is assumed that `new_selections` are inner selections of the root
+    selection `self`.
+
+    Args:
+        self (Selection): The Selection object to be expanded
+        new_selections (Selection | list[Selection]): A single or multiple Selection object(s) to expand `self` with
+
+    Returns:
+        Selection: The resulting new selection, i.e.: `self` expanded with `new_selections`
+    """
+    match new_selections:
+      case Selection() as new_selection:
+        return self.add_selections([new_selection])
+
+      case list() as new_selections:
+        return Selection(
+          fmeta=self.fmeta,
+          alias=self.alias,
+          selection=union(
+            self.selection,
+            new_selections,
+            key=lambda select: select.fmeta.name,
+            combine=Selection.combine
+          )
+        )
 
   def add_selection(self: Selection, new_selection: Selection) -> Selection:
+    warnings.warn("`Selection.add_selection` will be deprecated! Use `Selection.add_selections` instead", DeprecationWarning)
     return self.add_selections([new_selection])
 
-  @staticmethod
-  def remove_selections(select: Selection, selections_to_remove: list[Selection]) -> Selection:
+  def remove_selections(self: Selection, selections_to_remove: list[Selection]) -> Selection:
+    """ Returns a new Selection object consisting of a copy of `self` without the selections
+    in `selections_to_remove`
+
+    Args:
+        self (Selection): The selection to trim down
+        selections_to_remove (list[Selection]): The selections to remove from `self`
+
+    Returns:
+        Selection: The new trimmed down selection, i.e.: `self` without `selections_to_remove`
+    """
     def combine(select: Selection, selection_to_remove: Selection) -> Optional[Selection]:
       if selection_to_remove.selection == []:
         return None
       else:
         return Selection.remove_selections(select, selection_to_remove.selection)
 
+    # TODO: Resolve mypy complaints
     return Selection(
-      fmeta=select.fmeta,
-      alias=select.alias,
-      arguments=select.arguments,
+      fmeta=self.fmeta,
+      alias=self.alias,
+      arguments=self.arguments,
       selection=filter_none(union(
-        select.selection,
+        self.selection,
         selections_to_remove,
         key=lambda s: s.fmeta.name,
         combine=combine
       ))
     )
+
+  def remove_selection(select: Selection, selection_to_remove: Selection) -> Selection:
+    warnings.warn("`Selection.remove_selection` will be deprecated! Use `Selection.remove_selections` instead", DeprecationWarning)
+    return Selection.remove_selections(select, [selection_to_remove])
 
   def variable_args(self: Selection, recurse: bool = True) -> list[Argument]:
     var_args = list(self.arguments | where(lambda arg: type(arg.value) == InputValue.Variable))
@@ -318,12 +414,6 @@ class Selection:
 
     return list(self.selection | map(Selection.infer_variable_definitions) | traverse) + var_defs
 
-
-  @staticmethod
-  def remove_selection(select: Selection, selection_to_remove: Selection) -> Selection:
-    return Selection.remove_selections(select, [selection_to_remove])
-
-  @staticmethod
   def combine(select: Selection, other: Selection) -> Selection:
     if select.key != select.key:
       raise Exception(f"Selection.combine: {select.key} != {select.key}")
@@ -351,12 +441,21 @@ class Selection:
 
     return reduce(f, selections, [])
 
-  @staticmethod
-  def contains(select: Selection, other: Selection) -> bool:
-    if (select.fmeta == other.fmeta and rel_complement(other.selection, select.selection, key=lambda s: s.fmeta.name) == []):
+  def contains(self: Selection, other: Selection) -> bool:
+    """ Returns True i.f.f. the Selection `other` is a subtree of the
+    Selection `self` and False otherwise
+
+    Args:
+        self (Selection): _description_
+        other (Selection): _description_
+
+    Returns:
+        bool: _description_
+    """
+    if (self.fmeta == other.fmeta and rel_complement(other.selection, self.selection, key=lambda s: s.fmeta.name) == []):
       return all(
         other.selection
-        | map(lambda s: Selection.contains(next(filter(lambda s_: s.fmeta.name == s_.fmeta.name, select.selection)), s))
+        | map(lambda s: Selection.contains(next(filter(lambda s_: s.fmeta.name == s_.fmeta.name, self.selection)), s))
       )
     else:
       return False
@@ -882,7 +981,7 @@ class DataRequest:
 # ================================================================
 # Utility functions
 # ================================================================
-def input_value_of_string(type_: TypeRef.T, value: str) -> InputValue:
+def input_value_of_string(type_: TypeRef.T, value: str) -> InputValue.T:
   match type_:
     case TypeRef.Named("ID"):
       return InputValue.String(value)
@@ -909,7 +1008,7 @@ def input_value_of_string(type_: TypeRef.T, value: str) -> InputValue:
       raise TypeError(f"input_value_of_string: invalid type {type_}")
 
 
-def input_value_of_value(type_: TypeRef.T, value: Any) -> InputValue:
+def input_value_of_value(type_: TypeRef.T, value: Any) -> InputValue.T:
   match type_:
     case (TypeRef.Named("ID"), _, str()):
       return InputValue.String(str(value))
@@ -1045,7 +1144,7 @@ def selection_of_path(
 
 def pagination_args(page_size: int, num_entities: int) -> list[dict[str, int]]:
   num_pages = math.ceil(num_entities / page_size)
-  
+
   return [
     {'first': num_entities % page_size, 'skip': i * page_size} if (i == num_pages - 1 and num_entities % page_size != 0)
     else {'first': page_size, 'skip': i * page_size}
