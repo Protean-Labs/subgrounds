@@ -1,11 +1,9 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Tuple, TYPE_CHECKING
+from typing import Any, Callable, TYPE_CHECKING
 from functools import partial
 from pipe import map, traverse
-
 import logging
-logger = logging.getLogger('subgrounds')
 
 from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition, pagination_args
 from subgrounds.schema import TypeMeta, TypeRef
@@ -14,25 +12,13 @@ from subgrounds.utils import flatten, union
 if TYPE_CHECKING:
   from subgrounds.subgraph import Subgraph
 
+""" Subgrounds request transformation layers module
+
+This module defines transformation layers that can be used to 
+"""
 
 
-# def transform_request(fmeta: TypeMeta.FieldMeta, replacement: list[Selection], req: DataRequest) -> DataRequest:
-#   def transform(select: Selection) -> Selection:
-#     match select:
-#       case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == fmeta.name:
-#         return replacement
-#       case Selection(_, _, _, [] | None):
-#         return [select]
-#       case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
-#         new_inner_select = list(inner_select | map(transform) | traverse)
-#         return Selection(select_fmeta, alias, args, new_inner_select)
-#       case _:
-#         raise Exception(f"transform_request: unhandled selection {select}")
-
-#   return DataRequest.transform(
-#     req,
-#     lambda doc: Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform))
-#   )
+logger = logging.getLogger('subgrounds')
 
 
 def select_data(select: Selection, data: dict) -> list[Any]:
@@ -46,8 +32,12 @@ def select_data(select: Selection, data: dict) -> list[Any]:
     case (select, data):
       raise Exception(f"select_data: invalid selection {select} for data {data}")
 
+  assert False  # Suppress mypy missing return statement warning
+
 
 class RequestTransform(ABC):
+  """ Abstract class representing a transformation layer to be applied to whole DataRequest objects
+  """
   @abstractmethod
   def transform_request(self, req: DataRequest) -> DataRequest:
     return req
@@ -58,6 +48,8 @@ class RequestTransform(ABC):
 
 
 class DocumentTransform(ABC):
+  """ Abstract class representing a transformation layer to be applied to Document objects
+  """
   @abstractmethod
   def transform_document(self, req: Document) -> Document:
     return req
