@@ -69,12 +69,12 @@ class Subgrounds:
       | groupby(lambda fpath: fpath.subgraph.url)
       | map(lambda group: Document(
         url=group[0],
-        query=reduce(Query.add_selection, group[1] | map(FieldPath.selection), Query())
+        query=reduce(Query.add_selections, group[1] | map(FieldPath.selection), Query())
       ))
     ))
 
   def execute(self, req: DataRequest) -> list[dict]:
-    """Executes a `DataRequest` object, sending the underlying query(ies) to the server and returning 
+    """Executes a `DataRequest` object, sending the underlying query(ies) to the server and returning
     a data blob (list of Python dictionaries, one per actual query).
 
     Args:
@@ -177,7 +177,6 @@ class Subgrounds:
     """
     json_data = self.query_json(fpaths)
     return df_of_json(json_data, fpaths, columns, merge)
-
 
   def query(self, fpath: FieldPath | list[FieldPath], unwrap: bool = True) -> str | int | float | bool | list | tuple | None:
     """Executes one or multiple `FieldPath` objects immediately and return the data (as a tuple if multiple `FieldPath` objects are provided).
