@@ -18,7 +18,7 @@ logger = logging.getLogger('subgrounds')
 import subgrounds.client as client
 import subgrounds.schema as schema
 from subgrounds.query import Query, Selection, arguments_of_field_args, selection_of_path
-from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
+from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, mk_schema
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, LocalSyntheticField, DocumentTransform
 from subgrounds.utils import extract_data, identity
 
@@ -464,13 +464,12 @@ class FieldPath(FieldOperatorMixin):
     selection = kwargs.pop('selection', [])
     return FieldPath.set_arguments(self, kwargs, selection)
 
-  @staticmethod
-  def select(fpath: FieldPath, name: str) -> FieldPath:
-    """ Returns a new FieldPath corresponding to the FieldPath `fpath` extended with an additional 
+  def select(self: FieldPath, name: str) -> FieldPath:
+    """ Returns a new FieldPath corresponding to the FieldPath `self` extended with an additional
     selection on the field named `name`.
 
     Args:
-      fpath (FieldPath): The FieldPath on which to perform the selection/extension
+      self (FieldPath): The FieldPath on which to perform the selection/extension
       name (str): The name of the field to expand on the leaf of `fpath`
 
     Raises:
@@ -481,35 +480,34 @@ class FieldPath(FieldOperatorMixin):
     Returns:
       FieldPath: A new FieldPath containing `fpath` extended with the field named `name`
     """
-    match type_of_typeref(fpath.schema, fpath.type_):
+    match self.schema.type_of_typeref(self.type_):
       # If the FieldPath fpath
       case TypeMeta.EnumMeta() | TypeMeta.ScalarMeta():
-        raise TypeError(f"FieldPath: path {fpath} ends with a scalar field! cannot select field {name}")
+        raise TypeError(f"FieldPath: path {self} ends with a scalar field! cannot select field {name}")
 
       case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() as obj:
-        field = field_of_object(obj, name)
+        field = obj.field(name)
 
-        match type_of_field(fpath.schema, field):
+        match self.schema.type_of_typeref(field.type_):
           case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta():
             # Copy current path and append newly selected field
-            path = fpath.path.copy()
+            path = self.path.copy()
             path.append((None, field))
 
             # Return new FieldPath
             return FieldPath(
-              subgraph=fpath.subgraph,
-              root_type=fpath.root_type,
+              subgraph=self.subgraph,
+              root_type=self.root_type,
               type_=field.type_,
               path=path
             )
           case _:
-            raise TypeError(f"FieldPath: field {name} is not a valid field for object {fpath.type_.name} at path {fpath}")
+            raise TypeError(f"FieldPath: field {name} is not a valid field for object {self.type_.name} at path {self}")
 
       case _:
-        raise TypeError(f"FieldPath: Unexpected type {fpath.type_.name} when selection {name} on {fpath}")
+        raise TypeError(f"FieldPath: Unexpected type {self.type_.name} when selection {name} on {self}")
 
-  @staticmethod
-  def extend(fpath: FieldPath, ext: FieldPath) -> FieldPath:
+  def extend(self: FieldPath, ext: FieldPath) -> FieldPath:
     """ Extends the FieldPath `fpath` with the FieldPath `ext`. `ext` must start where the `fpath` ends.
 
     Args:
@@ -524,23 +522,23 @@ class FieldPath(FieldOperatorMixin):
     Returns:
       FieldPath: A new FieldPath containing the initial FieldPath `fpath` extended with `ext`
     """
-    match fpath.leaf:
+    match self.leaf:
       case TypeMeta.FieldMeta() as fmeta:
-        match schema.type_of_field(fpath.schema, fmeta):
+        match self.schema.type_of_typeref(fmeta.type_):
           case TypeMeta.ObjectMeta(name=name) | TypeMeta.InterfaceMeta(name=name):
             if name == ext.root_type.name:
               return FieldPath(
-                subgraph=fpath.subgraph,
-                root_type=fpath.root_type,
+                subgraph=self.subgraph,
+                root_type=self.root_type,
                 type_=ext.type_,
-                path=fpath.path + ext.path
+                path=self.path + ext.path
               )
             else:
-              raise TypeError(f"extend: FieldPath {ext} does not start at the same type from where FieldPath {fpath} ends")
+              raise TypeError(f"extend: FieldPath {ext} does not start at the same type from where FieldPath {self} ends")
           case _:
-            raise TypeError(f"extend: FieldPath {fpath} is not object field")
+            raise TypeError(f"extend: FieldPath {self} is not object field")
       case _:
-        raise TypeError(f"extend: FieldPath {fpath} is not an object field")
+        raise TypeError(f"extend: FieldPath {self} is not an object field")
 
   # Filter construction
   @staticmethod
@@ -601,16 +599,17 @@ class Object:
   def schema(self):
     return self.subgraph.schema
 
-  @staticmethod
-  def select(obj: Object, name: str) -> FieldPath:
-    field = schema.field_of_object(obj.object_, name)
+  def select(self: Object, name: str) -> FieldPath:
+    field = self.object_.field(name)
 
-    match schema.type_of_field(obj.schema, field):
+    match self.schema.type_of_typeref(field.type_):
       case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() as type_:
-        return FieldPath(obj.subgraph, TypeRef.Named(obj.object_.name), field.type_, [(None, field)])
+        return FieldPath(self.subgraph, TypeRef.Named(self.object_.name), field.type_, [(None, field)])
 
       case TypeMeta.T as type_:
-        raise TypeError(f"Object: Unexpected type {type_.name} when selection {name} on {obj}")
+        raise TypeError(f"Object: Unexpected type {type_.name} when selection {name} on {self}")
+
+    assert False  # Suppress mypy missing return statement warning
 
   @staticmethod
   def add_field(obj: Object, name: str, fpath: FieldPath) -> None:

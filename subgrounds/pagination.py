@@ -152,7 +152,7 @@ def preprocess_selection(
       try:
         next(new_selections | where(lambda select: select.fmeta.name == order_by_val))
       except StopIteration:
-        select_type: TypeMeta.ObjectMeta = schema.type_of_typeref(select.fmeta.type_)        
+        select_type: TypeMeta.ObjectMeta = schema.type_of_typeref(select.fmeta.type_)
         new_selections.append(Selection(fmeta=TypeMeta.FieldMeta(order_by_val, '', [], select_type.type_of_field(order_by_val))))
 
     new_args.append(order_by_arg)

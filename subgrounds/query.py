@@ -10,8 +10,7 @@ import warnings
 from subgrounds.schema import (
   TypeMeta,
   SchemaMeta,
-  TypeRef,
-  typeref_of_input_field
+  TypeRef
 )
 from subgrounds.utils import extract_data, filter_none, identity, rel_complement, union
 
@@ -1078,7 +1077,7 @@ def input_value_of_argument(
         return InputValue.List([fmt_value(t, val, non_null) for val in value])
 
       case (TypeRef.Named(), TypeMeta.InputObjectMeta() as input_object, dict()):
-        return InputValue.Object({key: fmt_value(typeref_of_input_field(input_object, key), val, non_null) for key, val in value.items()})
+        return InputValue.Object({key: fmt_value(input_object.type_of_input_field(key), val, non_null) for key, val in value.items()})
 
       case (value, typ, non_null):
         raise TypeError(f"mk_input_value({value}, {typ}, {non_null})")

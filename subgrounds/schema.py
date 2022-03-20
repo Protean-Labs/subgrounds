@@ -238,7 +238,7 @@ class TypeMeta:
           | map(lambda fmeta: fmeta.type_)
         )
       except StopIteration:
-        raise Exception(f'TypeMeta.ObjectMeta.type_of_field: no field named {fname} for object {self.name}')
+        raise KeyError(f'TypeMeta.ObjectMeta.type_of_field: no field named {fname} for object {self.name}')
 
   @dataclass
   class EnumValueMeta(T):
@@ -474,51 +474,3 @@ def mk_schema(json: dict[str, Any]) -> SchemaMeta:
 
     case _ as json:
       raise ParsingError(f"mk_schema: {json}")
-
-
-# ================================================================
-# Utility functions
-# ================================================================
-def field_of_object(meta: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta, fname: str) -> TypeMeta.FieldMeta:
-  warnings.warn("`schema.field_of_object` will be deprecated! Use `ObjectMeta.field` instead", DeprecationWarning)
-  match meta:
-    case TypeMeta.ObjectMeta(fields=fields) | TypeMeta.InterfaceMeta(fields=fields):
-      return next(filter(lambda field: field.name == fname, fields))
-    case _:
-      raise TypeError(f"field_of_object: TypeMeta {meta.name} is not of type ObjectMeta or InterfaceMeta")
-
-
-def type_of_arg(schema: SchemaMeta, meta: TypeMeta.T) -> TypeMeta.T:
-  warnings.warn("`schema.type_of_arg` will be deprecated! Use `SchemaMeta.type_of_arg` instead", DeprecationWarning)
-  match meta:
-    case TypeMeta.ArgumentMeta(type_=type_):
-      tname = TypeRef.root_type_name(type_)
-      return schema.type_map[tname]
-    case _:
-      raise TypeError(f"type_of_arg: TypeMeta {meta.name} is not of type ArgumentMeta")
-
-
-def type_of_field(schema: SchemaMeta, meta: TypeMeta.T) -> TypeMeta.T:
-  warnings.warn("`schema.type_of_field` will be deprecated! Use `SchemaMeta.type_of_field` instead", DeprecationWarning)
-  match meta:
-    case TypeMeta.FieldMeta(type_=type_):
-      tname = TypeRef.root_type_name(type_)
-      return schema.type_map[tname]
-    case _:
-      raise TypeError(f"type_of_field: TypeMeta {meta.name} is not a field type")
-
-
-def type_of_typeref(schema: SchemaMeta, typeref: TypeRef.T) -> TypeMeta.T:
-  warnings.warn("`schema.type_of_typeref` will be deprecated! Use `SchemaMeta.type_of_typeref` instead", DeprecationWarning)
-  tname = TypeRef.root_type_name(typeref)
-  return schema.type_map[tname]
-
-
-def typeref_of_input_field(meta: TypeMeta.InputObjectMeta, fname: str) -> TypeRef.T:
-  warnings.warn("`schema.typeref_of_input_field` will be deprecated! Use `SchemaMeta.typeref_of_input_field` instead", DeprecationWarning)
-  match meta:
-    case TypeMeta.InputObjectMeta(input_fields=input_fields):
-      arg = next(filter(lambda field: field.name == fname, input_fields))
-      return arg.type_
-    case _:
-      raise TypeError(f"type_of_field: TypeMeta {meta.name} is not of type FieldMeta")
