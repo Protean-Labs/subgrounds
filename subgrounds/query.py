@@ -361,11 +361,11 @@ class Selection:
     in `selections_to_remove`
 
     Args:
-        self (Selection): The selection to trim down
-        selections_to_remove (list[Selection]): The selections to remove from `self`
+      self (Selection): The selection to trim down
+      selections_to_remove (list[Selection]): The selections to remove from `self`
 
     Returns:
-        Selection: The new trimmed down selection, i.e.: `self` without `selections_to_remove`
+      Selection: The new trimmed down selection, i.e.: `self` without `selections_to_remove`
     """
     def combine(select: Selection, selection_to_remove: Selection) -> Optional[Selection]:
       if selection_to_remove.selection == []:
