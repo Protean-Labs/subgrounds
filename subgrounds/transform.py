@@ -1,3 +1,22 @@
+""" Subgrounds request/response transformation layers module
+
+This module defines interfaces (abstract classes) for transformation layers.
+Transformation layers, or transforms, can be applied to entire
+requests (see :class:`RequestTransform`) or on a per-document basis (see
+:class:`DocumentTransform`). Classes that implement either type of transforms
+can be used to perform modifications to queries and their response data.
+
+For example, the :class:`TypeTransform` class is used to tranform the response
+data of :attr:`BigInt` and :attr:`BigDecimal` fields (which are represented as
+strings in the response JSON data) to python :attr:`int` and :attr:`float`
+respectively (see the actual transforms in :attr:`DEFAULT_SUBGRAPH_TRANSFORMS`).
+
+Transforms are also used to apply :class:`SyntheticField` to queries and the
+response data (see :class:`LocalSyntheticField` transform class). Each
+:class:`SyntheticField` defined on a subgraph creates a new transformation layer
+by instantiating a new :class:`LocalSyntheticField` object.
+"""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Callable, TYPE_CHECKING
@@ -5,18 +24,12 @@ from functools import partial
 from pipe import map, traverse
 import logging
 
-from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition, pagination_args
+from subgrounds.query import DataRequest, Document, Query, Selection
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.utils import flatten, union
 
 if TYPE_CHECKING:
   from subgrounds.subgraph import Subgraph
-
-""" Subgrounds request transformation layers module
-
-This module defines transformation layers that can be used to 
-"""
-
 
 logger = logging.getLogger('subgrounds')
 
@@ -36,31 +49,97 @@ def select_data(select: Selection, data: dict) -> list[Any]:
 
 
 class RequestTransform(ABC):
-  """ Abstract class representing a transformation layer to be applied to whole DataRequest objects
+  """ Abstract class representing a transformation layer to be applied to entire
+  :class:`DataRequest` objects.
   """
   @abstractmethod
-  def transform_request(self, req: DataRequest) -> DataRequest:
+  def transform_request(
+    self,
+    req: DataRequest
+  ) -> DataRequest:
+    """ Method that will be applied to all :class:`DataRequest` objects that
+    pass through the transformation layer.
+
+    Args:
+      req (DataRequest): The initial request object
+
+    Returns:
+      DataRequest: The transformed request object
+    """
     return req
 
   @abstractmethod
-  def transform_response(self, req: DataRequest, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+  def transform_response(
+    self,
+    req: DataRequest,
+    data: list[dict[str, Any]]
+  ) -> list[dict[str, Any]]:
+    """ Method to be applied to all response data :attr:`data` of requests that pass
+    through the transformation layer.
+
+    :attr:`req` is the initial :class:`DataRequest` object that yielded the
+    resulting JSON data :attr:`data`.
+
+    Args:
+      req (DataRequest): Initial data request object
+      data (list[dict[str, Any]]): JSON data blob resulting from the execution
+        of the transformed data request.
+
+    Returns:
+      list[dict[str, Any]]: The transformed response data
+    """
     return data
 
 
 class DocumentTransform(ABC):
-  """ Abstract class representing a transformation layer to be applied to Document objects
+  """ Abstract class representing a transformation layer to be applied to
+  :class:`Document` objects.
   """
   @abstractmethod
-  def transform_document(self, req: Document) -> Document:
-    return req
+  def transform_document(self, doc: Document) -> Document:
+    """ Method that will be applied to all :class:`Document` objects that pass
+    through the transformation layer.
+
+    Args:
+      doc (Document): The initial document
+
+    Returns:
+      Document: The transformed document
+    """
+    return doc
 
   @abstractmethod
   def transform_response(self, req: Document, data: dict[str, Any]) -> dict[str, Any]:
+    """ Method to be applied to all response data :attr:`data` of requests that pass
+    through the transformation layer.
+
+    :attr:`doc` is the initial :class:`Document` object that yielded the
+    resulting JSON data :attr:`data`.
+
+    Args:
+      doc (Document): Initial document
+      data (dict[str, Any]): JSON data blob resulting from the execution of the
+        transformed document.
+
+    Returns:
+      dict[str, Any]: The transformed response data
+    """
     return data
 
 
 class TypeTransform(DocumentTransform):
-  def __init__(self, type_, f) -> None:
+  """ Transform to be applied to scalar fields on a per-type basis.
+
+  Attributes:
+    type_ (TypeRef.T): Type indicating which scalar values (i.e.: values of that
+      type) should be transformed using the function :attr:`f`
+    f (Callable[[Any], Any]): Function to be applied to scalar values of type
+      :attr:`type_` in the response data.
+  """
+  type_: TypeRef.T
+  f: Callable[[Any], Any]
+
+  def __init__(self, type_: TypeRef.T, f: Callable[[Any], Any]) -> None:
     self.type_ = type_
     self.f = f
     super().__init__()
@@ -108,12 +187,40 @@ class TypeTransform(DocumentTransform):
 
 
 class LocalSyntheticField(DocumentTransform):
+  """ Transform used to implement synthetic fields on GraphQL objects that only
+  depend on values accessible from that object.
+
+  :meth:`transform_document` replaces the field :attr:`fmeta` by the argument
+  fields selections :attr:`args` if the synthetic field :attr:`fmeta` is present
+  in the document.
+
+  :meth:`transform_response` applied :attr:`f` to the fields corresponding to
+  the argument selections :attr:`args` and places the result in the response.
+
+  Attributes:
+    subgraph (Subgraph): The subgraph to which the synthetic field's object
+      belongs.
+    fmeta (TypeMeta.FieldMeta): The synthetic field
+    type_ (TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta): The object for which
+      the synthetic field is defined
+    f (Callable): The function to be applied to the argument fields
+    default (Any): The default value of the synthetic field used in case of
+      exceptions (e.g.: division by zero)
+    args (list[Selection]): The selections of the fields used as arguments to
+      compute the synthetic field
+  """
+  subgraph: Subgraph
+  fmeta: TypeMeta.FieldMeta
+  type_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta
+  f: Callable
+  default: Any
+  args: list[Selection]
+
   def __init__(
     self,
     subgraph: Subgraph,
     fmeta: TypeMeta.FieldMeta,
     type_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta,
-    fpath_selection: Selection,
     f: Callable,
     default: Any,
     args: list[Selection]
@@ -121,20 +228,19 @@ class LocalSyntheticField(DocumentTransform):
     self.subgraph = subgraph
     self.fmeta = fmeta
     self.type_ = type_
-    self.fpath_selection = fpath_selection
     self.f = f
     self.default = default
     self.args = args
 
   def transform_document(self, doc: Document) -> Document:
-    logger.debug(f'LocalSyntheticField.transform_document: fmeta = {self.fmeta}, object = {self.type_}, fpath_selection = {self.fpath_selection}')
+    logger.debug(f'LocalSyntheticField.transform_document: fmeta = {self.fmeta}, object = {self.type_}')
 
     def transform(select: Selection) -> Selection | list[Selection]:
       logger.debug(f'LocalSyntheticField.transform_document.transform: select = {select}, args = {self.args}')
       match select:
         # case Selection(TypeMeta.FieldMeta(name) as fmeta, _, _, [] | None) if name == self.fmeta.name and fmeta.type_.name == self.type_.name:
         case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == self.fmeta.name:
-          return Selection.consolidate(self.args)
+          return Selection.merge(self.args)
         case Selection(_, _, _, [] | None):
           return [select]
         case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
@@ -143,18 +249,18 @@ class LocalSyntheticField(DocumentTransform):
         case _:
           raise Exception(f"transform_document: unhandled selection {select}")
 
-      assert False
+      assert False  # Suppress mypy missing return statement warning
 
     def transform_on_type(select: Selection) -> Selection:
       match select:
         case Selection(TypeMeta.FieldMeta(_, _, _, type_) as select_fmeta, alias, args, inner_select) if type_.name == self.type_.name:
-          new_inner_select = Selection.consolidate(list(inner_select | map(transform) | traverse))
+          new_inner_select = Selection.merge(list(inner_select | map(transform) | traverse))
           return Selection(select_fmeta, alias, args, new_inner_select)
 
         case Selection(fmeta, alias, args, inner_select):
           return Selection(fmeta, alias, args, list(inner_select | map(transform_on_type)))
 
-      assert False
+      assert False  # Suppress mypy missing return statement warning
 
     if self.subgraph.url == doc.url:
       return Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform_on_type))
@@ -162,14 +268,14 @@ class LocalSyntheticField(DocumentTransform):
       return doc
 
   def transform_response(self, doc: Document, data: dict[str, Any]) -> dict[str, Any]:
-    logger.debug(f'LocalSyntheticField.transform_response: fmeta = {self.fmeta}, object = {self.type_}, fpath_selection = {self.fpath_selection}')
-    
+    logger.debug(f'LocalSyntheticField.transform_response: fmeta = {self.fmeta}, object = {self.type_}')
+
     def transform(select: Selection, data: dict) -> None:
       logger.debug(f'LocalSyntheticField.transform_response.transform: select = {select}, data = {data}')
       match (select, data):
         case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
           arg_values = flatten(list(self.args | map(partial(select_data, data=data))))
-          
+
           try:
             data[name] = self.f(*arg_values)
           except ZeroDivisionError:
@@ -220,7 +326,7 @@ class LocalSyntheticField(DocumentTransform):
     return data
 
 
-# TODO: Test split transform
+# TODO: Decide if necessary
 class SplitTransform(RequestTransform):
   def __init__(self, query: Query) -> None:
     self.query = query

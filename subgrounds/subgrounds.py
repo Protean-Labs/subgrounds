@@ -1,3 +1,9 @@
+""" Toplevel Subgrounds module
+
+This module implements the toplevel API that most developers will be using when
+querying The Graph with Subgrounds.
+"""
+
 from dataclasses import dataclass, field
 from functools import reduce
 from typing import Any, Optional
@@ -26,16 +32,17 @@ class Subgrounds:
   subgraphs: dict[str, Subgraph] = field(default_factory=dict)
 
   def load_subgraph(self, url: str, save_schema: bool = False) -> Subgraph:
-    """Performs introspection on the provided GraphQL API `url` to get the schema,
-    stores the schema if `save_schema` is `True` and returns a generated class representing
-    the subgraph with all its entities.
+    """Performs introspection on the provided GraphQL API `url` to get the
+    schema, stores the schema if :attr:`save_schema` is `True` and returns a
+    generated class representing the subgraph with all its entities.
 
     Args:
-        url (str): The url of the API
-        save_schema (bool, optional): Flag indicating whether or not the schema should be saved to disk. Defaults to False.
+      url (str): The url of the API
+      save_schema (bool, optional): Flag indicating whether or not the schema
+        should be saved to disk. Defaults to False.
 
     Returns:
-        Subgraph: A generated class representing the subgraph and its entities
+      Subgraph: A generated class representing the subgraph and its entities
     """
     filename = url.split("/")[-1] + ".json"
     if os.path.isfile(filename):
@@ -52,37 +59,44 @@ class Subgrounds:
     return sg
 
   def mk_request(self, fpaths: list[FieldPath]) -> DataRequest:
-    """Creates a `DataRequest` object by combining multiple `FieldPath` objects
+    """Creates a :class:`DataRequest` object by combining multiple
+    :class:`FieldPath` objects.
 
     Args:
-        fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
+      fpaths (list[FieldPath]): The :class:`FieldPath` objects that should be
+        included in the request
 
     Returns:
-        DataRequest: A new `DataRequest` object
+      DataRequest: A new :class:`DataRequest` object
     """
     return DataRequest(documents=list(
       fpaths
       | groupby(lambda fpath: fpath.subgraph.url)
       | map(lambda group: Document(
         url=group[0],
-        query=reduce(Query.add_selection, group[1] | map(FieldPath.selection), Query())
+        query=reduce(Query.add, group[1] | map(FieldPath.selection), Query())
       ))
     ))
 
   def execute(self, req: DataRequest) -> list[dict]:
-    """Executes a `DataRequest` object, sending the underlying query(ies) to the server and returning 
-    a data blob (list of Python dictionaries, one per actual query).
+    """ Executes a :class:`DataRequest` object, sending the underlying
+    query(ies) to the server and returning a data blob (list of Python
+    dictionaries, one per actual query).
 
     Args:
-        req (DataRequest): The `DataRequest` object to be executed
+      req (DataRequest): The :class:`DataRequest` object to be executed
 
     Returns:
-        list[dict]: The reponse data
+      list[dict]: The reponse data
     """
     def execute_document(doc: Document) -> dict:
-      schema = next(self.subgraphs.values() | where(lambda sg: sg.url == doc.url) | map(lambda sg: sg.schema))
+      schema = next(
+        self.subgraphs.values()
+        | where(lambda sg: sg.url == doc.url)
+        | map(lambda sg: sg.schema)
+      )
       return pagination.paginate(schema, doc)
-    
+
     def transform_doc(transforms: list[DocumentTransform], doc: Document) -> dict:
       logger.debug(f'execute.transform_doc: doc = \n{doc.graphql}')
       match transforms:
@@ -93,6 +107,8 @@ class Subgrounds:
           data = transform_doc(rest, new_doc)
           return transform.transform_response(doc, data)
 
+      assert False  # Suppress mypy missing return statement warning
+
     def transform_req(transforms: list[RequestTransform], req: DataRequest) -> list[dict]:
       match transforms:
         case []:
@@ -101,17 +117,19 @@ class Subgrounds:
           new_req = transform.transform_request(req)
           data = transform_req(rest, new_req)
           return transform.transform_response(req, data)
-    
+
+      assert False  # Suppress mypy missing return statement warning
+
     return transform_req(self.global_transforms, req)
 
-  def query_json(self, fpaths: list[FieldPath]) -> list[dict]:
+  def query_json(self, fpaths: list[FieldPath]) -> list[dict[str, Any]]:
     """Combines `Subgrounds.mk_request` and `Subgrounds.execute` into one function.
 
     Args:
-        fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
+      fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
 
     Returns:
-        list[dict]: The reponse data
+      list[dict[str, Any]]: The reponse data
     """
     req = self.mk_request(fpaths)
     return self.execute(req)
@@ -120,31 +138,39 @@ class Subgrounds:
     self,
     fpaths: list[FieldPath],
     columns: Optional[list[str]] = None,
-    merge: bool = False,
+    concat: bool = False,
   ) -> pd.DataFrame | list[pd.DataFrame]:
-    """Same as `Subgrounds.query` but formats the response as a DataFrame. If the request
-    involves making multiple different GraphQL queries (e.g.: when querying data from different
-    subgraphs), then the function returns multiple dataframe (one per query).
-    
-    If `merge` is `True`, then the function will attempt to merge the DataFrames. Merging
-    requires that all DataFrames have the same number of columns of the same type. If the
-    column names differ, an explicit list of columns can be provided with the `columns` argument.
+    """Same as :func:`Subgrounds.query` but formats the response data into a
+    Pandas DataFrame. If the response data cannot be flattened to a single query
+    (e.g.: when querying multiple list fields that return different entities),
+    then multiple dataframes are returned
+
+    :attr:`fpaths` is a list of :class:`FieldPath` objects that indicate which
+    data must be queried.
+
+    :attr:`columns` is an optional argument used to rename the dataframes(s)
+    columns. The length of :attr:`columns` must be the same as the number of columns
+    of *all* returned dataframes.
+
+    :attr:`concat` indicates whether or not the resulting dataframes should be
+    concatenated together. The dataframes must have the same number of columns,
+    as well as the same column names and types (the names can be set using the
+    :attr:`columns` argument).
 
     Args:
-        fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
-        columns (Optional[list[str]], optional): The column labels. Defaults to None.
-        merge (bool, optional): Whether or not to merge resulting dataframes.
+      fpaths (list[FieldPath]): The `FieldPath` objects that should be included
+        in the request
+      columns (Optional[list[str]], optional): The column labels. Defaults to None.
+      merge (bool, optional): Whether or not to merge resulting dataframes.
 
     Returns:
-        pd.DataFrame | list[pd.DataFrame]: A DataFrame containing the reponse data
+      pd.DataFrame | list[pd.DataFrame]: A DataFrame containing the reponse data
 
     Example:
-    ```python
-    >>> from subgrounds.subgrounds import Subgrounds
 
+    >>> from subgrounds.subgrounds import Subgrounds
     >>> sg = Subgrounds()
     >>> univ3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
-
     >>> univ3.Swap.price = abs(univ3.Swap.amount0) / abs(univ3.Swap.amount1)
     >>> eth_usdc = univ3.Query.swaps(
     ...   orderBy=univ3.Swap.timestamp,
@@ -169,11 +195,9 @@ class Subgrounds:
     7       1643213370  2614.115746
     8       1643213210  2613.077301
     9       1643213196  2610.686563
-    ```
     """
     json_data = self.query_json(fpaths)
-    return df_of_json(json_data, fpaths, columns, merge)
-
+    return df_of_json(json_data, fpaths, columns, concat)
 
   def query(self, fpath: FieldPath | list[FieldPath], unwrap: bool = True) -> str | int | float | bool | list | tuple | None:
     """Executes one or multiple `FieldPath` objects immediately and return the data (as a tuple if multiple `FieldPath` objects are provided).
@@ -182,17 +206,14 @@ class Subgrounds:
       fpath (FieldPath): The `FieldPath` object(s) to query.
 
     Returns:
-        [type]: The `FieldPath` object(s) data
+      [type]: The `FieldPath` object(s) data
 
     Example:
-    ```python
-    >>> from subgrounds.subgrounds import Subgrounds
 
+    >>> from subgrounds.subgrounds import Subgrounds
     >>> sg = Subgrounds()
     >>> univ3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
-
     >>> univ3.Swap.price = abs(univ3.Swap.amount0) / abs(univ3.Swap.amount1)
-
     >>> eth_usdc_last = univ3.Query.swaps(
     ...   orderBy=univ3.Swap.timestamp,
     ...   orderDirection='desc',
@@ -201,10 +222,9 @@ class Subgrounds:
     ...     univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
     ...   ]
     ... ).price
-
     >>> sg.query(eth_usdc_last)
     2628.975030015892
-    ```
+
     """
     fpaths = list([fpath] | traverse)
     blob = self.query_json(fpaths)
@@ -223,21 +243,21 @@ class Subgrounds:
     else:
       return data
 
-  def query_timeseries(
-    self,
-    x: FieldPath,
-    y: FieldPath | list[FieldPath],
-    interval: str,
-    cumulative: bool
-  ):
-    # fpaths = list([x, y] | traverse)
-    # df = self.query_df(fpaths)[0]
+  # def query_timeseries(
+  #   self,
+  #   x: FieldPath,
+  #   y: FieldPath | list[FieldPath],
+  #   interval: str,
+  #   cumulative: bool
+  # ):
+  #   # fpaths = list([x, y] | traverse)
+  #   # df = self.query_df(fpaths)[0]
 
-    # match interval:
-    #   case 'hour':
-    #     tmin
+  #   # match interval:
+  #   #   case 'hour':
+  #   #     tmin
 
-    raise NotImplementedError
+  #   raise NotImplementedError
 
 
 def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:

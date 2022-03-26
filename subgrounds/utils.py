@@ -1,7 +1,10 @@
+""" Utility module for Subgrounds
+"""
+
 from itertools import filterfalse
 from typing import Any, Callable, Optional, Tuple, TypeVar
 
-from pipe import map, traverse, where
+from pipe import map
 
 
 def flatten(t):

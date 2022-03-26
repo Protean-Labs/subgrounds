@@ -1,26 +1,32 @@
+""" Subgraph module that defines various classes to manipulate requests and
+subgraphs.
+
+This module is the glue that connects the lower level modules (i.e.:
+:module:`query`, :module:`schema`, :module:`transform`, :module:`pagination`) to
+the higher toplevel modules (i.e.: :module:`subgrounds`).
+"""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Callable, ClassVar, Dict, List, Optional, Tuple
+from typing import Any, Callable, ClassVar, Optional, Tuple
 from functools import partial, reduce
 import os
 import json
 import operator
 from hashlib import blake2b
 from pipe import map, where
-
-import warnings
-warnings.simplefilter('default')
-
 import logging
-logger = logging.getLogger('subgrounds')
+import warnings
 
 import subgrounds.client as client
-import subgrounds.schema as schema
-from subgrounds.query import Query, Selection, arguments_of_field_args, selection_of_path
+from subgrounds.query import Query, Selection, arguments_of_field_args
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, mk_schema
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, LocalSyntheticField, DocumentTransform
 from subgrounds.utils import extract_data, identity
+
+logger = logging.getLogger('subgrounds')
+warnings.simplefilter('default')
 
 
 @dataclass
@@ -364,18 +370,18 @@ class FieldPath(FieldOperatorMixin):
     This function assumes that all fieldpaths in `fpaths` belong to the same subgraph
 
     Args:
-        fpaths (list[FieldPath]): _description_
+      fpaths (list[FieldPath]): _description_
 
     Returns:
-        list[Selection]: _description_
+      list[Selection]: _description_
     """
-    query = reduce(Query.add_selection, fpaths | map(FieldPath.selection), Query())
+    query = reduce(Query.add, fpaths | map(FieldPath.selection), Query())
     return query.selection
 
   def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
     return extract_data(self.data_path, data)
 
-  def split_args(self, kwargs: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+  def split_args(self, kwargs: dict[str, Any]) -> Tuple[dict[str, Any], dict[str, Any]]:
     query_args = {}
     other_args = {}
     for key, item in kwargs.items():
@@ -440,26 +446,26 @@ class FieldPath(FieldOperatorMixin):
 
   # When setting arguments
   def __call__(self, **kwargs: Any) -> Any:
-    """ Sets field arguments and expand subfields. The updated FieldPath is returned. 
+    """ Sets field arguments and expand subfields. The updated FieldPath is returned.
 
     Example:
-    ```python
-    aaveV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/aave/protocol-v2")
 
-    query = aaveV2.Query.borrows(
-      first=10,
-      order_by=aaveV2.Borrow.timestamp,
-      order_direction="desc",
-      selection=[
-        aaveV2.Borrow.id,
-        aaveV2.Borrow.timestamp,
-        aaveV2.Borrow.amount
-      ]
-    )
-    ```
+    >>> aaveV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/aave/protocol-v2")
+    >>> query = aaveV2.Query.borrows(
+    ...   first=10,
+    ...   order_by=aaveV2.Borrow.timestamp,
+    ...   order_direction="desc",
+    ...   selection=[
+    ...     aaveV2.Borrow.id,
+    ...     aaveV2.Borrow.timestamp,
+    ...     aaveV2.Borrow.amount
+    ...   ]
+    ... )
 
     Returns:
-      FieldPath | list[FieldPath]: The updated field path if selection is not set, or a list of FieldPaths when selection is set
+      FieldPath | list[FieldPath]: The updated field path if :attr:`selection`
+        is not specified, or a list of fieldpaths when :attr:`selection` is
+        specified.
     """
     selection = kwargs.pop('selection', [])
     return FieldPath.set_arguments(self, kwargs, selection)
@@ -636,7 +642,7 @@ class Object:
             raise Exception(f'SyntheticField {obj.object_.name}.{name}: {obj_.name} does not have the field {field_name}')
         case []:
           return
-          
+
     for fpath in sfield.deps:
       f(obj.object_, fpath.name_path)
 
@@ -691,17 +697,6 @@ class Subgraph:
     fmeta = TypeMeta.FieldMeta(name, '', [], sfield.type_)
     object_.fields.append(fmeta)
 
-    # dep_selections = Selection.consolidate(list(sfield.deps | map(FieldPath.selection)))
-    # match dep_selections:
-    #   case []:
-    #     dep_selections = []
-    #   case [select]:
-    #     dep_selections = []
-    #   case [select, *rest]:
-    #     dep_selections = reduce(Selection.consolidate, rest, select)
-
-    # print(sfield.deps)
-    # print(Selection.consolidate(list(sfield.deps | map(FieldPath.selection))))
     sfield_fpath = FieldPath(self, TypeRef.Named(object_.name), sfield.type_, [(None, fmeta)])
     logger.debug(f'Subgraph: Adding SyntheticField at FieldPath {sfield_fpath.root_type.name}.{sfield_fpath.name_path}')
 
@@ -709,7 +704,6 @@ class Subgraph:
       self,
       fmeta,
       object_,
-      FieldPath.selection(sfield_fpath),
       sfield.f,
       sfield.default,
       list(sfield.deps | map(FieldPath.selection))

@@ -1,8 +1,13 @@
+""" Small module containing low level functions related to sending
+GraphQL http requests.
+"""
+
 from typing import Any
 import requests
 
 import logging
 logger = logging.getLogger('subgrounds')
+
 
 INTROSPECTION_QUERY: str = """
   query IntrospectionQuery {
@@ -96,17 +101,18 @@ INTROSPECTION_QUERY: str = """
 
 
 def get_schema(url: str) -> dict[str, Any]:
-  """ Runs the introspection query on the GraphQL API served localed at `url` and returns
-  the result. In case of errors, an exception containing the error message is thrown.
+  """ Runs the introspection query on the GraphQL API served localed at
+  :attr:`url` and returns the result. In case of errors, an exception containing
+  the error message is thrown.
 
   Args:
-      url (str): _description_
+    url (str): The url of the GraphQL API
 
   Raises:
-      Exception: _description_
+    Exception: In case of GraphQL server error
 
   Returns:
-      dict[str, Any]: _description_
+    dict[str, Any]: The GraphQL API's schema in JSON
   """
   resp = requests.post(
     url,
@@ -120,26 +126,38 @@ def get_schema(url: str) -> dict[str, Any]:
     raise Exception(resp["errors"]) from exn
 
 
-def query(url: str, query_str: str, variables: dict[str, Any] = {}) -> dict[str, Any]:
-  """ Executes the GraphQL query `query_str` with variables `variables` against the API
-  served at `url` and returns the response data. In case of errors, an exception containing
-  the error message is thrown.
+def query(
+  url: str,
+  query_str: str,
+  variables: dict[str, Any] = {}
+) -> dict[str, Any]:
+  """ Executes the GraphQL query :attr:`query_str` with variables
+  :attr:`variables` against the API served at :attr:`url` and returns the
+  response data. In case of errors, an exception containing the error message is
+  thrown.
 
   Args:
-      url (str): The URL of the GraphQL API
-      query_str (str): The GraphQL query string
-      variables (dict[str, Any], optional): Variables for the GraphQL query. Defaults to {}.
+    url (str): The URL of the GraphQL API
+    query_str (str): The GraphQL query string
+    variables (dict[str, Any], optional): Variables for the GraphQL query.
+      Defaults to {}.
 
   Raises:
-      Exception: GraphQL error
+    Exception: GraphQL error
 
   Returns:
-      dict[str, Any]: Response data
+    dict[str, Any]: Response data
   """
-  logger.info(f'client.query: url = {url}, variables = {variables}\n{query_str}')
+  logger.info(
+    f'client.query: url = {url}, variables = {variables}\n{query_str}'
+  )
   resp = requests.post(
     url,
-    json={'query': query_str} if variables == {} else {'query': query_str, 'variables': variables},
+    json=(
+      {'query': query_str}
+      if variables == {}
+      else {'query': query_str, 'variables': variables}
+    ),
     headers={'Content-Type': 'application/json'}
   ).json()
 

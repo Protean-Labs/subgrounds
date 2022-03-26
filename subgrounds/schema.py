@@ -1,3 +1,9 @@
+""" Schema data structure module
+
+This module contains various data structures in the form of dataclasses that
+are used to represent GraphQL schemas in Subgrounds.
+"""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -7,12 +13,6 @@ import warnings
 from pipe import where, map
 
 warnings.simplefilter('default')
-
-""" Schema data structure module
-
-This module contains various data structures in the form of dataclasses that
-are used to represent GraphQL schemas in Subgrounds.
-"""
 
 
 # ================================================================
@@ -198,14 +198,14 @@ class TypeMeta:
       return True
 
     def field(self: TypeMeta.ObjectMeta, fname: str) -> TypeMeta.FieldMeta:
-      """ Returns the field definition of object `self` with name `fname`, if any.
+      """ Returns the field definition of object :attr:`self` with name :attr:`fname`, if any.
 
       Args:
         self (TypeMeta.ObjectMeta): The object type
         fname (str): The name of the desired field definition
 
       Raises:
-        KeyError: If no field named `fname` is defined for object `self`.
+        KeyError: If no field named :attr:`fname` is defined for object :attr:`self`.
 
       Returns:
         TypeMeta.FieldMeta: The field definition
@@ -219,14 +219,14 @@ class TypeMeta:
         raise KeyError(f'TypeMeta.ObjectMeta.field: no field named {fname} for interface {self.name}')
 
     def type_of_field(self: TypeMeta.ObjectMeta, fname: str) -> TypeRef.T:
-      """ Returns the type reference of the field of object `self` with name `fname`, if any.
+      """ Returns the type reference of the field of object :attr:`self` with name :attr:`fname`, if any.
 
       Args:
         self (TypeMeta.ObjectMeta): The object type
         fname (str): The name of the desired field type
 
       Raises:
-        KeyError: If no field named `fname` is defined for object `self`.
+        KeyError: If no field named :attr:`fname` is defined for object :attr:`self`.
 
       Returns:
         TypeRef.T: The field type reference
@@ -267,7 +267,7 @@ class TypeMeta:
         fname (str): The name of the desired field definition
 
       Raises:
-        KeyError: If no field named `fname` is defined for interface `self`.
+        KeyError: If no field named :attr:`fname` is defined for interface :attr:`self`.
 
       Returns:
         TypeMeta.FieldMeta: The field definition
