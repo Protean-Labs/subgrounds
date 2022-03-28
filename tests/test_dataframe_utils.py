@@ -36,7 +36,7 @@ class TestColumnsOfSelection(unittest.TestCase):
       carbon_offsets.tokenAddress,
     ]
 
-    query = reduce(Query.add_selection, fpaths | map(FieldPath.selection), Query())
+    query = reduce(Query.add, fpaths | map(FieldPath.selection), Query())
 
     self.assertEqual(columns_of_selections(query.selection), expected)
 
@@ -64,7 +64,7 @@ class TestColumnsOfSelection(unittest.TestCase):
       carbon_offsets.tokenAddress,
     ]
 
-    query = reduce(Query.add_selection, fpaths | map(FieldPath.selection), Query())
+    query = reduce(Query.add, fpaths | map(FieldPath.selection), Query())
 
     self.assertEqual(columns_of_selections(query.selection), expected)
 
@@ -376,7 +376,7 @@ class TestDFOfJSON(unittest.TestCase):
       ]),
     ]
 
-    assert_frame_equal(df_of_json(json, fpaths, columns=['timestamp', 'tx_type', 'pool_id', 'token0_symbol', 'token1_symbol'], merge=True), expected)
+    assert_frame_equal(df_of_json(json, fpaths, columns=['timestamp', 'tx_type', 'pool_id', 'token0_symbol', 'token1_symbol'], concat=True), expected)
 
   def test_df_of_json_3(self):
     expected = pd.DataFrame(data={

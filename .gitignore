@@ -3,5 +3,13 @@ notes/
 *.json
 *.md
 __pycache__/
+docs/
+dist/
+*.ipynb
+.coverage
+.python-version
+subgrounds.egg-info/
+*.log
+scratch/
 
 !README.md

@@ -170,7 +170,7 @@ class TestQueryString(unittest.TestCase):
 
 
 class TestSelectionFunctions(unittest.TestCase):
-  def test_add_selection_1(self):
+  def test_add_1(self):
     expected = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
       Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
       Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
@@ -180,14 +180,14 @@ class TestSelectionFunctions(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
     ])
 
-    new_selection = Selection.add_selection(
+    new_selection = Selection.add(
       og_selection,
       Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], [])
     )
 
     self.assertEqual(new_selection, expected)
 
-  def test_add_selection_2(self):
+  def test_add_2(self):
     expected = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
       Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
         Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
@@ -202,7 +202,7 @@ class TestSelectionFunctions(unittest.TestCase):
       ])
     ])
 
-    new_selection = Selection.add_selection(
+    new_selection = Selection.add(
       og_selection,
       Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
         Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
@@ -212,7 +212,7 @@ class TestSelectionFunctions(unittest.TestCase):
 
     self.assertEqual(new_selection, expected)
 
-  def test_add_selections_1(self):
+  def test_add_3(self):
     expected = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
       Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
       Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
@@ -223,7 +223,7 @@ class TestSelectionFunctions(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
     ])
 
-    new_selection = Selection.add_selections(
+    new_selection = Selection.add(
       og_selection,
       [
         Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
@@ -233,7 +233,7 @@ class TestSelectionFunctions(unittest.TestCase):
 
     self.assertEqual(new_selection, expected)
 
-  def test_remove_selection_1(self):
+  def test_remove_1(self):
     expected = Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
       Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('Float')), None, [], []),
       Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], []),
@@ -245,14 +245,14 @@ class TestSelectionFunctions(unittest.TestCase):
       Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
     ])
 
-    new_selection = Selection.remove_selection(
+    new_selection = Selection.remove(
       og_selection,
       Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
     )
 
     self.assertEqual(new_selection, expected)
 
-  def test_remove_selection_2(self):
+  def test_remove_2(self):
     expected = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
       Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
         Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
@@ -267,7 +267,7 @@ class TestSelectionFunctions(unittest.TestCase):
       ])
     ])
 
-    new_selection = Selection.remove_selection(
+    new_selection = Selection.remove(
       og_selection,
       Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
         Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
@@ -277,7 +277,7 @@ class TestSelectionFunctions(unittest.TestCase):
 
     self.assertEqual(new_selection, expected)
 
-  def test_remove_selection_3(self):
+  def test_remove_3(self):
     expected = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [])
 
     og_selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
@@ -288,7 +288,7 @@ class TestSelectionFunctions(unittest.TestCase):
       ])
     ])
 
-    new_selection = Selection.remove_selection(
+    new_selection = Selection.remove(
       og_selection,
       Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [])
     )
@@ -379,7 +379,7 @@ class TestSelectionFunctions(unittest.TestCase):
 
     self.assertEqual(Selection.select(selection, s2), expected)
 
-  def test_consolidate_1(self):
+  def test_merge_1(self):
     expected = [
       Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
         Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
@@ -408,9 +408,9 @@ class TestSelectionFunctions(unittest.TestCase):
       ])
     ]
 
-    self.assertEqual(Selection.consolidate(selections), expected)
+    self.assertEqual(Selection.merge(selections), expected)
 
-  def test_consolidate_2(self):
+  def test_merge_2(self):
     expected = [
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
         Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
@@ -445,11 +445,11 @@ class TestSelectionFunctions(unittest.TestCase):
       ])
     ]
 
-    self.assertEqual(Selection.consolidate(selections), expected)
+    self.assertEqual(Selection.merge(selections), expected)
 
 
 class TestQueryFunctions(unittest.TestCase):
-  def test_add_selection_1(self):
+  def test_add_1(self):
     expected = Query(
       None,
       [
@@ -471,7 +471,7 @@ class TestQueryFunctions(unittest.TestCase):
       []
     )
 
-    new_query = Query.add_selection(
+    new_query = Query.add(
       og_query,
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
         Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('Float')), None, [], [])
@@ -480,7 +480,7 @@ class TestQueryFunctions(unittest.TestCase):
 
     self.assertEqual(new_query, expected)
 
-  def test_add_selection_2(self):
+  def test_add_2(self):
     expected = Query(
       None,
       [
@@ -507,7 +507,7 @@ class TestQueryFunctions(unittest.TestCase):
       []
     )
 
-    new_query = Query.add_selection(
+    new_query = Query.add(
       og_query,
       Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
         Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
@@ -519,7 +519,7 @@ class TestQueryFunctions(unittest.TestCase):
 
     self.assertEqual(new_query, expected)
 
-  def test_add_selections_1(self):
+  def test_add_3(self):
     expected = Query(
       None,
       [
@@ -542,7 +542,7 @@ class TestQueryFunctions(unittest.TestCase):
       []
     )
 
-    new_query = Query.add_selections(
+    new_query = Query.add(
       og_query,
       [
         Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
@@ -554,7 +554,7 @@ class TestQueryFunctions(unittest.TestCase):
 
     self.assertEqual(new_query, expected)
 
-  def test_remove_selection_1(self):
+  def test_remove_1(self):
     expected = Query(
       None,
       [
@@ -578,7 +578,7 @@ class TestQueryFunctions(unittest.TestCase):
       []
     )
 
-    new_query = Query.remove_selection(
+    new_query = Query.remove(
       og_query,
       Selection(TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')), None, [], [
         Selection(TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('Int')), None, [], []),
@@ -587,7 +587,7 @@ class TestQueryFunctions(unittest.TestCase):
 
     self.assertEqual(new_query, expected)
 
-  def test_remove_selection_2(self):
+  def test_remove_2(self):
     expected = Query(
       None,
       [
@@ -614,7 +614,7 @@ class TestQueryFunctions(unittest.TestCase):
       []
     )
 
-    new_query = Query.remove_selection(
+    new_query = Query.remove(
       og_query,
       Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
         Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [

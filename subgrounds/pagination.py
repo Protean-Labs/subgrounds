@@ -1,15 +1,96 @@
+""" Pagination module
+
+This module implements functions and data structures used to perform automatic
+pagination on user-specified Subgrounds GraphQL queries.
+
+Pagination is done in two steps:
+1. The input query is transformed such that every field selection in the query
+which yields a list of entities has:
+
+#. An ordering (i.e.: :attr:`orderBy` and :attr:`orderDirection` are specified)
+#. A :attr:`first` argument set to the :attr:`firstN` variable
+#. A :attr:`skip` argument set to the :attr:`skipN` variable
+#. A :attr:`where` filter with the filter name derived from the ordering and the
+   value being a variable named :attr:`lastOrderingValueN`
+
+In other words, the query will be transformed in a form which allows Subgrounds
+to paginate automatically by simply setting the set of pagination variables
+(i.e.: :attr:`firstN`, :attr:`skipN` and :attr:`lastOrderingValueN`) to different
+values. Each field that requires pagination (i.e.: each field that yields a list)
+will have its own set of variables, hence the :attr:`N` post-fix.
+
+Example:
+The initial query
+
+.. code-block:: none
+
+  query {
+    items(
+      orderBy: timestamp,
+      orderDirection: desc,
+      first: 10000
+    ) {
+      foo
+    }
+  }
+
+will be transformed to
+
+.. code-block:: none
+
+  query($first0: Int, $skip0: Int, $lastOrderingValue0: BigInt) {
+    items(
+      orderBy: timestamp,
+      orderDirection: desc,
+      first: $first0,
+      skip: $skip0,
+      where: {
+        timestamp_lt: $lastOrderingValue0
+      }
+    ) {
+      foo
+    }
+  }
+
+As part of this step, a tree of PaginationNode objects is also created, which
+mirrors the selection tree of the initial query but only includes fields that
+require pagination.
+
+See :class:`PaginationNode`, :func:`preprocess_selection` and
+:func:`preprocess_document`.
+
+2. Using the PaginationNode tree, a "cursor" (ish) tree is initialized which
+provides a cursor that is used to iterate through the set of pagination arguments
+values (i.e.: :attr:`firstN`, :attr:`skipN`, :attr:`lastOrderingValueN`). This
+"cursor" maintains a pagination state for each of the pagination nodes in the
+pagination node tree that keeps track (amongst other things) of the number of
+entities queried for each list fields. The cursor is moved forward based on
+the response from the query executed with the variable values of the cursor's
+previous state.
+
+By looping through the "cursor" states until enough entities are queried, we can
+get a sequence of response data which, when merged, are equivalen to the initial
+request.
+
+See :class:`Cursor`, :func:`trim_document` and :func:`paginate`.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from functools import partial, reduce
+from functools import reduce
 from itertools import count
-import math
-import operator
-from pprint import pp
 from pipe import map, traverse, where
-from typing import Any, ClassVar, Optional, Tuple
+from typing import Any, Optional, Tuple
 
-from subgrounds.query import Argument, Document, InputValue, Selection, Query, VariableDefinition
+from subgrounds.query import (
+  Argument,
+  Document,
+  InputValue,
+  Selection,
+  Query,
+  VariableDefinition
+)
 import subgrounds.client as client
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef
 from subgrounds.utils import extract_data, union
@@ -17,53 +98,61 @@ from subgrounds.utils import extract_data, union
 DEFAULT_NUM_ENTITIES = 100
 PAGE_SIZE = 900
 
-"""
-Cannonical query form
-
-```graphql
-query itemsQuery($first: BigInt!, $last: Any!) {
-  items(
-    orderBy: FIELD,
-    orderDirection: desc,
-    first: $first,
-    where: {
-      FIELD_lt: $last
-    }
-  ) {
-    field1
-    field2
-  }
-}
-```
-
-If `orderBy` is not provided, then `FIELD` defaults to `id`.
-
-If `skip` is provided, then use the skip value for the first query, then drop it.
-
-"""
-
 
 @dataclass(frozen=True)
 class PaginationNode:
+  """ Class representing the pagination config for a single GraphQL list field.
+
+  Attributes:
+    node_idx (int): Index of PaginationNode, used to label pagination arguments
+      for this node.
+    filter_field (str): Name of the node's filter field, e.g.: if
+      :attr:`filter_name` is :attr:`timestamp_gt`, then :attr:`filter_field`
+      is :attr:`timestamp`
+    first_value (int): Initial value of the :attr:`first` argument
+    skip_value (int): Initial value of the :attr:`skip` argument
+    filter_value (Any): Initial value of the filter argument
+      (i.e.: :attr:`where: {filter: FILTER_VALUE}`)
+    filter_value_type (TypeRef.T): Type of the filter value
+    key_path (list[str]): Location in the list field to which this pagination
+      node refers to in the initial query
+    inner (list[PaginationNode]): Nested pagination nodes (if any).
+  """
   node_idx: int
-  filter_field: str       # name of the node's filter field, e.g.: if `filter_name` is `timestamp_gt`, then `filter_field` is `timestamp`
-  
-  first_value: int        # initial `first_varname` value
-  skip_value: int         # initial `skip_varname` value
-  filter_value: Any       # initial `filter_varname` value
+  filter_field: str
+
+  first_value: int
+  skip_value: int
+  filter_value: Any
   filter_value_type: TypeRef.T
 
   key_path: list[str]
   inner: list[PaginationNode] = field(default_factory=list)
 
   def variable_definitions(self: PaginationNode) -> list[VariableDefinition]:
+    """ Returns a list of variable definitions corresponding to this pagination
+    node's pagination arguments as well as the variable definitions related
+    to any nested pagination nodes.
+
+    Args:
+      self (PaginationNode): The current PaginationNode
+
+    Returns:
+      list[VariableDefinition]: _description_
+    """
     vardefs = [
       VariableDefinition(f'first{self.node_idx}', TypeRef.Named('Int')),
       VariableDefinition(f'skip{self.node_idx}', TypeRef.Named('Int')),
       VariableDefinition(f'lastOrderingValue{self.node_idx}', self.filter_value_type),
     ]
 
-    return list(self.inner | map(PaginationNode.variable_definitions) | traverse) + vardefs
+    nested_vardefs = list(
+      self.inner
+      | map(PaginationNode.variable_definitions)
+      | traverse
+    )
+
+    return nested_vardefs + vardefs
 
 
 def preprocess_selection(
@@ -72,40 +161,33 @@ def preprocess_selection(
   key_path: list[str],
   counter: count[int]
 ) -> Tuple[Selection, PaginationNode]:
-  """ Returns a tuple `(select_, node)` where `select_` is the same selection
-  tree as `select` except it has been normalized for pagination and `node` is 
-  a PaginationNode tree containing all pagination metadata for each selection in
-  `select` yielding a list of entities.
-  
-  A normalized selection is of the form:
-  ```graphql
-  items(
-    first: $firstN,
-    skip: $skipN,
-    orderBy: FIELD,
-    orderDirection: ORD
-    where: {
-      FIELD_ORD: $lastOrderingValueN
-    }
-  )
-  ```
+  """ Returns a tuple :attr:`(select_, node)` where :attr:`select_` is the same
+  selection tree as :attr:`select` except it has been normalized for pagination
+  and :attr:`node` is a :class:`PaginationNode` tree containing all pagination
+  metadata for each selection in :attr:`select` yielding a list of entities.
 
   Args:
-      schema (SchemaMeta): _description_
-      select (Selection): _description_
-      key_path (list[str]): _description_
-      counter (count[int]): _description_
+    schema (SchemaMeta): _description_
+    select (Selection): _description_
+    key_path (list[str]): _description_
+    counter (count[int]): _description_
 
   Returns:
-      Tuple[Selection, PaginationNode]: _description_
+    Tuple[Selection, PaginationNode]: _description_
   """
 
-  # 'Folding' function to recursively apply `preprocess_selection` to `select`'s inner selections
+  # 'Folding' function to recursively apply `preprocess_selection` to
+  # `select`'s inner selections
   def fold(
     acc: Tuple[list[Selection], list[PaginationNode]],
     select_: Selection
   ) -> Tuple[list[Selection], list[PaginationNode]]:
-    new_select, pagination_node = preprocess_selection(schema, select_, [*key_path, select.key], counter)
+    new_select, pagination_node = preprocess_selection(
+      schema,
+      select_,
+      [*key_path, select.key],
+      counter
+    )
     return ([*acc[0], new_select], [*acc[1], pagination_node])
 
   # Compute nested nromalized selections and pagination nodes
@@ -122,48 +204,52 @@ def preprocess_selection(
     n = next(counter)
 
     # Starting point for new arguments: all arguments not important for pagination
-    new_args = list(select.arguments | where(lambda arg: arg.name not in ['first', 'skip', 'where', 'orderBy', 'orderDirection']))
+    pagination_args = ['first', 'skip', 'where', 'orderBy', 'orderDirection']
+    new_args = list(
+      select.arguments
+      | where(lambda arg: arg.name not in pagination_args)
+    )
 
     # Set `first` argument
-    first_arg: Argument | None = select.get_argument('first', recurse=False)
-    if first_arg is None:
-      first_arg_value = 100
-    else:
+    try:
+      first_arg = select.get_argument('first', recurse=False)
       first_arg_value = first_arg.value.value
+    except KeyError:
+      first_arg_value = DEFAULT_NUM_ENTITIES
     new_args.append(Argument(name='first', value=InputValue.Variable(f'first{n}')))
 
     # Set `skip` argument
-    skip_arg: Argument | None = select.get_argument('skip', recurse=False)
-    if skip_arg is None:
-      skip_arg_value = 0
-    else:
+    try:
+      skip_arg = select.get_argument('skip', recurse=False)
       skip_arg_value = skip_arg.value.value
+    except KeyError:
+      skip_arg_value = 0
     new_args.append(Argument(name='skip', value=InputValue.Variable(f'skip{n}')))
 
     # Check if `orderBy` argument is provided. If not, set the `orderBy` argument to `id`
-    order_by_arg: Argument | None = select.get_argument('orderBy', recurse=False)
-    if order_by_arg is None:
-      order_by_arg = Argument(name='orderBy', value=InputValue.Enum('id'))
-      order_by_val = 'id'
-    else:
+    try:
+      order_by_arg = select.get_argument('orderBy', recurse=False)
       order_by_val = order_by_arg.value.value
 
       # Add `order_by_val` field to selection if not already present
       try:
         next(new_selections | where(lambda select: select.fmeta.name == order_by_val))
       except StopIteration:
-        select_type: TypeMeta.ObjectMeta = schema.type_of_typeref(select.fmeta.type_)        
+        select_type: TypeMeta.ObjectMeta = schema.type_of_typeref(select.fmeta.type_)
         new_selections.append(Selection(fmeta=TypeMeta.FieldMeta(order_by_val, '', [], select_type.type_of_field(order_by_val))))
 
+    except KeyError:
+      order_by_arg = Argument(name='orderBy', value=InputValue.Enum('id'))
+      order_by_val = 'id'
     new_args.append(order_by_arg)
 
     # Check if `orderDirection` argument is provided. If not, set it to `asc`.
-    order_direction_arg: Argument | None = select.get_argument('orderDirection', recurse=False)
-    if order_direction_arg is None:
+    try:
+      order_direction_arg = select.get_argument('orderDirection', recurse=False)
+      order_direction_val = order_direction_arg.value.value
+    except KeyError:
       order_direction_arg = Argument(name='orderDirection', value=InputValue.Enum('asc'))
       order_direction_val = 'asc'
-    else:
-      order_direction_val = order_direction_arg.value.value
     new_args.append(order_direction_arg)
 
     # Check if `where` argument is provided. If not, set it to `where: {filtering_arg: $lastOrderingValueN}`
@@ -171,13 +257,9 @@ def preprocess_selection(
     # E.g.: if `orderBy` is `foo` and `orderDirection` is `asc`, then `filtering_arg` will be `foo_gt`
     filtering_arg = '{}_{}'.format(order_by_val, 'gt' if order_direction_val == 'asc' else 'lt')
 
-    where_arg: Argument | None = select.get_argument('where', recurse=False)
-    if where_arg is None:
-      where_arg = Argument(name='where', value=InputValue.Object({
-        filtering_arg: InputValue.Variable(f'lastOrderingValue{n}')
-      }))
-      filter_value = None
-    else:
+    try:
+      where_arg = select.get_argument('where', recurse=False)
+
       if filtering_arg in where_arg.value.value:
         filter_value = where_arg.value.value[filtering_arg].value
       else:
@@ -186,7 +268,11 @@ def preprocess_selection(
       where_arg = Argument(name='where', value=InputValue.Object(
         where_arg.value.value | {filtering_arg: InputValue.Variable(f'lastOrderingValue{n}')}
       ))
-
+    except KeyError:
+      where_arg = Argument(name='where', value=InputValue.Object({
+        filtering_arg: InputValue.Variable(f'lastOrderingValue{n}')
+      }))
+      filter_value = None
     new_args.append(where_arg)
 
     # Find type of filter argument
@@ -204,7 +290,7 @@ def preprocess_selection(
       PaginationNode(
         node_idx=n,
         filter_field=order_by_val,
-        
+
         first_value=first_arg_value,
         skip_value=skip_arg_value,
         filter_value=filter_value,
@@ -244,7 +330,7 @@ def preprocess_document(
       ) -> Tuple[list[Selection], list[PaginationNode]]:
         new_select, pagination_node = preprocess_selection(schema, select, [], counter)
         return ([*acc[0], new_select], [*acc[1], pagination_node])
-      
+
       acc0: Tuple[list[Selection], list[PaginationNode]] = ([], [])
       new_selections, pagination_nodes = reduce(fold, query.selection, acc0)
 
@@ -275,21 +361,11 @@ def preprocess_document(
       )
 
 
-def flatten(l: list[list | dict]) -> list[dict]:
-  match l[0]:
-    case list():
-      return reduce(lambda acc, l: acc + flatten(l), l, [])
-    case _:
-      return l
-
-
 @dataclass
-class ArgGeneratorFSM:
-  PAGE_SIZE: ClassVar[int] = 900
-
+class Cursor:
   page_node: PaginationNode
 
-  inner: list[ArgGeneratorFSM]
+  inner: list[Cursor]
   inner_idx: int = 0
 
   filter_value: Any = None
@@ -300,7 +376,7 @@ class ArgGeneratorFSM:
 
   def __init__(self, page_node: PaginationNode) -> None:
     self.page_node = page_node
-    self.inner = list(page_node.inner | map(ArgGeneratorFSM))
+    self.inner = list(page_node.inner | map(Cursor))
     self.reset()
 
   @property
@@ -320,7 +396,6 @@ class ArgGeneratorFSM:
     index_field_data = list(extract_data([*self.page_node.key_path, self.page_node.filter_field], data) | traverse)
     num_entities = len(index_field_data)
     filter_value = index_field_data[-1] if len(index_field_data) > 0 else None
-    # print('node {}: num_entities = {}, filter_value = {}'.format('_'.join(self.page_node.key_path), num_entities, filter_value))
 
     id_data = list(extract_data([*self.page_node.key_path, 'id'], data) | traverse)
     for key in id_data:
@@ -334,7 +409,7 @@ class ArgGeneratorFSM:
       self.filter_value = filter_value
 
     if (
-      (self.is_leaf and num_entities < ArgGeneratorFSM.PAGE_SIZE)
+      (self.is_leaf and num_entities < PAGE_SIZE)
       or (not self.is_leaf and num_entities == 0)
       or (self.queried_entities == self.page_node.first_value)
     ):
@@ -371,8 +446,8 @@ class ArgGeneratorFSM:
       return {
         # `first`
         f'first{self.page_node.node_idx}': self.page_node.first_value - self.queried_entities
-        if self.page_node.first_value - self.queried_entities < ArgGeneratorFSM.PAGE_SIZE
-        else ArgGeneratorFSM.PAGE_SIZE,
+        if self.page_node.first_value - self.queried_entities < PAGE_SIZE
+        else PAGE_SIZE,
 
         # `skip`
         f'skip{self.page_node.node_idx}': self.page_node.skip_value if self.page_count == 0 else 0,
@@ -406,16 +481,19 @@ class ArgGeneratorFSM:
     self.keys = set()
 
 
-def trim_document(document: Document, pagination_args: dict[str, int]) -> Document:
-  """ Returns a new Document containing only the selection subtrees of `document`
-  whose arguments are present in `pagination_args`.
+def trim_document(document: Document, pagination_args: dict[str, Any]) -> Document:
+  """ Returns a new Document containing only the selection subtrees of
+  :attr:`document` whose arguments are present in :attr:`pagination_args`.
 
   Args:
-      document (Document): _description_
-      pagination_args (dict[str, int]): _description_
+    document (Document): The GraphQL document to be trimmed based on provided
+      arguments.
+    pagination_args (dict[str, Any]): The pagination arguments
 
   Returns:
-      Query: _description_
+    Document: A new document containing only the selection subtrees of
+      :attr:`document` for which the pagination arguments are set in
+      :attr:`pagination_args`.
   """
 
   def trim_where_input_object(input_object: InputValue.Object) -> InputValue.Object:
@@ -488,44 +566,74 @@ def trim_document(document: Document, pagination_args: dict[str, int]) -> Docume
   )
 
 
-def merge(data1, data2):
+def merge(
+  data1: list[Any] | dict[str, Any] | Any,
+  data2: list[Any] | dict[str, Any] | Any
+) -> list[Any] | dict[str, Any] | Any:
+  """ Merges :attr:`data1` and :attr:`data2` and returns the combined result.
+
+  :attr:`data1` and :attr:`data2` must be of the same type. Either both are
+  :attr:`dict`, :attr:`list` or anything else.
+
+  Args:
+    data1 (list[Any] | dict[str, Any] | Any): First data blob
+    data2 (list[Any] | dict[str, Any] | Any): Second data blob
+
+  Returns:
+      list[Any] | dict[str, Any] | Any: Combined data blob
+  """
   match (data1, data2):
-    case (list(), list()):
+    case (list() as l1, list() as l2):
       return union(
-        data1,
-        data2,
+        l1,
+        l2,
         lambda data: data['id'],
         combine=merge
       )
       # return data1 + data2
 
-    case (dict(), dict()):
+    case (dict() as d1, dict() as d2):
       data = {}
-      for key in data1:
-        if key in data2:
-          data[key] = merge(data1[key], data2[key])
+      for key in d1:
+        if key in d2:
+          data[key] = merge(d1[key], d2[key])
         else:
-          data[key] = data1[key]
+          data[key] = d1[key]
 
-      for key in data2:
+      for key in d2:
         if key not in data:
-          data[key] = data2[key]
+          data[key] = d2[key]
 
       return data
+
+    case (dict(), _) | (_, dict()) | (list(), _) | (_, list()):
+      raise TypeError(f'merge: incompatible data types! type(data1): {type(data1)} != type(data2): {type(data2)}')
 
     case (val1, _):
       return val1
 
+  assert False  # Suppress mypy missing return statement warning
+
 
 def paginate(schema: SchemaMeta, doc: Document) -> dict[str, Any]:
+  """ Executes the request document `doc` based on the GraphQL schema `schema` and returns
+  the response as a JSON dictionary.
+
+  Args:
+    schema (SchemaMeta): The GraphQL schema on which the request document is based
+    doc (Document): The request document
+
+  Returns:
+    dict[str, Any]: The response data as a JSON dictionary
+  """
   new_doc, pagination_nodes = preprocess_document(schema, doc)
 
   if pagination_nodes == []:
     return client.query(doc.url, doc.graphql, variables=doc.variables)
   else:
-    data = {}
+    data: dict[str, Any] = {}
     for page_node in pagination_nodes:
-      arg_gen = ArgGeneratorFSM(page_node)
+      arg_gen = Cursor(page_node)
 
       while True:
         try:
@@ -536,5 +644,5 @@ def paginate(schema: SchemaMeta, doc: Document) -> dict[str, Any]:
           arg_gen.step(page_data)
         except StopIteration:
           break
-    
+
     return data

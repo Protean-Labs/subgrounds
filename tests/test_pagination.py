@@ -3,7 +3,7 @@ import unittest
 from subgrounds.client import query
 
 from subgrounds.pagination import (
-  ArgGeneratorFSM,
+  Cursor,
   PaginationNode,
   preprocess_document,
   trim_document,
@@ -696,7 +696,7 @@ class TestPaginationArgs(unittest.TestCase):
       inner=[]
     )
 
-    arg_gen = ArgGeneratorFSM(page_node)
+    arg_gen = Cursor(page_node)
 
     self.__test_args(arg_gen, expected, data_and_fails)
 
@@ -720,7 +720,7 @@ class TestPaginationArgs(unittest.TestCase):
       inner=[]
     )
 
-    arg_gen = ArgGeneratorFSM(page_node)
+    arg_gen = Cursor(page_node)
 
     self.__test_args(arg_gen, expected, data_and_fails)
 
@@ -744,7 +744,7 @@ class TestPaginationArgs(unittest.TestCase):
       inner=[]
     )
 
-    arg_gen = ArgGeneratorFSM(page_node)
+    arg_gen = Cursor(page_node)
 
     self.__test_args(arg_gen, expected, data_and_fails)
 
@@ -787,7 +787,7 @@ class TestPaginationArgs(unittest.TestCase):
       ]
     )
 
-    arg_gen = ArgGeneratorFSM(page_node)
+    arg_gen = Cursor(page_node)
 
     self.__test_args(arg_gen, expected, data_and_fails)
 
@@ -848,7 +848,7 @@ class TestPaginationArgs(unittest.TestCase):
       ]
     )
 
-    arg_gen = ArgGeneratorFSM(page_node)
+    arg_gen = Cursor(page_node)
 
     self.__test_args(arg_gen, expected, data_and_fails)
 
@@ -874,7 +874,7 @@ class TestPaginationArgs(unittest.TestCase):
       inner=[]
     )
 
-    arg_gen = ArgGeneratorFSM(page_node)
+    arg_gen = Cursor(page_node)
 
     self.__test_args(arg_gen, expected, data_and_fails)
 
@@ -900,7 +900,7 @@ class TestPaginationArgs(unittest.TestCase):
       inner=[]
     )
 
-    arg_gen = ArgGeneratorFSM(page_node)
+    arg_gen = Cursor(page_node)
 
     self.__test_args(arg_gen, expected, data_and_fails)
 

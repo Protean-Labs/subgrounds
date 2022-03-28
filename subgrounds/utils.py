@@ -1,8 +1,11 @@
+""" Utility module for Subgrounds
+"""
+
 from itertools import filterfalse
-from functools import reduce, partial
 from typing import Any, Callable, Optional, Tuple, TypeVar
 
-from pipe import map, traverse, where
+from pipe import map
+
 
 def flatten(t):
   return [item for sublist in t for item in sublist]
@@ -118,7 +121,7 @@ def extract_data(keys: list[str], data: dict[str, Any] | list[dict[str, Any]]) -
       raise Exception('extract_data: data is not dict or list')
 
 
-def flatten_dict(data: dict, keys: list[str] = []) -> dict:
+def flatten_dict(data: dict[str, Any], keys: list[str] = []) -> dict:
   """ Takes a dictionary containing key-value pairs where all values are of type
   other than `list` and flattens it such that all key-value pairs in nested dictionaries
   are now at depth 1.
@@ -130,14 +133,14 @@ def flatten_dict(data: dict, keys: list[str] = []) -> dict:
   Returns:
     dict: Flat dictionary containing all key-value pairs in `data` and its nested dictionaries
   """
-  flat_dict = {}
+  flat_dict: dict[str, Any] = {}
   for key, value in data.items():
     match value:
       case dict():
         flat_dict = flat_dict | flatten_dict(value, [*keys, key])
       case value:
         flat_dict['_'.join([*keys, key])] = value
-  
+
   return flat_dict
 
 
@@ -162,15 +165,15 @@ def contains_list(data: dict | list | str | int | float | bool) -> bool:
       return False
 
 
-def columns_of_json(data: dict, keys: list[str] = []) -> list[str]:
-  columns = []
-  for key, value in data.items():
-    match value:
-      case dict():
-        columns.append(columns_of_json(value, [*keys, key]))
-      case list():
-        columns.append(reduce(union, value | map(partial(columns_of_json, keys=[*keys, key])) | map(lambda x: list(x | traverse)), []))
-      case value:
-        columns.append('_'.join([*keys, key]))
+# def columns_of_json(data: dict, keys: list[str] = []) -> list[str]:
+#   columns: list[str] = []
+#   for key, value in data.items():
+#     match value:
+#       case dict():
+#         columns.append(columns_of_json(value, [*keys, key]))
+#       case list():
+#         columns.append(reduce(union, value | map(partial(columns_of_json, keys=[*keys, key])) | map(lambda x: list(x | traverse)), []))
+#       case value:
+#         columns.append('_'.join([*keys, key]))
   
-  return columns
+#   return columns

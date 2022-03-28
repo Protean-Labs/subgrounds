@@ -1,21 +1,48 @@
+""" Query data structure module
+
+This module contains various data structures in the form of dataclasses that
+are used to represent GraphQL queries in Subgrounds. To the extent possible,
+these dataclasses are immutable (i.e.: :attr:`frozen=True`) to enforce a
+functional programming style and reduce side-effects.
+
+A typical Subgrounds request will have the following dataclass hierarchy:
+.. code-block:: none
+
+  DataRequest
+    Document
+      Query
+        VariableDefinition
+          InputValue
+        Selection
+          Argument
+            InputValue
+          Selection
+"""
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial, reduce
-from typing import Any, Callable, Optional, Tuple
-from pipe import map, traverse, where, take, take_while
-import math
+from typing import Any, Callable, Optional, Protocol
+from pipe import map, traverse, where, take
+import warnings
 
 from subgrounds.schema import (
   TypeMeta,
   SchemaMeta,
-  TypeRef,
-  typeref_of_input_field
+  TypeRef
 )
-from subgrounds.utils import extract_data, filter_none, identity, rel_complement, union
+from subgrounds.utils import (
+  extract_data,
+  filter_none,
+  identity,
+  rel_complement,
+  union
+)
 
 import logging
 logger = logging.getLogger('subgrounds')
+warnings.simplefilter('default')
 
 
 # ================================================================
@@ -137,12 +164,35 @@ class InputValue:
 
 @dataclass(frozen=True)
 class VariableDefinition:
+  """ Representation of a GraphQL variable definition
+
+  Attributes:
+    name (str): Name of the argument
+    type_ (TypeRef.T): GraphQL type of the argument
+    default (InputValue.T, optional): Default value of the variable.
+      Defaults to None.
+  """
   name: str
   type_: TypeRef.T
   default: Optional[InputValue.T] = None
 
   @property
   def graphql(self) -> str:
+    """ Returns the GraphQL string representation of the variable definition
+
+    Example:
+
+    >>> vardef = VariableDefinition(
+    ...   name='foo',
+    ...   type_=TypeRef.NonNull(TypeRef.Named('Int')),
+    ...   default=InputValue.Int(100)
+    ... )
+    >>> print(vardef.graphql)
+    $foo: Int! = 100
+
+    Returns:
+        str: The GraphQL string representation of the variable definition
+    """
     if self.default is None:
       return f'${self.name}: {TypeRef.graphql(self.type_)}'
     else:
@@ -161,13 +211,15 @@ class Argument:
 
 @dataclass(frozen=True)
 class Selection:
-  """ 
+  """ Represents a GraphQL field selection.
 
-  Raises:
-    Exception: [description]
-
-  Returns:
-    [type]: [description]
+  Attributes:
+    fmeta (TypeMeta.FieldMeta): The type definition of the field being selected.
+    alias (str, optional): The alias of the field selection. Defaults to None.
+    arguments (list[Argument]): The arguments, if any, of the field selection.
+      Defaults to [].
+    selection (list[Selection]): The inner field selections, if any.
+      Defaults to [].
   """
   fmeta: TypeMeta.FieldMeta
   alias: Optional[str] = None
@@ -212,7 +264,8 @@ class Selection:
         return [name]
       case Selection(TypeMeta.FieldMeta(name), None, _, [inner_select, *_]) | Selection(TypeMeta.FieldMeta(_), str() as name, _, [inner_select, *_]):
         return [name] + inner_select.data_path
-    assert False
+
+    assert False  # Suppress mypy missing return statement warning
 
   @property
   def data_paths(self) -> list[list[str]]:
@@ -226,57 +279,142 @@ class Selection:
 
     return list(f(self))
 
-  def contains_list(self: Selection) -> bool:
+  def contains_list(self: Selection, recurse: bool = True) -> bool:
+    """ Returns True i.f.f. the selection :attr:`self` selects a field of type
+    list. If :attr:`recurse` is set to True, then the method also checks for
+    list fields in nested selections.
+
+    Args:
+      self (Selection): The selection to traverse
+      recurse (bool, optional): Flag indicating if the method should be executed
+        on the nested selections. Defaults to True.
+
+    Returns:
+      bool: True if selection (or possibly nested selections) selects a list
+      field. False otherwise.
+    """
     if self.fmeta.type_.is_list:
       return True
     else:
-      return any(self.selection | map(Selection.contains_list))
+      if recurse:
+        return any(self.selection | map(Selection.contains_list))
+      else:
+        return False
 
-  @staticmethod
-  def split(select: Selection) -> list[Selection]:
-    match select:
+  def split(self: Selection) -> list[Selection]:
+    """ Returns a list of selections where each of the selections corresponds
+    to a single selection path from the root to a leaf for each leaf selected
+    in :attr:`self`.
+
+    Example (simplified, does not show all attributes):
+
+    >>> select = Selection('foo', inner=[
+    ...   Selection('bar', inner=[
+    ...     Selection('field0', inner=[]),
+    ...     Selection('field1', inner=[]),
+    ...   ]),
+    ...   Selection('x', inner=[])
+    ... ])
+    >>> split(select)
+    [
+      Selection('foo', inner=[Selection('bar', inner=[Selection('field0', inner=[])])]),
+      Selection('foo', inner=[Selection('bar', inner=[Selection('field1', inner=[])])]),
+      Selection('foo', inner=[Selection('x', inner=[])]),
+    ]
+
+    Args:
+      self (Selection): The selection to split
+
+    Returns:
+      list[Selection]: The split selections
+    """
+    match self:
       case Selection(_, _, _, [] | None):
-        return [select]
+        return [self]
       case Selection(fmeta, alias, args, inner_select):
-        return list(inner_select | map(Selection.split) | traverse | map(lambda inner_select: Selection(fmeta, alias, args, inner_select)))
+        return list(
+          inner_select
+          | map(Selection.split)
+          | traverse
+          | map(lambda inner_select: Selection(fmeta, alias, args, inner_select))
+        )
 
-  def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
+  def extract_data(self: Selection, data: dict | list[dict]) -> list[Any] | Any:
     return extract_data(self.data_path, data)
 
-  def add_selections(self: Selection, new_selections: list[Selection]) -> Selection:
-    return Selection(
-      fmeta=self.fmeta,
-      alias=self.alias,
-      selection=union(
-        self.selection,
-        new_selections,
-        key=lambda select: select.fmeta.name,
-        combine=Selection.combine
-      )
-    )
+  def add(
+    self: Selection,
+    new_selections: Selection | list[Selection]
+  ) -> Selection:
+    """ Returns a new selection consisting of a copy of :attr:`self` expanded
+    with the selection(s) :attr:`new_selections`. It is assumed that
+    :attr:`new_selections` are inner selections of the root selection
+    :attr:`self`.
 
-  def add_selection(self: Selection, new_selection: Selection) -> Selection:
-    return self.add_selections([new_selection])
+    Args:
+      self (Selection): The Selection object to be expanded
+      new_selections (Selection | list[Selection]): A single or multiple
+        Selection object(s) to be added to :attr:`self`
 
-  @staticmethod
-  def remove_selections(select: Selection, selections_to_remove: list[Selection]) -> Selection:
+    Returns:
+      Selection: The resulting new selection, i.e.: :attr:`self`
+        expanded with :attr:`new_selections`
+    """
+    match new_selections:
+      case Selection() as new_selection:
+        return self.add([new_selection])
+
+      case list() as new_selections:
+        return Selection(
+          fmeta=self.fmeta,
+          alias=self.alias,
+          selection=union(
+            self.selection,
+            new_selections,
+            key=lambda select: select.fmeta.name,
+            combine=Selection.combine
+          )
+        )
+
+  def remove(
+    self: Selection,
+    to_remove: Selection | list[Selection]
+  ) -> Selection:
+    """ Returns a new Selection object consisting of a copy of :attr:`self`
+    without the selections in :attr:`selections_to_remove`.
+
+    Args:
+      self (Selection): The selection to trim down
+      to_remove (Selection | list[Selection]): The selection(s) to remove from
+        :attr:`self`
+
+    Returns:
+      Selection: The new trimmed down selection, i.e.: :attr:`self` without
+        :attr:`selections_to_remove`
+    """
     def combine(select: Selection, selection_to_remove: Selection) -> Optional[Selection]:
       if selection_to_remove.selection == []:
         return None
       else:
-        return Selection.remove_selections(select, selection_to_remove.selection)
+        return select.remove(selection_to_remove.selection)
 
-    return Selection(
-      fmeta=select.fmeta,
-      alias=select.alias,
-      arguments=select.arguments,
-      selection=filter_none(union(
-        select.selection,
-        selections_to_remove,
-        key=lambda s: s.fmeta.name,
-        combine=combine
-      ))
-    )
+    # TODO: Resolve mypy complaints
+    match to_remove:
+      case Selection() as to_remove:
+        return self.remove([to_remove])
+
+      case list() as to_remove:
+        return Selection(
+          fmeta=self.fmeta,
+          alias=self.alias,
+          arguments=self.arguments,
+          selection=filter_none(union(
+            self.selection,
+            to_remove,
+            key=lambda s: s.fmeta.name,
+            combine=combine
+          ))
+        )
 
   def variable_args(self: Selection, recurse: bool = True) -> list[Argument]:
     var_args = list(self.arguments | where(lambda arg: type(arg.value) == InputValue.Variable))
@@ -302,22 +440,16 @@ class Selection:
 
     return list(self.selection | map(Selection.infer_variable_definitions) | traverse) + var_defs
 
-
-  @staticmethod
-  def remove_selection(select: Selection, selection_to_remove: Selection) -> Selection:
-    return Selection.remove_selections(select, [selection_to_remove])
-
-  @staticmethod
-  def combine(select: Selection, other: Selection) -> Selection:
-    if select.key != select.key:
-      raise Exception(f"Selection.combine: {select.key} != {select.key}")
+  def combine(self: Selection, other: Selection) -> Selection:
+    if self.key != other.key:
+      raise Exception(f"Selection.combine: {self.key} != {other.key}")
 
     return Selection(
-      fmeta=select.fmeta,
-      alias=select.alias,
-      arguments=select.arguments,
+      fmeta=self.fmeta,
+      alias=self.alias,
+      arguments=self.arguments,
       selection=filter_none(union(
-        select.selection,
+        self.selection,
         other.selection,
         key=lambda select: select.fmeta.name,
         combine=Selection.combine
@@ -325,7 +457,16 @@ class Selection:
     )
 
   @staticmethod
-  def consolidate(selections: list[Selection]) -> list[Selection]:
+  def merge(selections: list[Selection]) -> list[Selection]:
+    """ Returns a list of Selection objects resulting from merging
+    :attr:`selections` to the extent possible.
+
+    Args:
+      selections (list[Selection]): The selections to be merged
+
+    Returns:
+      list[Selection]: _description_
+    """
     def f(selections: list[Selection], other: Selection) -> list[Selection]:
       try:
         next(selections | where(lambda select: select.key == other.key))
@@ -335,44 +476,79 @@ class Selection:
 
     return reduce(f, selections, [])
 
-  @staticmethod
-  def contains(select: Selection, other: Selection) -> bool:
-    if (select.fmeta == other.fmeta and rel_complement(other.selection, select.selection, key=lambda s: s.fmeta.name) == []):
+  def contains(self: Selection, other: Selection) -> bool:
+    """ Returns True i.f.f. the Selection :attr:`other` is a subtree of the
+    Selection :attr:`self` and False otherwise
+
+    Args:
+      self (Selection): The selection
+      other (Selection): The subselection
+
+    Returns:
+      bool: True i.f.f. :attr:`other` is in :attr:`self`
+    """
+    if (self.fmeta == other.fmeta and rel_complement(other.selection, self.selection, key=lambda s: s.fmeta.name) == []):
       return all(
         other.selection
-        | map(lambda s: Selection.contains(next(filter(lambda s_: s.fmeta.name == s_.fmeta.name, select.selection)), s))
+        | map(lambda s: Selection.contains(next(filter(lambda s_: s.fmeta.name == s_.fmeta.name, self.selection)), s))
       )
     else:
       return False
 
-  def contains_argument(self: Selection, arg_name: str) -> bool:
+  def contains_argument(
+    self: Selection,
+    argname: str,
+    recurse: bool = True
+  ) -> bool:
+    """ Returns True i.f.f. there is an Argument object in :attr:`self` named
+    :attr:`argname`. If :attr:`recurse` is True, then the method also checks the
+    nested selections for an argument named :attr:`argname`.
+
+    Args:
+      self (Selection): The selection
+      argname (str): The name of the argument
+      recurse (bool, optional): Flag indicating whether or not the method should
+        be run recursively on nested selections. Defaults to True.
+
+    Returns:
+      bool: True i.f.f. there is an argument named :attr:`argname` in :attr:`self`
+    """
     try:
-      next(filter(lambda arg: arg.name == arg_name, self.arguments))
+      next(filter(lambda arg: arg.name == argname, self.arguments))
       return True
     except StopIteration:
-      return any(
-        self.selection
-        | map(partial(Selection.contains_argument, arg_name=arg_name))
-      )
+      if recurse:
+        return any(
+          self.selection
+          | map(partial(Selection.contains_argument, argname=argname))
+        )
+      else:
+        return False
 
   def get_argument(
     self: Selection,
     argname: str,
     recurse: bool = True
-  ) -> Optional[Argument]:
-    """ Returns an Argument object corresponding to the argument in the Selection object 
-    `select` with name `argname`. If `select` does not contain such an argument and `recurse` 
-    is True, then the function is called recursively on `select`'s inner selections. If 
-    no such argument is found in `select` or its inner selections, then the function 
-    returns `None`
+  ) -> Argument:
+    """ Returns an Argument object corresponding to the argument in the Selection
+    object :attr:`select` with name :attr:`argname`. If :attr:`select` does not
+    contain such an argument and :attr:`recurse` is True, then the function is
+    called recursively on :attr:`select`'s inner selections. If no such argument
+    is found in :attr:`select` or its inner selections, then the function raises
+    an exception.
 
     Args:
       select (Selection): The selection to scan
       argname (str): The name of the argument to find
-      recurse (bool, optional): Flag indicating whether or not the function should be run recursively. Defaults to True.
+      recurse (bool, optional): Flag indicating whether or not the method should
+        be run recursively on nested selections. Defaults to True.
+
+    Raises:
+      KeyError: If no argument named :attr:`argname` exists in the selection
+        :attr:`self`.
 
     Returns:
-      Optional[Argument]: The argument in `select` with name `argname` ir it exists, otherwise None
+      Argument: The argument in :attr:`select` with name :attr:`argname` (if any).
     """
     try:
       return next(self.arguments | where(lambda arg: arg.name == argname))
@@ -385,32 +561,39 @@ class Selection:
             | where(lambda x: x is not None)
           )
         except StopIteration:
-          return None
+          raise KeyError(f'Selection.get_argument: no argument named {argname} found in selection')
       else:
-        return None
+        raise KeyError(f'Selection.get_argument: no argument named {argname} found in selection')
 
   def get_argument_by_variable(
     self: Selection,
     varname: str,
     recurse: bool = True
-  ) -> Optional[Argument]:
-    """ Returns an Argument object corresponding to the argument in the Selection object 
-    `select` whose value is a variable named `varname`. If `select` does not contain such 
-    an argument and `recurse` is True, then the function is called recursively on `select`'s 
-    inner selections. If no such argument is found in `select` or its inner selections, then 
-    the function returns `None`
+  ) -> Argument:
+    """ Returns an Argument object corresponding to the argument in the Selection
+    object :attr:`select` whose value is a variable named :attr:`varname`. If
+    :attr:`select` does not contain such an argument and :attr:`recurse` is True,
+    then the function is called recursively on :attr:`select`'s inner selections.
+    If no such argument is found in :attr:`select` or its inner selections, then
+    the function raises an exception
 
     Args:
       select (Selection): The selection to scan
-      argname (str): The name of the argument to find
-      recurse (bool, optional): Flag indicating whether or not the function should be run recursively. Defaults to True.
+      varname (str): The name of the variable to find
+      recurse (bool, optional): Flag indicating whether or not the function
+        should be run recursively. Defaults to True.
+
+    Raises:
+      KeyError: If no argument with variable value named :attr:`varname` exists
+        in the selection :attr:`self`.
 
     Returns:
-      Optional[Argument]: The argument in `select` with name `argname` ir it exists, otherwise None
+      Argument: The argument in :attr:`select` with variable value named
+        :attr:`varname` if it exists
     """
     try:
       return next(self.arguments | where(lambda arg: arg.value.name == varname))
-    except StopIteration | AttributeError:
+    except (StopIteration, AttributeError):
       if recurse:
         try:
           return next(
@@ -419,42 +602,44 @@ class Selection:
             | where(lambda x: x is not None)
           )
         except StopIteration:
-          return None
+          raise KeyError(f'Selection.get_argument_by_variable: no argument with variable value named {varname} found in selection')
       else:
-        return None
+        raise KeyError(f'Selection.get_argument_by_variable: no argument with variable value named {varname} found in selection')
 
-  @staticmethod
   def substitute_arg(
-    select: Selection,
+    self: Selection,
     argname: str,
     replacement: Argument | list[Argument],
     recurse: bool = True
   ) -> Selection:
-    """ Returns a new Selection object containing the same data as `select` with the argument
-    named `argname` replaced with `replacement`. The function is recursive and the substitution
-    is also applied to `select`'s inner selection.
+    """ Returns a new Selection object containing the same data as :attr:`self`
+    with the argument named :attr:`argname` replaced with :attr:`replacement`.
+    If :attr:`recurse` is True, then the method is called recursively on
+    :attr:`self`'s inner selections and the substitution is also applied to the
+    latter.
 
     Args:
-      select (Selection): _description_
-      argname (str): _description_
-      replacement (Argument | list[Argument]): _description_
-      recurse (bool, optional): Flag indicating whether or not the function should be run recursively. Defaults to True.
+      self (Selection): _description_
+      argname (str): The name of the argument to substitute.
+      replacement (Argument | list[Argument]): The argument(s) replacement
+      recurse (bool, optional): Flag indicating whether or not the method
+        should be run recursively. Defaults to True.
 
     Returns:
       Selection: _description_
     """
     return Selection(
-      fmeta=select.fmeta,
-      alias=select.alias,
+      fmeta=self.fmeta,
+      alias=self.alias,
       arguments=list(
-        select.arguments
+        self.arguments
         | map(lambda arg: replacement if arg.name == argname else arg)
         | traverse
       ),
       selection=list(
-        select.selection
+        self.selection
         | map(partial(Selection.substitute_arg, argname=argname, replacement=replacement))
-      ) if recurse else select.selection
+      ) if recurse else self.selection
     )
 
   def select(self: Selection, other: Selection) -> Selection:
@@ -477,9 +662,9 @@ class Selection:
       )
 
   # TODO: Function to recover an approximate selection from a JSON data object
-  @staticmethod
-  def of_json(data: dict) -> Selection:
-    pass
+  # @staticmethod
+  # def of_json(data: dict) -> Selection:
+  #   pass
 
 
 @dataclass(frozen=True)
@@ -488,7 +673,6 @@ class Query:
   selection: list[Selection] = field(default_factory=list)
 
   # Variables as query arguments, not the values of those variables
-  # NOTE: Temporarily add the values with the definitions
   variables: list[VariableDefinition] = field(default_factory=list)
 
   @property
@@ -509,149 +693,98 @@ class Query:
 
     return f'query{args_str} {{\n{selection_str}\n}}'
 
-  def infer_variable_definitions(self: Selection) -> list[VariableDefinition]:
+  def infer_variable_definitions(self: Query) -> list[VariableDefinition]:
     return list(self.selection | map(Selection.infer_variable_definitions) | traverse)
 
-  def add_selections(self: Query, new_selections: list[Selection]) -> Query:
-    """ Returns a new Query containing all selections in 'query' along with
-    the new selections in `new_selections`
+  def add(
+    self: Query,
+    other: Query | Selection | list[Selection]
+  ) -> Query:
+    """ Returns a new Query containing all selections in :attr:'self' along with
+    the new selections in :attr:`other`
 
     Args:
-      self (Query): The query to which new selections are to be added
-      new_selections (list[Selection]): The new selections to be added to the query
+      self (Query): The query to which new selection(s) or query are to be added
+      other (Query | Selection | list[Selection]): The new selection(s)
+      or query to be added to the query
 
     Returns:
       Query: A new `Query` objects containing all selections
     """
-    return Query(
-      name=self.name,
-      selection=union(
-        self.selection,
-        new_selections,
-        key=lambda select: select.key,
-        combine=Selection.combine
-      )
-    )
+    match other:
+      case Selection() as new_selection:
+        return self.add([new_selection])
 
-  @staticmethod
-  def add_selection(query: Query, new_selection: Selection) -> Query:
-    """ Same as `add_selections`, but for a single `new_selection`.
+      case Query() as query:
+        return self.add(query.selection)
+
+      case list() as new_selections:
+        return Query(
+          name=self.name,
+          selection=union(
+            self.selection,
+            new_selections,
+            key=lambda select: select.key,
+            combine=Selection.combine
+          )
+        )
+
+  def remove(
+    self: Query,
+    other: Query | Selection | list[Selection]
+  ) -> Query:
+    """ Returns a new :class:`Query` object containing all selections in
+    :attr:`self` minus the subquery or selection(s) specified in :attr:`other`.
+
+    Note: :attr:`other` does not need to be a "full" selection (i.e.: a
+    selection all the way to leaves of the GraphQL schema).
+
+    Example:
+
+    >>> og_selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
+    ...   Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
+    ...     Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
+    ...     Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
+    ...     Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+    ...   ])
+    ... ])
+    >>> selection_to_remove = Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [])
+    >>> og_selection.remove(selection_to_remove)
+    Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [])
 
     Args:
-      query (Query): The query to which new selections are to be added
-      new_selection (Selection): The new selection to be added to the query
+      query (Query): The query to which a selection has to be removed
+      other (Query | Selection | list[Selection]): The subquery or
+        selection(s) to remove from :attr:`self`
 
     Returns:
-      Query: A new `Query` objects containing all selections
-    """
-    return Query.add_selections(query, [new_selection])
-
-  @staticmethod
-  def remove_selections(query: Query, selections_to_remove: list[Selection]) -> Query:
-    """ Returns a new `Query` object containing all selections in `query` minus the selections
-    sepcified in `selections_to_remove`.
-
-    Note: Selections in `selections_to_remove` do not need to be "full" selections (i.e.: a selections all the way to
-    leaves of the GraphQL schema).
-
-    Args:
-      query (Query): The query to which selections have to be removed
-      selections_to_remove (list[Selection]): The selections to remove from the query
-
-    Returns:
-      Query: A new `Query` object containing the original query selections without the
-      selections in `selections_to_remove`
+      Query: A new `Query` object containing the original query selections
+        minus :attr:`other`
     """
     def combine(select: Selection, selection_to_remove: Selection) -> Optional[Selection]:
       if selection_to_remove.selection == []:
         return None
       else:
-        return Selection.remove_selections(select, selection_to_remove.selection)
+        return select.remove(selection_to_remove.selection)
 
-    return Query(
-      name=query.name,
-      selection=filter_none(union(
-        query.selection,
-        selections_to_remove,
-        key=lambda s: s.fmeta.name,
-        combine=combine
-      )),
-      variables=query.variables
-    )
+    match other:
+      case Selection() as to_remove:
+        return self.remove([to_remove])
 
-  @staticmethod
-  def remove_selection(query: Query, selection_to_remove: Selection) -> Query:
-    """ Same as `remove_selections` but for a single selection
+      case Query() as to_remove:
+        return self.remove(to_remove.selection)
 
-    Note: `selection_to_remove` does not need to be a "full" selection (i.e.: a selection all the way to
-    leaves of the GraphQL schema).
-
-    Example:
-    ```python
-    expected = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [])
-
-    og_selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
-      Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
-        Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
-        Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
-        Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
-      ])
-    ])
-
-    selection_to_remove = Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [])
-
-    new_selection = Selection.remove_selection(og_selection, selection_to_remove)
-    self.assertEqual(new_selection, expected)
-    ```
-
-    Args:
-        query (Query): The query to which a selection has to be removed
-        selection_to_remove (Selection): The selection to remove from the query
-
-    Returns:
-      Query: A new `Query` object containing the original query selections without the
-      selection `selection_to_remove`
-    """
-    return Query.remove_selections(query, [selection_to_remove])
-
-  @staticmethod
-  def remove(query: Query, other: Query) -> Query:
-    """ Same as `remove_selections` but takes another `Query` object as argument
-    instead of a list of selections
-
-    Note: `other` does not need to include "full" selections (i.e.: selections all the way to
-    leaves of the GraphQL schema).
-
-    Args:
-        query (Query): The query for which selections are to be removed
-        other (Query): A query containing selections that will be removed from `query`
-
-    Returns:
-      Query: A new `Query` object containing the original query selections without the
-      selections in `other`
-    """
-    return reduce(Query.remove_selection, other.selection, query)
-
-  @staticmethod
-  def combine(query: Query, other: Query) -> Query:
-    """ Returns a new `Query` object containing the selections of both `query` and `other`
-
-    Args:
-      query (Query): A `Query` object
-      other (Query): Another `Query` object
-
-    Returns:
-      Query: A new `Query` object containing the selections of both `query` and `other`
-    """
-    return Query(
-      name=query.name,
-      selection=union(
-        query.selection,
-        other.selection,
-        key=lambda select: select.key,
-        combine=Selection.combine
-      )
-    )
+      case list() as to_remove:
+        return Query(
+          name=self.name,
+          selection=filter_none(union(
+            self.selection,
+            to_remove,
+            key=lambda s: s.fmeta.name,
+            combine=combine
+          )),
+          variables=self.variables
+        )
 
   @staticmethod
   def transform(
@@ -659,24 +792,25 @@ class Query:
     variable_f: Callable[[VariableDefinition], VariableDefinition] = identity,
     selection_f: Callable[[Selection], Selection] = identity
   ) -> Query:
-    return reduce(Query.add_selection, query.selection | map(selection_f) | traverse, Query(
+    return reduce(Query.add, query.selection | map(selection_f) | traverse, Query(
       name=query.name,
       variables=list(query.variables | map(variable_f) | traverse)
     ))
 
-  @staticmethod
-  def contains_selection(query: Query, selection: Selection) -> bool:
-    """ Returns True i.f.f. the `selection` is present in `query`
+  def contains_selection(self: Query, selection: Selection) -> bool:
+    """ Returns True i.f.f. the selection tree :attr:`selection` is present in
+    :attr:`query`.
 
     Args:
       query (Query): A query object
-      selection (Selection): The selection to be found (or not) in `query`
+      selection (Selection): The selection to be found (or not) in :attr:`query`
 
     Returns:
-      bool: True if the `selection` is present in `query`, otherwise False
+      bool: True if the :attr:`selection` is present in :attr:`query`, False
+        otherwise.
     """
     return any(
-      query.selection
+      self.selection
       | map(lambda select: Selection.contains(select, selection))
     )
 
@@ -781,11 +915,12 @@ class Fragment:
 @dataclass(frozen=True)
 class Document:
   url: str
-  query: Optional[Query]
+  query: Query
   fragments: list[Fragment] = field(default_factory=list)
 
   # A list of variable assignments. For non-repeating queries
-  # the list would be of length 1 (i.e.: only one set of query variable assignments)
+  # the list would be of length 1 (i.e.: only one set of query variable
+  # assignments)
   variables: dict[str, Any] = field(default_factory=dict)
 
   @property
@@ -794,7 +929,7 @@ class Document:
 
   @staticmethod
   def mk_single_query(url: str, query: Query) -> Document:
-    return Document(url, [query])
+    return Document(url, query)
 
   @staticmethod
   def combine(doc: Document, other: Document) -> Document:
@@ -862,67 +997,13 @@ class DataRequest:
   def add_documents(self: DataRequest, docs: Document | list[Document]) -> DataRequest:
     return DataRequest(list([self.documents, docs] | traverse))
 
-  
+
 # ================================================================
 # Utility functions
 # ================================================================
-def input_value_of_string(type_: TypeRef.T, value: str) -> InputValue:
-  match type_:
-    case TypeRef.Named("ID"):
-      return InputValue.String(value)
-
-    case TypeRef.Named("Int"):
-      return InputValue.Int(int(value))
-    case TypeRef.Named("BigInt"):
-      return InputValue.String(value)
-
-    case (TypeRef.Named("Float")):
-      return InputValue.Float(float(value))
-    case (TypeRef.Named("BigDecimal")):
-      return InputValue.String(value)
-
-    case (TypeRef.Named("Boolean")):
-      return InputValue.Boolean(bool(value))
-
-    case (TypeRef.Named("String" | "Bytes")):
-      return InputValue.String(value)
-    case (TypeRef.Named()):
-      return InputValue.Enum(value)
-
-    case type_:
-      raise TypeError(f"input_value_of_string: invalid type {type_}")
-
-
-def input_value_of_value(type_: TypeRef.T, value: Any) -> InputValue:
-  match type_:
-    case (TypeRef.Named("ID"), _, str()):
-      return InputValue.String(str(value))
-
-    case TypeRef.Named("Int"):
-      return InputValue.Int(int(value))
-    case TypeRef.Named("BigInt"):
-      return InputValue.String(str(value))
-
-    case (TypeRef.Named("Float")):
-      return InputValue.Float(float(value))
-    case (TypeRef.Named("BigDecimal")):
-      return InputValue.String(str(value))
-
-    case (TypeRef.Named("Boolean")):
-      return InputValue.Boolean(bool(value))
-
-    case (TypeRef.Named("String" | "Bytes")):
-      return InputValue.String(str(value))
-    case (TypeRef.Named()):
-      return InputValue.Enum(str(value))
-
-    case type_:
-      raise TypeError(f"input_value_of_value: invalid type {type_}")
-
-
 def input_value_of_argument(
   schema: SchemaMeta,
-  meta: TypeMeta,
+  argmeta: TypeMeta.ArgumentMeta,
   value: Any
 ) -> InputValue:
   def fmt_value(type_ref: TypeRef.T, value: Any, non_null=False):
@@ -932,7 +1013,7 @@ def input_value_of_argument(
         if not non_null:
           return InputValue.Null()
         else:
-          raise TypeError(f"Argument {meta.name} cannot be None!")
+          raise TypeError(f"Argument {argmeta.name} cannot be None!")
 
       # If type is non_null, recurse with non_null=True
       case (TypeRef.NonNull(t), _, _):
@@ -963,23 +1044,12 @@ def input_value_of_argument(
         return InputValue.List([fmt_value(t, val, non_null) for val in value])
 
       case (TypeRef.Named(), TypeMeta.InputObjectMeta() as input_object, dict()):
-        return InputValue.Object({key: fmt_value(typeref_of_input_field(input_object, key), val, non_null) for key, val in value.items()})
+        return InputValue.Object({key: fmt_value(input_object.type_of_input_field(key), val, non_null) for key, val in value.items()})
 
       case (value, typ, non_null):
         raise TypeError(f"mk_input_value({value}, {typ}, {non_null})")
 
-  match meta:
-    case TypeMeta.ArgumentMeta(type_=type_):
-      return fmt_value(type_, value)
-    case _:
-      raise TypeError(f"input_value_of_argument: TypeMeta {meta.name} is not of type TypeMeta.ArgumentMeta")
-
-
-def add_object_field(
-  object_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta,
-  field: TypeMeta.FieldMeta
-) -> None:
-  object_.fields.append(field)
+  return fmt_value(argmeta.type_, value)
 
 
 def arguments_of_field_args(
@@ -1010,28 +1080,3 @@ def arguments_of_field_args(
       return list(filter(lambda arg: arg is not None, args))
     case _:
       raise TypeError(f"arguments_of_field_args: TypeMeta {field.name} is not of type FieldMeta")
-
-
-def selection_of_path(
-  schema: SchemaMeta,
-  fpath: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]
-) -> list[Selection]:
-  match fpath:
-    case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
-      return [Selection(
-        fmeta,
-        arguments=arguments_of_field_args(schema, fmeta, args),
-        selection=selection_of_path(schema, rest)
-      )]
-    case []:
-      return []
-
-
-def pagination_args(page_size: int, num_entities: int) -> list[dict[str, int]]:
-  num_pages = math.ceil(num_entities / page_size)
-  
-  return [
-    {'first': num_entities % page_size, 'skip': i * page_size} if (i == num_pages - 1 and num_entities % page_size != 0)
-    else {'first': page_size, 'skip': i * page_size}
-    for i in range(0, num_pages)
-  ]
