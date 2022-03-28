@@ -22,7 +22,7 @@ import warnings
 import subgrounds.client as client
 from subgrounds.query import Query, Selection, arguments_of_field_args
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, mk_schema
-from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, LocalSyntheticField, DocumentTransform
+from subgrounds.transform import DEFAULT_SUBGRAPH_TRANSFORMS, LocalSyntheticField, DocumentTransform
 from subgrounds.utils import extract_data, identity
 
 logger = logging.getLogger('subgrounds')
@@ -672,10 +672,11 @@ class Subgraph:
   url: str
   schema: SchemaMeta
   transforms: list[DocumentTransform] = field(default_factory=list)
+  is_subgraph: bool = True
 
   # TODO: Remove
   @staticmethod
-  def of_url(url: str) -> None:
+  def of_url(url: str) -> Subgraph:
     warnings.warn("`of_url` will be deprecated! Use `Subgrounds`'s `load_subgraph` instead", DeprecationWarning)
     filename = url.split("/")[-1] + ".json"
     if os.path.isfile(filename):
@@ -686,7 +687,7 @@ class Subgraph:
       with open(filename, mode="w") as f:
         json.dump(schema, f)
 
-    return Subgraph(url, mk_schema(schema), DEFAULT_GLOBAL_TRANSFORMS)
+    return Subgraph(url, mk_schema(schema), DEFAULT_SUBGRAPH_TRANSFORMS)
 
   def add_synthetic_field(
     self,

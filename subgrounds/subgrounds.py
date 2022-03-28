@@ -58,6 +58,33 @@ class Subgrounds:
     self.subgraphs[url] = sg
     return sg
 
+  def load_api(self, url: str, save_schema: bool = False) -> Subgraph:
+    """Performs introspection on the provided GraphQL API `url` to get the
+    schema, stores the schema if :attr:`save_schema` is `True` and returns a
+    generated class representing the GraphQL endpoint with all its entities.
+
+    Args:
+      url (str): The url of the API
+      save_schema (bool, optional): Flag indicating whether or not the schema
+        should be saved to disk. Defaults to False.
+
+    Returns:
+      Subgraph: A generated class representing the subgraph and its entities
+    """
+    filename = url.split("/")[-1] + ".json"
+    if os.path.isfile(filename):
+      with open(filename) as f:
+        schema = json.load(f)
+    else:
+      schema = client.get_schema(url)
+      if save_schema:
+        with open(filename, mode="w") as f:
+          json.dump(schema, f)
+
+    sg = Subgraph(url, mk_schema(schema), DEFAULT_SUBGRAPH_TRANSFORMS, False)
+    self.subgraphs[url] = sg
+    return sg
+
   def mk_request(self, fpaths: list[FieldPath]) -> DataRequest:
     """Creates a :class:`DataRequest` object by combining multiple
     :class:`FieldPath` objects.
@@ -78,24 +105,30 @@ class Subgrounds:
       ))
     ))
 
-  def execute(self, req: DataRequest) -> list[dict]:
+  def execute(self, req: DataRequest, auto_paginate: bool = True) -> list[dict]:
     """ Executes a :class:`DataRequest` object, sending the underlying
     query(ies) to the server and returning a data blob (list of Python
     dictionaries, one per actual query).
 
     Args:
       req (DataRequest): The :class:`DataRequest` object to be executed
+      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
+        should automatically paginate the query. Useful for querying non-subgraph
+        APIs since automatic pagination is only supported for subgraph APIs.
+        Defaults to True.
 
     Returns:
       list[dict]: The reponse data
     """
     def execute_document(doc: Document) -> dict:
-      schema = next(
+      subgraph = next(
         self.subgraphs.values()
         | where(lambda sg: sg.url == doc.url)
-        | map(lambda sg: sg.schema)
       )
-      return pagination.paginate(schema, doc)
+      if auto_paginate and subgraph.is_subgraph:
+        return pagination.paginate(subgraph.schema, doc)
+      else:
+        return client.query(doc.url, doc.graphql, variables=doc.variables)
 
     def transform_doc(transforms: list[DocumentTransform], doc: Document) -> dict:
       logger.debug(f'execute.transform_doc: doc = \n{doc.graphql}')
@@ -122,23 +155,32 @@ class Subgrounds:
 
     return transform_req(self.global_transforms, req)
 
-  def query_json(self, fpaths: list[FieldPath]) -> list[dict[str, Any]]:
+  def query_json(
+    self,
+    fpaths: list[FieldPath],
+    auto_paginate: bool = True
+  ) -> list[dict[str, Any]]:
     """Combines `Subgrounds.mk_request` and `Subgrounds.execute` into one function.
 
     Args:
       fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
+      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
+        should automatically paginate the query. Useful for querying non-subgraph
+        APIs since automatic pagination is only supported for subgraph APIs.
+        Defaults to True.
 
     Returns:
       list[dict[str, Any]]: The reponse data
     """
     req = self.mk_request(fpaths)
-    return self.execute(req)
+    return self.execute(req, auto_paginate=auto_paginate)
 
   def query_df(
     self,
     fpaths: list[FieldPath],
     columns: Optional[list[str]] = None,
     concat: bool = False,
+    auto_paginate: bool = True
   ) -> pd.DataFrame | list[pd.DataFrame]:
     """Same as :func:`Subgrounds.query` but formats the response data into a
     Pandas DataFrame. If the response data cannot be flattened to a single query
@@ -162,6 +204,10 @@ class Subgrounds:
         in the request
       columns (Optional[list[str]], optional): The column labels. Defaults to None.
       merge (bool, optional): Whether or not to merge resulting dataframes.
+      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
+        should automatically paginate the query. Useful for querying non-subgraph
+        APIs since automatic pagination is only supported for subgraph APIs.
+        Defaults to True.
 
     Returns:
       pd.DataFrame | list[pd.DataFrame]: A DataFrame containing the reponse data
@@ -196,15 +242,26 @@ class Subgrounds:
     8       1643213210  2613.077301
     9       1643213196  2610.686563
     """
-    json_data = self.query_json(fpaths)
+    json_data = self.query_json(fpaths, auto_paginate=auto_paginate)
     return df_of_json(json_data, fpaths, columns, concat)
 
-  def query(self, fpath: FieldPath | list[FieldPath], unwrap: bool = True) -> str | int | float | bool | list | tuple | None:
+  def query(
+    self,
+    fpath: FieldPath | list[FieldPath],
+    unwrap: bool = True,
+    auto_paginate: bool = True
+  ) -> str | int | float | bool | list | tuple | None:
     """Executes one or multiple `FieldPath` objects immediately and return the data (as a tuple if multiple `FieldPath` objects are provided).
 
     Args:
       fpath (FieldPath): The `FieldPath` object(s) to query.
-
+      unwrap (bool, optional): Flag indicating whether or not, in the case where
+        the returned data is a list of one element, the element itself should be
+        returned instead of the list. Defaults to True.
+      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
+        should automatically paginate the query. Useful for querying non-subgraph
+        APIs since automatic pagination is only supported for subgraph APIs.
+        Defaults to True.
     Returns:
       [type]: The `FieldPath` object(s) data
 
@@ -227,9 +284,9 @@ class Subgrounds:
 
     """
     fpaths = list([fpath] | traverse)
-    blob = self.query_json(fpaths)
+    blob = self.query_json(fpaths, auto_paginate=auto_paginate)
 
-    def f(fpath):
+    def f(fpath: FieldPath) -> dict[str, Any]:
       data = fpath.extract_data(blob)
       if type(data) == list and len(data) == 1 and unwrap:
         return data[0]
