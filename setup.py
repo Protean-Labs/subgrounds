@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
   name="subgrounds",
-  version="0.0.8",
+  version="0.0.9",
   author="Protean Labs",
   author_email="info@protean.so",
   description="A framework for integrating The Graph data with dash components.",
@@ -16,7 +16,7 @@ setuptools.setup(
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License"
   ],
-  packages=setuptools.find_packages(exclude=["tests", "examples"]),
+  packages=setuptools.find_packages(exclude=["tests", "examples", "scratch"]),
   install_requires=['dash', 'requests', 'pipe', 'pandas'],
   python_requires=">=3.10",
 )

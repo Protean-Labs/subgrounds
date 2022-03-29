@@ -472,7 +472,54 @@ This project also builds on the excellent work by the good folks over at Plotly.
 
 # Notes
 ## Non-subgraph GraphQL APIs
-Although Subgrounds has been developed with subgraph APIs in mind, most features will also work with any GraphQL API. However, Subgrounds has not been tested with non-subgraph GraphQL APIs and some features will definitely break if the non-subgraph APIs do not follow the same conventions as subgraph APIs (e.g.: automatic pagination relies on each entity having a unique `id` field). 
+Although Subgrounds has been developed with subgraph APIs in mind, most features will also work with any GraphQL API. However, Subgrounds has not been tested with non-subgraph GraphQL APIs and some features will definitely break if the non-subgraph APIs do not follow the same conventions as subgraph APIs (e.g.: automatic pagination relies on each entity having a unique `id` field).
+
+It is nonetheless possible to use Subgrounds with non-subgraph GraphQL APIs by using `load_api` instead of `load_subgraph`. This will bypass Subgrounds automatic pagination feature and pagination will therefore have to be done manually. Below is an example of using Subgrounds with the snapshot GraphQL API.
+```python
+>>> from datetime import datetime
+
+>>> from subgrounds.subgrounds import Subgrounds
+>>> from subgrounds.subgraph import SyntheticField
+
+>>> sg = Subgrounds()
+>>> snapshot = sg.load_api('https://hub.snapshot.org/graphql')
+
+>>> snapshot.Proposal.datetime = SyntheticField(
+...   lambda timestamp: str(datetime.fromtimestamp(timestamp)),
+...   SyntheticField.STRING,
+...   snapshot.Proposal.end,
+... )
+
+>>> proposals = snapshot.Query.proposals(
+...   orderBy='created',
+...   orderDirection='desc',
+...   first=100,
+...   where=[
+...     snapshot.Proposal.space == 'olympusdao.eth',
+...     snapshot.Proposal.state == 'closed'
+...   ]
+... )
+
+>>> sg.query_df([
+...   proposals.datetime,
+...   proposals.title,
+...   proposals.votes,
+... ])
+     proposals_datetime                                    proposals_title  proposals_votes
+0   2022-03-25 15:33:00  OIP-87: BeraChain Investment + Strategic Partn...              184
+1   2022-03-25 12:00:00                 OIP-86: Uniswap Migration Proposal              146
+2   2022-03-25 13:12:00                    TAP 8 - Yearn Finance Whitelist              137
+3   2022-03-22 15:10:10                      OIP-85: Emissions Adjustments              167
+4   2022-03-13 20:17:26                  TAP 7 - Anchor Protocol Whitelist              141
+..                  ...                                                ...              ...
+95  2021-11-20 23:00:00                 OlympusDAO Add ETH to the Treasury               52
+96  2022-01-31 12:00:00                            Add BTC to the Treasury              232
+97  2021-11-29 23:00:00   OlympusDAO OlympusDAO Launch OHM on POLYGON c...              234
+98  2021-11-29 23:00:00                 OlympusDAO Launch OHM on BSC chain               92
+99  2021-11-20 23:00:00  Suggestions to add more video operation guidan...               53
+
+[100 rows x 3 columns]
+```
 
 ## GraphQL Aliases
 The use of the alias `xf608864358427cfb` in the query string is to prevent conflict when merging fieldpaths that select the same fields with different arguments. For example, in the following code, the `borrows` query field is selected twice with different arguments:
