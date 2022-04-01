@@ -1,14 +1,18 @@
+""" Pandas DataFrame utility module containing functions related to the
+formatting of GraphQL JSON data into DataFrames.
+"""
+
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Optional
-from functools import partial, reduce
+from typing import Any, Optional
+from functools import partial
 
 from pipe import dedup, groupby, map, traverse, where
 import pandas as pd
 
-from subgrounds.query import Query, Selection
+from subgrounds.query import Selection
 from subgrounds.subgraph import FieldPath
-from subgrounds.utils import flatten_dict, contains_list, loop_generator, snd, union
+from subgrounds.utils import loop_generator, union
 
 
 def gen_columns(data: list | dict, prefix: str = '') -> list[str]:
@@ -33,33 +37,35 @@ def fmt_cols(df: pd.DataFrame, col_map: dict[str, str]) -> pd.DataFrame:
 
 @dataclass
 class DataFrameColumns:
-  """ Helper class that holds data related to the shape of a DataFrame """
+  """ Helper class that holds data related to the shape of a DataFrame
+  """
   key: str
   fpaths: list[str]
 
-  def combine(self: DataFrameColumns, other: DataFrameColumns) -> DataFrameColumns:
-    """ Returns new DataFrameColumns containing the union of `self` and `other`'s columns
+  def combine(self, other: DataFrameColumns) -> DataFrameColumns:
+    """ Returns new DataFrameColumns containing the union of :attr:`self` and
+    :attr:`other`'s columns
 
     Args:
-      self (DataFrameColumns): DataFrameColumns object
-      other (DataFrameColumns): DataFrameColumns object
+      other (DataFrameColumns): Columns to be combined to :attr:`self`
 
     Returns:
-      DataFrameColumns: New DataFrameColumns containing the union of `self` and `other`
+      DataFrameColumns: New :class:`DataFrameColumns` containing the union of
+        :attr:`self` and :attr:`other`
     """
     return DataFrameColumns(self.key, union(self.fpaths, other.fpaths))
 
   def mk_df(
-    self: DataFrameColumns,
-    data: dict,
+    self,
+    data: list[dict[str, Any]],
     path_map: dict[str, FieldPath]
   ) -> pd.DataFrame:
-    """ Formats the JSON data `data` into a DataFrame containing the columns defined in `self`.
+    """ Formats the JSON data :attr:`data` into a DataFrame containing the columns
+    defined in :attr:`self`.
 
     Args:
-      self (DataFrameColumns): A DataFrameColumns object
-      data (dict): The JSON data to be formatted into a dataframe
-      path_map (dict[str, FieldPath]): A dictionary of `key-FieldPath` pairs
+      data (list[dict[str, Any]]): The JSON data to be formatted into a dataframe
+      path_map (dict[str, FieldPath]): A dictionary of :attr:`(key-FieldPath)` pairs
 
     Returns:
       pd.DataFrame: The JSON data formatted into a DataFrame
@@ -99,7 +105,7 @@ class DataFrameColumns:
 #     # Subset of the `data` dictionary containing only key-value pairs whose value
 #     # if not a list, nor contains a nested list
 #     values_dict = flatten_dict({key: value for key, value in data.items() if not contains_list(value)})
-    
+
 #     # List names identifiyng the values in `values_dict`
 #     values_fpaths = ['_'.join([*keys, key]) for key in values_dict]
 
@@ -140,13 +146,14 @@ class DataFrameColumns:
 
 
 def columns_of_selections(selections: list[Selection]) -> list[DataFrameColumns]:
-  """ Generates a list of DataFrame columns specifications based on a list of Selection trees.
+  """ Generates a list of DataFrame columns specifications based on a list of
+  :class:`Selection` trees.
 
   Args:
-      selections (list[Selection]): The selection trees
+    selections (list[Selection]): The selection trees
 
   Returns:
-      list[DataFrameColumns]: The list of DataFrame columns specifications
+    list[DataFrameColumns]: The list of DataFrame columns specifications
   """
   def columns_of_selections(selections: list[Selection], keys: list[str] = [], fpaths: list[str] = []) -> list[DataFrameColumns]:
     non_list_selections = [select for select in selections if not select.contains_list()]
@@ -170,14 +177,42 @@ def columns_of_selections(selections: list[Selection]) -> list[DataFrameColumns]
 
 
 def df_of_json(
-  json_data: dict,
+  json_data: list[dict[str, Any]],
   fpaths: list[FieldPath],
   columns: Optional[list[str]] = None,
-  merge: bool = False,
+  concat: bool = False,
 ) -> pd.DataFrame | list[pd.DataFrame]:
+  """ Formats the JSON data :attr:`json_data` into Pandas DataFrames,
+  flattening the data in the process.
+
+  Depending on the request's fieldpaths, either one or multiple dataframes will
+  be returned based on how flattenable the response data is.
+
+  :attr:`fpaths` is a list of :class:`FieldPath` objects corresponding to the
+  set of fieldpaths that were used to get the response data :attr:`json_data`.
+
+  :attr:`columns` is an optional argument used to rename the dataframes(s)
+  columns. The length of :attr:`columns` must be the same as the number of columns
+  of all returned dataframes.
+
+  :attr:`concat` indicates whether or not the resulting dataframes should be
+  concatenated together. The dataframes must have the same number of columns,
+  as well as the same column names (which can be set using the :attr:`columns`
+  argument).
+
+  Args:
+    json_data (list[dict[str, Any]]): Response data
+    fpaths (list[FieldPath]): Fieldpaths that yielded the response data
+    columns (Optional[list[str]], optional): Column names. Defaults to None.
+    concat (bool, optional): Flag indicating whether or not to concatenate the
+      resulting dataframes, if there are more than one. Defaults to False.
+
+  Returns:
+    pd.DataFrame | list[pd.DataFrame]: The resulting dataframe(s)
+  """
   if columns is None:
     columns = list(fpaths | map(lambda fpath: fpath.longname))
-  
+
   col_fpaths = zip(fpaths, loop_generator(columns))
   col_map = {fpath.dataname: colname for fpath, colname in col_fpaths}
 
@@ -192,7 +227,7 @@ def df_of_json(
     | map(partial(DataFrameColumns.mk_df, data=json_data, path_map=path_map))
   )
 
-  match (len(dfs), merge):
+  match (len(dfs), concat):
     case (0, _):
       return pd.DataFrame(columns=columns, data=[])
     case (1, _):
@@ -202,3 +237,5 @@ def df_of_json(
     case (_, True):
       dfs = list(dfs | map(lambda df: fmt_cols(df, col_map)))
       return pd.concat(dfs, ignore_index=True)
+
+  assert False  # Suppress mypy missing return statement warning

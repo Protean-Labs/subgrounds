@@ -1,26 +1,32 @@
+""" Subgraph module that defines various classes to manipulate requests and
+subgraphs.
+
+This module is the glue that connects the lower level modules (i.e.:
+:module:`query`, :module:`schema`, :module:`transform`, :module:`pagination`) to
+the higher toplevel modules (i.e.: :module:`subgrounds`).
+"""
+
 from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Callable, ClassVar, Dict, List, Optional, Tuple
+from typing import Any, Callable, ClassVar, Optional, Tuple
 from functools import partial, reduce
 import os
 import json
 import operator
 from hashlib import blake2b
 from pipe import map, where
-
-import warnings
-warnings.simplefilter('default')
-
 import logging
-logger = logging.getLogger('subgrounds')
+import warnings
 
 import subgrounds.client as client
-import subgrounds.schema as schema
-from subgrounds.query import Query, Selection, arguments_of_field_args, selection_of_path
-from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, field_of_object, mk_schema, type_of_field, type_of_typeref
-from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, LocalSyntheticField, DocumentTransform
+from subgrounds.query import Query, Selection, arguments_of_field_args
+from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, mk_schema
+from subgrounds.transform import DEFAULT_SUBGRAPH_TRANSFORMS, LocalSyntheticField, DocumentTransform
 from subgrounds.utils import extract_data, identity
+
+logger = logging.getLogger('subgrounds')
+warnings.simplefilter('default')
 
 
 @dataclass
@@ -116,34 +122,34 @@ class FieldOperatorMixin:
   subgraph: Subgraph
   type_: TypeRef.T
 
-  def __add__(self, other: Any) -> SyntheticField:
+  def __add__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.add, typeref_of_binary_op('add', self.type_, other), [self, other])
 
-  def __radd__(self, other: Any) -> SyntheticField:
+  def __radd__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.add(y, x), typeref_of_binary_op('add', self.type_, other), [self, other])
 
-  def __sub__(self, other: Any) -> SyntheticField:
+  def __sub__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.sub, typeref_of_binary_op('sub', self.type_, other), [self, other])
 
-  def __rsub__(self, other: Any) -> SyntheticField:
+  def __rsub__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.sub(y, x), typeref_of_binary_op('sub', self.type_, other), [self, other])
 
-  def __mul__(self, other: Any) -> SyntheticField:
+  def __mul__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.mul, typeref_of_binary_op('mul', self.type_, other), [self, other])
 
-  def __rmul__(self, other: Any) -> SyntheticField:
+  def __rmul__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.mul(y, x), typeref_of_binary_op('mul', self.type_, other), [self, other])
 
-  def __truediv__(self, other: Any) -> SyntheticField:
+  def __truediv__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.truediv, typeref_of_binary_op('div', self.type_, other), [self, other])
 
-  def __rtruediv__(self, other: Any) -> SyntheticField:
+  def __rtruediv__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.truediv(y, x), typeref_of_binary_op('div', self.type_, other), [self, other])
 
-  def __floordiv__(self, other: Any) -> SyntheticField:
+  def __floordiv__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(operator.floordiv, typeref_of_binary_op('div', self.type_, other), [self, other])
 
-  def __rfloordiv__(self, other: Any) -> SyntheticField:
+  def __rfloordiv__(self: FieldOperatorMixin, other: Any) -> SyntheticField:
     return SyntheticField(lambda x, y: operator.floordiv(y, x), typeref_of_binary_op('div', self.type_, other), [self, other])
 
   def __pow__(self, rhs: Any) -> SyntheticField:
@@ -364,18 +370,18 @@ class FieldPath(FieldOperatorMixin):
     This function assumes that all fieldpaths in `fpaths` belong to the same subgraph
 
     Args:
-        fpaths (list[FieldPath]): _description_
+      fpaths (list[FieldPath]): _description_
 
     Returns:
-        list[Selection]: _description_
+      list[Selection]: _description_
     """
-    query = reduce(Query.add_selection, fpaths | map(FieldPath.selection), Query())
+    query = reduce(Query.add, fpaths | map(FieldPath.selection), Query())
     return query.selection
 
   def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
     return extract_data(self.data_path, data)
 
-  def split_args(self, kwargs: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+  def split_args(self, kwargs: dict[str, Any]) -> Tuple[dict[str, Any], dict[str, Any]]:
     query_args = {}
     other_args = {}
     for key, item in kwargs.items():
@@ -440,37 +446,36 @@ class FieldPath(FieldOperatorMixin):
 
   # When setting arguments
   def __call__(self, **kwargs: Any) -> Any:
-    """ Sets field arguments and expand subfields. The updated FieldPath is returned. 
+    """ Sets field arguments and expand subfields. The updated FieldPath is returned.
 
     Example:
-    ```python
-    aaveV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/aave/protocol-v2")
 
-    query = aaveV2.Query.borrows(
-      first=10,
-      order_by=aaveV2.Borrow.timestamp,
-      order_direction="desc",
-      selection=[
-        aaveV2.Borrow.id,
-        aaveV2.Borrow.timestamp,
-        aaveV2.Borrow.amount
-      ]
-    )
-    ```
+    >>> aaveV2 = Subgraph.of_url("https://api.thegraph.com/subgraphs/name/aave/protocol-v2")
+    >>> query = aaveV2.Query.borrows(
+    ...   first=10,
+    ...   order_by=aaveV2.Borrow.timestamp,
+    ...   order_direction="desc",
+    ...   selection=[
+    ...     aaveV2.Borrow.id,
+    ...     aaveV2.Borrow.timestamp,
+    ...     aaveV2.Borrow.amount
+    ...   ]
+    ... )
 
     Returns:
-      FieldPath | list[FieldPath]: The updated field path if selection is not set, or a list of FieldPaths when selection is set
+      FieldPath | list[FieldPath]: The updated field path if :attr:`selection`
+        is not specified, or a list of fieldpaths when :attr:`selection` is
+        specified.
     """
     selection = kwargs.pop('selection', [])
     return FieldPath.set_arguments(self, kwargs, selection)
 
-  @staticmethod
-  def select(fpath: FieldPath, name: str) -> FieldPath:
-    """ Returns a new FieldPath corresponding to the FieldPath `fpath` extended with an additional 
+  def select(self: FieldPath, name: str) -> FieldPath:
+    """ Returns a new FieldPath corresponding to the FieldPath `self` extended with an additional
     selection on the field named `name`.
 
     Args:
-      fpath (FieldPath): The FieldPath on which to perform the selection/extension
+      self (FieldPath): The FieldPath on which to perform the selection/extension
       name (str): The name of the field to expand on the leaf of `fpath`
 
     Raises:
@@ -481,35 +486,34 @@ class FieldPath(FieldOperatorMixin):
     Returns:
       FieldPath: A new FieldPath containing `fpath` extended with the field named `name`
     """
-    match type_of_typeref(fpath.schema, fpath.type_):
+    match self.schema.type_of_typeref(self.type_):
       # If the FieldPath fpath
       case TypeMeta.EnumMeta() | TypeMeta.ScalarMeta():
-        raise TypeError(f"FieldPath: path {fpath} ends with a scalar field! cannot select field {name}")
+        raise TypeError(f"FieldPath: path {self} ends with a scalar field! cannot select field {name}")
 
       case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() as obj:
-        field = field_of_object(obj, name)
+        field = obj.field(name)
 
-        match type_of_field(fpath.schema, field):
+        match self.schema.type_of_typeref(field.type_):
           case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta():
             # Copy current path and append newly selected field
-            path = fpath.path.copy()
+            path = self.path.copy()
             path.append((None, field))
 
             # Return new FieldPath
             return FieldPath(
-              subgraph=fpath.subgraph,
-              root_type=fpath.root_type,
+              subgraph=self.subgraph,
+              root_type=self.root_type,
               type_=field.type_,
               path=path
             )
           case _:
-            raise TypeError(f"FieldPath: field {name} is not a valid field for object {fpath.type_.name} at path {fpath}")
+            raise TypeError(f"FieldPath: field {name} is not a valid field for object {self.type_.name} at path {self}")
 
       case _:
-        raise TypeError(f"FieldPath: Unexpected type {fpath.type_.name} when selection {name} on {fpath}")
+        raise TypeError(f"FieldPath: Unexpected type {self.type_.name} when selection {name} on {self}")
 
-  @staticmethod
-  def extend(fpath: FieldPath, ext: FieldPath) -> FieldPath:
+  def extend(self: FieldPath, ext: FieldPath) -> FieldPath:
     """ Extends the FieldPath `fpath` with the FieldPath `ext`. `ext` must start where the `fpath` ends.
 
     Args:
@@ -524,23 +528,23 @@ class FieldPath(FieldOperatorMixin):
     Returns:
       FieldPath: A new FieldPath containing the initial FieldPath `fpath` extended with `ext`
     """
-    match fpath.leaf:
+    match self.leaf:
       case TypeMeta.FieldMeta() as fmeta:
-        match schema.type_of_field(fpath.schema, fmeta):
+        match self.schema.type_of_typeref(fmeta.type_):
           case TypeMeta.ObjectMeta(name=name) | TypeMeta.InterfaceMeta(name=name):
             if name == ext.root_type.name:
               return FieldPath(
-                subgraph=fpath.subgraph,
-                root_type=fpath.root_type,
+                subgraph=self.subgraph,
+                root_type=self.root_type,
                 type_=ext.type_,
-                path=fpath.path + ext.path
+                path=self.path + ext.path
               )
             else:
-              raise TypeError(f"extend: FieldPath {ext} does not start at the same type from where FieldPath {fpath} ends")
+              raise TypeError(f"extend: FieldPath {ext} does not start at the same type from where FieldPath {self} ends")
           case _:
-            raise TypeError(f"extend: FieldPath {fpath} is not object field")
+            raise TypeError(f"extend: FieldPath {self} is not object field")
       case _:
-        raise TypeError(f"extend: FieldPath {fpath} is not an object field")
+        raise TypeError(f"extend: FieldPath {self} is not an object field")
 
   # Filter construction
   @staticmethod
@@ -601,16 +605,17 @@ class Object:
   def schema(self):
     return self.subgraph.schema
 
-  @staticmethod
-  def select(obj: Object, name: str) -> FieldPath:
-    field = schema.field_of_object(obj.object_, name)
+  def select(self: Object, name: str) -> FieldPath:
+    field = self.object_.field(name)
 
-    match schema.type_of_field(obj.schema, field):
+    match self.schema.type_of_typeref(field.type_):
       case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() as type_:
-        return FieldPath(obj.subgraph, TypeRef.Named(obj.object_.name), field.type_, [(None, field)])
+        return FieldPath(self.subgraph, TypeRef.Named(self.object_.name), field.type_, [(None, field)])
 
       case TypeMeta.T as type_:
-        raise TypeError(f"Object: Unexpected type {type_.name} when selection {name} on {obj}")
+        raise TypeError(f"Object: Unexpected type {type_.name} when selection {name} on {self}")
+
+    assert False  # Suppress mypy missing return statement warning
 
   @staticmethod
   def add_field(obj: Object, name: str, fpath: FieldPath) -> None:
@@ -637,7 +642,7 @@ class Object:
             raise Exception(f'SyntheticField {obj.object_.name}.{name}: {obj_.name} does not have the field {field_name}')
         case []:
           return
-          
+
     for fpath in sfield.deps:
       f(obj.object_, fpath.name_path)
 
@@ -667,10 +672,11 @@ class Subgraph:
   url: str
   schema: SchemaMeta
   transforms: list[DocumentTransform] = field(default_factory=list)
+  is_subgraph: bool = True
 
   # TODO: Remove
   @staticmethod
-  def of_url(url: str) -> None:
+  def of_url(url: str) -> Subgraph:
     warnings.warn("`of_url` will be deprecated! Use `Subgrounds`'s `load_subgraph` instead", DeprecationWarning)
     filename = url.split("/")[-1] + ".json"
     if os.path.isfile(filename):
@@ -681,7 +687,7 @@ class Subgraph:
       with open(filename, mode="w") as f:
         json.dump(schema, f)
 
-    return Subgraph(url, mk_schema(schema), DEFAULT_GLOBAL_TRANSFORMS)
+    return Subgraph(url, mk_schema(schema), DEFAULT_SUBGRAPH_TRANSFORMS)
 
   def add_synthetic_field(
     self,
@@ -692,17 +698,6 @@ class Subgraph:
     fmeta = TypeMeta.FieldMeta(name, '', [], sfield.type_)
     object_.fields.append(fmeta)
 
-    # dep_selections = Selection.consolidate(list(sfield.deps | map(FieldPath.selection)))
-    # match dep_selections:
-    #   case []:
-    #     dep_selections = []
-    #   case [select]:
-    #     dep_selections = []
-    #   case [select, *rest]:
-    #     dep_selections = reduce(Selection.consolidate, rest, select)
-
-    # print(sfield.deps)
-    # print(Selection.consolidate(list(sfield.deps | map(FieldPath.selection))))
     sfield_fpath = FieldPath(self, TypeRef.Named(object_.name), sfield.type_, [(None, fmeta)])
     logger.debug(f'Subgraph: Adding SyntheticField at FieldPath {sfield_fpath.root_type.name}.{sfield_fpath.name_path}')
 
@@ -710,7 +705,6 @@ class Subgraph:
       self,
       fmeta,
       object_,
-      FieldPath.selection(sfield_fpath),
       sfield.f,
       sfield.default,
       list(sfield.deps | map(FieldPath.selection))

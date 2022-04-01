@@ -1,7 +1,6 @@
 import dash
 from dash import html
 
-from subgrounds.plotly_wrappers import Bar, Figure
 from subgrounds.dash_wrappers import DataTable, AutoUpdate
 from subgrounds.subgrounds import Subgrounds
 
