@@ -96,6 +96,8 @@ class Subgrounds:
     Returns:
       DataRequest: A new :class:`DataRequest` object
     """
+    fpaths = list(fpaths | map(FieldPath.auto_select) | traverse)
+
     return DataRequest(documents=list(
       fpaths
       | groupby(lambda fpath: fpath.subgraph.url)
@@ -172,6 +174,7 @@ class Subgrounds:
     Returns:
       list[dict[str, Any]]: The reponse data
     """
+    fpaths = list(fpaths | map(FieldPath.auto_select) | traverse)
     req = self.mk_request(fpaths)
     return self.execute(req, auto_paginate=auto_paginate)
 
@@ -242,6 +245,7 @@ class Subgrounds:
     8       1643213210  2613.077301
     9       1643213196  2610.686563
     """
+    fpaths = list(fpaths | map(FieldPath.auto_select) | traverse)
     json_data = self.query_json(fpaths, auto_paginate=auto_paginate)
     return df_of_json(json_data, fpaths, columns, concat)
 
@@ -283,7 +287,7 @@ class Subgrounds:
     2628.975030015892
 
     """
-    fpaths = list([fpath] | traverse)
+    fpaths = list([fpath] | map(FieldPath.auto_select) | traverse)
     blob = self.query_json(fpaths, auto_paginate=auto_paginate)
 
     def f(fpath: FieldPath) -> dict[str, Any]:

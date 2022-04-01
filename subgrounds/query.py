@@ -1001,6 +1001,28 @@ class DataRequest:
 # ================================================================
 # Utility functions
 # ================================================================
+def selections_of_object(
+  schema: SchemaMeta,
+  object_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta
+):
+  """ Returns generator of Selection objects that selects all non-list fields of
+  GraphQL Object of Interface :attr:`object_`.
+
+  Args:
+    schema (SchemaMeta): _description_
+    object_ (TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta): _description_
+
+  Yields:
+    _type_: _description_
+  """
+  for fmeta in object_.fields:
+    if not fmeta.type_.is_list and len(fmeta.arguments) == 0:
+      match schema.type_of_typeref(fmeta.type_):
+        case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() as inner_object:
+          yield Selection(fmeta, selection=[Selection(inner_object.field('id'))])
+        case _:
+          yield Selection(fmeta)
+
 def input_value_of_argument(
   schema: SchemaMeta,
   argmeta: TypeMeta.ArgumentMeta,
