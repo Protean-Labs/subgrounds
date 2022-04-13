@@ -20,7 +20,7 @@ import logging
 import warnings
 
 import subgrounds.client as client
-from subgrounds.query import Query, Selection, arguments_of_field_args
+from subgrounds.query import Query, Selection, arguments_of_field_args, selections_of_object
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef, mk_schema
 from subgrounds.transform import DEFAULT_SUBGRAPH_TRANSFORMS, LocalSyntheticField, DocumentTransform
 from subgrounds.utils import extract_data, identity
@@ -378,6 +378,40 @@ class FieldPath(FieldOperatorMixin):
     query = reduce(Query.add, fpaths | map(FieldPath.selection), Query())
     return query.selection
 
+  @staticmethod
+  def fieldpaths_of_object(
+    subgraph: Subgraph,
+    object_: TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta
+  ):
+    """ Returns generator of FieldPath objects that selects all non-list fields of
+    GraphQL Object of Interface :attr:`object_`.
+
+    Args:
+      schema (SchemaMeta): _description_
+      object_ (TypeMeta.ObjectMeta | TypeMeta.InterfaceMeta): _description_
+
+    Yields:
+      _type_: _description_
+    """
+    for fmeta in object_.fields:
+      if not fmeta.type_.is_list and len(fmeta.arguments) == 0:
+        match subgraph.schema.type_of_typeref(fmeta.type_):
+          case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta():
+            yield subgraph.__getattribute__(object_.name).__getattribute__(fmeta.name).id
+          case _:
+            yield subgraph.__getattribute__(object_.name).__getattribute__(fmeta.name)
+
+  def auto_select(self) -> FieldPath | list[FieldPath]:
+    match self.subgraph.schema.type_of_typeref(self.leaf.type_):
+      case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() as object_:
+        return list(
+          FieldPath.fieldpaths_of_object(self.subgraph, object_)
+          | map(partial(FieldPath.extend, self))
+        )
+
+      case _:
+        return self
+
   def extract_data(self, data: dict | list[dict]) -> list[Any] | Any:
     return extract_data(self.data_path, data)
 
@@ -393,14 +427,15 @@ class FieldPath(FieldOperatorMixin):
 
     return query_args, other_args
 
-  @staticmethod
-  def selection(fpath: FieldPath) -> Selection:
+  def selection(self) -> Selection | list[Selection]:
+    """ Returns a selection or list of selections corresponding to the fieldpath.
+
+    Returns:
+      Selection | list[Selection]: _description_
+    """
     def f(path: list[Tuple[Optional[dict[str, Any]], TypeMeta.FieldMeta]]) -> list[Selection]:
       match path:
-        case [(None, TypeMeta.FieldMeta() as fmeta), *rest]:
-          return [Selection(fmeta, selection=f(rest))]
-
-        case [(args, TypeMeta.FieldMeta() as fmeta), *rest] if args == {}:
+        case [(args, TypeMeta.FieldMeta() as fmeta), *rest] if args == {} or args is None:
           return [Selection(fmeta, selection=f(rest))]
 
         case [(args, TypeMeta.FieldMeta() as fmeta), *rest]:
@@ -408,15 +443,14 @@ class FieldPath(FieldOperatorMixin):
             fmeta,
             # TODO: Revisit this
             alias=FieldPath.hash(fmeta.name + str(args)),
-            arguments=arguments_of_field_args(fpath.subgraph.schema, fmeta, args),
+            arguments=arguments_of_field_args(self.subgraph.schema, fmeta, args),
             selection=f(rest)
           )]
 
         case []:
           return []
 
-    # print(f'FieldPath.selection: path = {fpath.path}')
-    return f(fpath.path)[0]
+    return f(self.path)[0]
 
   @staticmethod
   def set_arguments(fpath: FieldPath, args: dict[str, Any], selection: list[FieldPath] = []) -> FieldPath:
@@ -470,12 +504,11 @@ class FieldPath(FieldOperatorMixin):
     selection = kwargs.pop('selection', [])
     return FieldPath.set_arguments(self, kwargs, selection)
 
-  def select(self: FieldPath, name: str) -> FieldPath:
+  def select(self, name: str) -> FieldPath:
     """ Returns a new FieldPath corresponding to the FieldPath `self` extended with an additional
     selection on the field named `name`.
 
     Args:
-      self (FieldPath): The FieldPath on which to perform the selection/extension
       name (str): The name of the field to expand on the leaf of `fpath`
 
     Raises:

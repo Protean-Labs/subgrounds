@@ -309,6 +309,32 @@ class TestQueryString(unittest.TestCase):
 
     self.assertEqual(req, expected)
 
+  def test_auto_selections_1(self):
+    sg = Subgrounds()
+
+    pairs = self.subgraph1.Query.pairs(
+      first=100,
+      where={'reserveUSD_lt': 10},
+      orderBy='reserveUSD',
+      orderDirection='desc'
+    )
+
+    req = sg.mk_request([
+      pairs
+    ])
+
+    expected = sg.mk_request([
+      pairs.id,
+      pairs.token0.id,
+      pairs.token1.id,
+      pairs.reserveUSD,
+      pairs.priceToken0,
+      pairs.priceToken1,
+      pairs.createdAtTimestamp
+    ])
+
+    self.assertEqual(req, expected)
+
 
 class TestData(unittest.TestCase):
   def setUp(self):
