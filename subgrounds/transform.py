@@ -262,7 +262,7 @@ class LocalSyntheticField(DocumentTransform):
 
       assert False  # Suppress mypy missing return statement warning
 
-    if self.subgraph.url == doc.url:
+    if self.subgraph._url == doc.url:
       return Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform_on_type))
     else:
       return doc
@@ -319,7 +319,7 @@ class LocalSyntheticField(DocumentTransform):
             case dict():
               list(inner_select | map(partial(transform_on_type, data=data[name])))
 
-    if self.subgraph.url == doc.url:
+    if self.subgraph._url == doc.url:
       for select in doc.query.selection:
         transform_on_type(select, data)
 
@@ -367,14 +367,17 @@ class SplitTransform(RequestTransform):
         case (value, _):
           return value
 
-      assert False
+      assert False  # Suppress mypy missing return statement warning
 
     def transform(docs: list[Document], data: list[dict[str, Any]], acc: list[dict[str, Any]]) -> list[dict[str, Any]]:
       match (docs, data):
         case ([doc, *docs_rest], [d1, d2, *data_rest]) if Query.contains(doc.query, self.query):
           return transform(docs_rest, data_rest, [*acc, merge_data(d1, d2)])
+
         case ([], []):
           return acc
+
+      assert False  # Suppress mypy missing return statement warning
 
     return transform(req.documents, data, [])
 

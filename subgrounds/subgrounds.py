@@ -17,7 +17,8 @@ import warnings
 from subgrounds.dataframe_utils import df_of_json
 from subgrounds.query import DataRequest, Document, Query
 from subgrounds.schema import mk_schema
-from subgrounds.subgraph import FieldPath, Subgraph
+from subgrounds.subgraph.fieldpath import FieldPath
+from subgrounds.subgraph.subgraph import Subgraph
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, DEFAULT_SUBGRAPH_TRANSFORMS, DocumentTransform, RequestTransform
 import subgrounds.client as client
 import subgrounds.pagination as pagination
@@ -96,14 +97,14 @@ class Subgrounds:
     Returns:
       DataRequest: A new :class:`DataRequest` object
     """
-    fpaths = list(fpaths | map(FieldPath.auto_select) | traverse)
+    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
 
     return DataRequest(documents=list(
       fpaths
-      | groupby(lambda fpath: fpath.subgraph.url)
+      | groupby(lambda fpath: fpath._subgraph._url)
       | map(lambda group: Document(
         url=group[0],
-        query=reduce(Query.add, group[1] | map(FieldPath.selection), Query())
+        query=reduce(Query.add, group[1] | map(FieldPath._selection), Query())
       ))
     ))
 
@@ -123,12 +124,12 @@ class Subgrounds:
       list[dict]: The reponse data
     """
     def execute_document(doc: Document) -> dict:
-      subgraph = next(
+      subgraph: Subgraph = next(
         self.subgraphs.values()
-        | where(lambda sg: sg.url == doc.url)
+        | where(lambda sg: sg._url == doc.url)
       )
-      if auto_paginate and subgraph.is_subgraph:
-        return pagination.paginate(subgraph.schema, doc)
+      if auto_paginate and subgraph._is_subgraph:
+        return pagination.paginate(subgraph._schema, doc)
       else:
         return client.query(doc.url, doc.graphql, variables=doc.variables)
 
@@ -147,7 +148,7 @@ class Subgrounds:
     def transform_req(transforms: list[RequestTransform], req: DataRequest) -> list[dict]:
       match transforms:
         case []:
-          return list(req.documents | map(lambda doc: transform_doc(self.subgraphs[doc.url].transforms, doc)))
+          return list(req.documents | map(lambda doc: transform_doc(self.subgraphs[doc.url]._transforms, doc)))
         case [transform, *rest]:
           new_req = transform.transform_request(req)
           data = transform_req(rest, new_req)
@@ -174,7 +175,7 @@ class Subgrounds:
     Returns:
       list[dict[str, Any]]: The reponse data
     """
-    fpaths = list(fpaths | map(FieldPath.auto_select) | traverse)
+    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
     req = self.mk_request(fpaths)
     return self.execute(req, auto_paginate=auto_paginate)
 
@@ -245,7 +246,7 @@ class Subgrounds:
     8       1643213210  2613.077301
     9       1643213196  2610.686563
     """
-    fpaths = list(fpaths | map(FieldPath.auto_select) | traverse)
+    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
     json_data = self.query_json(fpaths, auto_paginate=auto_paginate)
     return df_of_json(json_data, fpaths, columns, concat)
 
@@ -287,11 +288,11 @@ class Subgrounds:
     2628.975030015892
 
     """
-    fpaths = list([fpath] | map(FieldPath.auto_select) | traverse)
+    fpaths = list([fpath] | map(FieldPath._auto_select) | traverse)
     blob = self.query_json(fpaths, auto_paginate=auto_paginate)
 
     def f(fpath: FieldPath) -> dict[str, Any]:
-      data = fpath.extract_data(blob)
+      data = fpath._extract_data(blob)
       if type(data) == list and len(data) == 1 and unwrap:
         return data[0]
       else:
@@ -319,57 +320,3 @@ class Subgrounds:
   #   #     tmin
 
   #   raise NotImplementedError
-
-
-def to_dataframe(data: list[dict]) -> pd.DataFrame | list[pd.DataFrame]:
-  """ Formats the dictionary `data` into a pandas DataFrame using some
-  heuristics when no clear "flattening" scheme is present.
-  """
-  warnings.warn("`to_dataframe` will be deprecated! Use `Subgrounds`'s `query_df` instead", DeprecationWarning)
-
-  def columns(data, prefix: str = '') -> list[str]:
-    match data:
-      case dict():
-        return list(
-          list(data.keys())
-          | map(lambda key: columns(data[key], f'{prefix}_{key}' if prefix != '' else key))
-          | traverse
-        )
-      case list():
-        return columns(data[0], prefix)
-      case _:
-        return prefix
-
-  def rows(data, prefix: str = '', partial_row: dict = {}) -> list[dict[str, Any]]:
-    def merge(data: dict, item: dict | list[dict]) -> dict | list[dict]:
-      match item:
-        case dict():
-          return data | item
-        case list():
-          return list(item | map(lambda item: merge(data, item)))
-
-    match data:
-      case dict():
-        row_items = list(
-          list(data.keys())
-          | map(lambda key: rows(data[key], f'{prefix}_{key}' if prefix != '' else key, partial_row))
-        )
-
-        return reduce(merge, row_items, partial_row)
-
-      case list():
-        return list(data | map(lambda row: rows(row, prefix, partial_row)))
-      case value:
-        return {prefix: value}
-
-  def flatten(data: list[list[Any]]) -> list[Any]:
-    match data[0]:
-      case dict():
-        return data
-      case list():
-        return reduce(lambda l1, l2: l1 + flatten(l2), data, [])
-
-  if len(data) == 1:
-    return pd.DataFrame(columns=columns(data), data=flatten(rows(data)))
-  else:
-    return list(data | map(lambda data: pd.DataFrame(columns=columns(data), data=flatten(rows(data)))))
