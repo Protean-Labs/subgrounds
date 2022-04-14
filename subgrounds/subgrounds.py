@@ -288,7 +288,7 @@ class Subgrounds:
     2628.975030015892
 
     """
-    fpaths = list([fpath] | map(FieldPath._auto_select) | traverse)
+    fpaths = list(fpath | map(FieldPath._auto_select) | traverse)
     blob = self.query_json(fpaths, auto_paginate=auto_paginate)
 
     def f(fpath: FieldPath) -> dict[str, Any]:

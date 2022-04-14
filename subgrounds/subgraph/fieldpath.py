@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger('subgrounds')
 warnings.simplefilter('default')
 
-FPATH_DEPTH_LIMIT: int = 2
+FPATH_DEPTH_LIMIT: int = 4
 
 
 def typeref_of_binary_op(op: str, t1: TypeRef.T, t2: int | float | str | bool | FieldPath | SyntheticField):
