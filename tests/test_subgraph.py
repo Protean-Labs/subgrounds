@@ -107,7 +107,7 @@ class TestAddType(unittest.TestCase):
     Pair = self.subgraph.Pair
     Pair.reserveCAD = sfield
 
-    self.assertEqual(self.subgraph.schema, expected)
+    self.assertEqual(self.subgraph._schema, expected)
 
   def test_add_synthetic_field_2(self):
     expected = SchemaMeta(query_type='Query', type_map={
@@ -197,7 +197,7 @@ class TestAddType(unittest.TestCase):
     Pair = self.subgraph.Pair
     Pair.reserveCAD = Pair.reserveUSD * 1.3
 
-    self.assertEqual(self.subgraph.schema, expected)
+    self.assertEqual(self.subgraph._schema, expected)
 
   def test_add_synthetic_field_3(self):
     expected = SchemaMeta(query_type='Query', type_map={
@@ -289,7 +289,7 @@ class TestAddType(unittest.TestCase):
     Pair.reserveCAD = Pair.reserveUSD * 1.3
     Pair.reserveEUR = Pair.reserveCAD * 1.5
 
-    self.assertEqual(self.subgraph.schema, expected)
+    self.assertEqual(self.subgraph._schema, expected)
 
   def test_add_synthetic_field_4(self):
     expected = SchemaMeta(query_type='Query', type_map={
@@ -379,7 +379,7 @@ class TestAddType(unittest.TestCase):
     Pair = self.subgraph.Pair
     Pair.tokenString = Pair.token0.symbol + "_" + Pair.token0.id + "_" + Pair.token1.symbol + "_" + Pair.token1.id
 
-    self.assertEqual(self.subgraph.schema, expected)
+    self.assertEqual(self.subgraph._schema, expected)
 
 
 class TestFieldPath(unittest.TestCase):
@@ -388,7 +388,7 @@ class TestFieldPath(unittest.TestCase):
     self.subgraph = Subgraph("", self.schema)
 
   def tearDown(self) -> None:
-    FieldPath.test_mode = False
+    FieldPath.__test_mode = False
 
   def test_object(self):
     object_ = TypeMeta.ObjectMeta('Pair', '', fields=[
@@ -405,7 +405,7 @@ class TestFieldPath(unittest.TestCase):
 
     Pair = self.subgraph.Pair
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(Pair, expected)
 
   def test_field_path_1(self):
@@ -427,7 +427,7 @@ class TestFieldPath(unittest.TestCase):
 
     fpath = self.subgraph.Pair.token0
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_2(self):
@@ -449,7 +449,7 @@ class TestFieldPath(unittest.TestCase):
 
     fpath = self.subgraph.Pair.id
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_3(self):
@@ -472,7 +472,7 @@ class TestFieldPath(unittest.TestCase):
 
     fpath = self.subgraph.Pair.token0.id
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_1(self):
@@ -497,7 +497,7 @@ class TestFieldPath(unittest.TestCase):
     self.subgraph.Pair.reserveCAD = sfield
     fpath = self.subgraph.Pair.reserveCAD
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_2(self):
@@ -521,7 +521,7 @@ class TestFieldPath(unittest.TestCase):
     self.subgraph.Token.frenchName = sfield
     fpath = self.subgraph.Pair.token0.frenchName
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_synthetic_field_path_3(self):
@@ -537,7 +537,7 @@ class TestFieldPath(unittest.TestCase):
     self.subgraph.Pair.token0Id = self.subgraph.Pair.token0.id
     fpath = self.subgraph.Pair.token0Id
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_filter_1(self):
@@ -549,7 +549,7 @@ class TestFieldPath(unittest.TestCase):
 
     filter_ = self.subgraph.Pair.reserveUSD > 100
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(filter_, expected)
 
   def test_field_path_args_1(self):
@@ -585,7 +585,7 @@ class TestFieldPath(unittest.TestCase):
       orderDirection='desc'
     )
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_args_2(self):
@@ -621,7 +621,7 @@ class TestFieldPath(unittest.TestCase):
       ]
     )
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_args_3(self):
@@ -663,7 +663,7 @@ class TestFieldPath(unittest.TestCase):
       orderBy=self.subgraph.Pair.reserveUSD
     )
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
   def test_field_path_extend_1(self):
@@ -698,9 +698,9 @@ class TestFieldPath(unittest.TestCase):
     fpath1 = self.subgraph.Query.pairs
     fpath2 = self.subgraph.Pair.token0.symbol
 
-    fpath = FieldPath.extend(fpath1, fpath2)
+    fpath = FieldPath._extend(fpath1, fpath2)
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(fpath, expected)
 
 
@@ -733,16 +733,16 @@ class TestQueryBuilding(unittest.TestCase):
       )
     ]))
 
-    app = Subgrounds()
+    sg = Subgrounds()
 
     pairs = self.subgraph.Query.pairs(first=10)
 
-    query = app.mk_request([
+    query = sg.mk_request([
       pairs.id,
       pairs.token0.symbol
     ])
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.maxDiff = None
     self.assertEqual(query, expected)
 
@@ -779,7 +779,7 @@ class TestQueryBuilding(unittest.TestCase):
       pairs.token0Id
     ])
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.maxDiff = None
     self.assertEqual(query, expected)
 
@@ -807,7 +807,7 @@ class TestQueryBuilding(unittest.TestCase):
       self.subgraph.Query.swaps.price
     ])
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.maxDiff = None
     self.assertEqual(query, expected)
 
@@ -835,7 +835,7 @@ class TestQueryBuilding(unittest.TestCase):
       self.subgraph.Query.swaps.my_value
     ])
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.maxDiff = None
     self.assertEqual(query, expected)
 
@@ -861,8 +861,8 @@ class TestSyntheticField(unittest.TestCase):
       Swap.amount0In
     )
 
-    self.assertEqual(sfield.f(1), 10)
-    self.assertEqual(sfield.deps, expected_deps)
+    self.assertEqual(sfield._f(1), 10)
+    self.assertEqual(sfield._deps, expected_deps)
 
   def test_synthetic_field_2(self):
     Swap = self.subgraph.Swap
@@ -874,8 +874,8 @@ class TestSyntheticField(unittest.TestCase):
 
     sfield: SyntheticField = Swap.amount0In - Swap.amount0Out
 
-    self.assertEqual(sfield.f(10, 0), 10)
-    self.assertEqual(sfield.deps, expected_deps)
+    self.assertEqual(sfield._f(10, 0), 10)
+    self.assertEqual(sfield._deps, expected_deps)
 
   def test_synthetic_field_3(self):
     Swap = self.subgraph.Swap
@@ -888,8 +888,8 @@ class TestSyntheticField(unittest.TestCase):
 
     sfield: SyntheticField = Swap.amount0In - Swap.amount0Out + Swap.amount1In
 
-    self.assertEqual(sfield.f(10, 0, 4), 14)
-    self.assertEqual(sfield.deps, expected_deps)
+    self.assertEqual(sfield._f(10, 0, 4), 14)
+    self.assertEqual(sfield._deps, expected_deps)
 
   def test_synthetic_field_5(self):
     Swap = self.subgraph.Swap
@@ -903,8 +903,8 @@ class TestSyntheticField(unittest.TestCase):
 
     sfield: SyntheticField = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.amount1Out)
 
-    self.assertEqual(sfield.f(10, 0, 0, 20), 0.5)
-    self.assertEqual(sfield.deps, expected_deps)
+    self.assertEqual(sfield._f(10, 0, 0, 20), 0.5)
+    self.assertEqual(sfield._deps, expected_deps)
 
   def test_synthetic_field_6(self):
     Swap = self.subgraph.Swap
@@ -916,5 +916,5 @@ class TestSyntheticField(unittest.TestCase):
 
     sfield: SyntheticField = Swap.amount0In / 10 ** Swap.amount0Out
 
-    self.assertEqual(sfield.f(100, 2), 1)
-    self.assertEqual(sfield.deps, expected_deps)
+    self.assertEqual(sfield._f(100, 2), 1)
+    self.assertEqual(sfield._deps, expected_deps)

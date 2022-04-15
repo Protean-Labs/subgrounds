@@ -36,7 +36,7 @@ class TestColumnsOfSelection(unittest.TestCase):
       carbon_offsets.tokenAddress,
     ]
 
-    query = reduce(Query.add, fpaths | map(FieldPath.selection), Query())
+    query = reduce(Query.add, fpaths | map(FieldPath._selection), Query())
 
     self.assertEqual(columns_of_selections(query.selection), expected)
 
@@ -64,7 +64,7 @@ class TestColumnsOfSelection(unittest.TestCase):
       carbon_offsets.tokenAddress,
     ]
 
-    query = reduce(Query.add, fpaths | map(FieldPath.selection), Query())
+    query = reduce(Query.add, fpaths | map(FieldPath._selection), Query())
 
     self.assertEqual(columns_of_selections(query.selection), expected)
 

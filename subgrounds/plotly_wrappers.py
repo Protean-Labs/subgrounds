@@ -31,7 +31,7 @@ class TraceWrapper(ABC):
   def mk_trace(self, data: list[dict[str, Any]] | dict[str, Any]) -> BaseTraceType:
     fpath_data = {}
     for key, fpath in self.fpaths.items():
-      item = fpath.extract_data(data)
+      item = fpath._extract_data(data)
       if type(item) == list and len(item) == 1:
         fpath_data[key] = item[0]
       else:
