@@ -86,11 +86,18 @@ class Object:
   # ================================================================
   # Overloaded magic functions
   # ================================================================
-  # def __getattribute__(self, __name: str) -> Any:
-  #   try:
-  #     return super().__getattribute__(__name)
-  #   except AttributeError:
-  #     return Object._select(self, __name)
+  # Field selection
+  def __getattribute__(self, __name: str) -> Any:
+    # Small hack to get code completion to work while allowing updates to FieldPath
+    # (i.e.: setting arguments)
+    try:
+      match super().__getattribute__(__name):
+        case FieldPath() | SyntheticField() | None:
+          return self._select(__name)
+        case value:
+          return value
+    except AttributeError:
+      return self._select(__name)
 
   def __setattr__(self, __name: str, __value: SyntheticField | FieldPath | Any) -> None:
     match __value:
