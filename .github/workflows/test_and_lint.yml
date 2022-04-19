@@ -32,7 +32,7 @@ jobs:
 
     - name: Install dependencies
       if: steps.cache-pipenv.outputs.cache-hit != 'true'
-      run: pipenv install --deploy --dev
+      run: pipenv install
 
     - name: Run unit tests
       run: pipenv run nose2
