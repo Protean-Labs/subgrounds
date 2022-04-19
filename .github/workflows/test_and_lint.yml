@@ -3,8 +3,8 @@ name: Test and lint
 on:
   pull_request:
     branches: [ main ]
-  release:
-    types: [ created ]
+  push:
+    branches: [ main ]
 
 jobs:
   test:

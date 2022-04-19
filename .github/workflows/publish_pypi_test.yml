@@ -1,8 +1,8 @@
 name: Publish main branch to PyPi test
 
 on:
-  push:
-    branches: [ main ]
+  release:
+    types: [ created ]
 
 jobs:
   test:
@@ -76,5 +76,6 @@ jobs:
     - name: Publish distribution 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN_TEST }}
         repository_url: https://test.pypi.org/legacy/
