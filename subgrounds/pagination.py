@@ -194,7 +194,13 @@ def preprocess_selection(
   acc0: Tuple[list[Selection], list[PaginationNode]] = ([], [])
   new_selections, pagination_nodes = reduce(fold, select.selection, acc0)
 
-  if select.fmeta.type_.is_list:
+  if (
+    select.fmeta.type_.is_list
+    and (
+      type(schema.type_of_typeref(select.fmeta.type_)) == TypeMeta.ObjectMeta
+      or type(schema.type_of_typeref(select.fmeta.type_)) == TypeMeta.InterfaceMeta
+    )
+  ):
     # Add id to selection if not already present
     try:
       next(new_selections | where(lambda select: select.fmeta.name == 'id'))
