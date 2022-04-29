@@ -156,12 +156,15 @@ def columns_of_selections(selections: list[Selection]) -> list[DataFrameColumns]
     list[DataFrameColumns]: The list of DataFrame columns specifications
   """
   def columns_of_selections(selections: list[Selection], keys: list[str] = [], fpaths: list[str] = []) -> list[DataFrameColumns]:
-    non_list_selections = [select for select in selections if not select.contains_list()]
-    non_list_fpaths = list(
-      non_list_selections
-      | map(lambda select: ['_'.join([*keys, *path]) for path in select.data_paths])
-      | traverse
-    )
+    if len(selections) > 0:
+      non_list_selections = [select for select in selections if not select.contains_list()]
+      non_list_fpaths = list(
+        non_list_selections
+        | map(lambda select: ['_'.join([*keys, *path]) for path in select.data_paths])
+        | traverse
+      )
+    else:
+      non_list_fpaths = ['_'.join(keys)]
 
     list_selections = [select for select in selections if select.contains_list()]
 

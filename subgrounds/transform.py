@@ -151,11 +151,18 @@ class TypeTransform(DocumentTransform):
     def transform(select: Selection, data: dict[str, Any]) -> None:
       # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
       match (select, data):
+        # Type matches
         case (
           Selection(TypeMeta.FieldMeta(name, _, _, ftype), None, _, [] | None) | Selection(TypeMeta.FieldMeta(_, _, _, ftype), str() as name, _, [] | None),
           dict() as data
         ) if TypeRef.root_type_name(self.type_) == TypeRef.root_type_name(ftype):
-          data[name] = self.f(data[name])
+          match data[name]:
+            case list() as values:
+              data[name] = list(values | map(lambda value: self.f(value) if value is not None else None))
+            case None:
+              data[name] = None
+            case _ as value:
+              data[name] = self.f(value)
 
         case (Selection(_, _, _, [] | None), dict()):
           pass
@@ -385,6 +392,6 @@ class SplitTransform(RequestTransform):
 DEFAULT_GLOBAL_TRANSFORMS: list[RequestTransform] = []
 
 DEFAULT_SUBGRAPH_TRANSFORMS: list[DocumentTransform] = [
-  TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal) if bigdecimal is not None else None),
-  TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint) if bigint is not None else None),
+  TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal)),
+  TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint)),
 ]
