@@ -36,7 +36,7 @@ class TestColumnsOfSelection(unittest.TestCase):
       carbon_offsets.tokenAddress,
     ]
 
-    query = reduce(Query.add, fpaths | map(FieldPath.selection), Query())
+    query = reduce(Query.add, fpaths | map(FieldPath._selection), Query())
 
     self.assertEqual(columns_of_selections(query.selection), expected)
 
@@ -64,7 +64,7 @@ class TestColumnsOfSelection(unittest.TestCase):
       carbon_offsets.tokenAddress,
     ]
 
-    query = reduce(Query.add, fpaths | map(FieldPath.selection), Query())
+    query = reduce(Query.add, fpaths | map(FieldPath._selection), Query())
 
     self.assertEqual(columns_of_selections(query.selection), expected)
 
@@ -893,6 +893,59 @@ class TestDFOfJSON(unittest.TestCase):
       burns.pair.id,
       burns.pair.token0.symbol,
       burns.pair.token1.symbol,
+    ]
+
+    for df in zip(df_of_json(json, fpaths), expected):
+      assert_frame_equal(df[0], df[1])
+
+  def test_df_of_json_scalar_list(self):
+    expected = [
+      pd.DataFrame(data={
+        'pools_id': [
+          '0x071c661b4deefb59e2a3ddb20db036821eee8f4b',
+          '0x071c661b4deefb59e2a3ddb20db036821eee8f4b'
+        ],
+        'pools_coins_name': [
+          'Curve.fi renBTC/wBTC/sBTC',
+          'Binance Wrapped BTC',
+        ],
+      }),
+      pd.DataFrame(data={
+        'pools_id': [
+          '0x071c661b4deefb59e2a3ddb20db036821eee8f4b',
+          '0x071c661b4deefb59e2a3ddb20db036821eee8f4b'
+        ],
+        'pools_balances': [
+          90175905,
+          911885899208018333
+        ],
+      }),
+    ]
+
+    curve = self.sg.load_subgraph('https://api.thegraph.com/subgraphs/name/gvladika/curve')
+    curve_pools = curve.Query.pools(first = 1)
+
+    fpaths = [
+      curve_pools.id,
+      curve_pools.coins.name,
+      curve_pools.balances
+    ]
+
+    json = [
+      {
+        'x977dc24a0884a6b2': [
+          {
+            'id': '0x071c661b4deefb59e2a3ddb20db036821eee8f4b',
+            'coins': [
+              {'name': 'Curve.fi renBTC/wBTC/sBTC', 'id': '0x075b1bb99792c9e1041ba13afef80c91a1e70fb3'},
+             {'name': 'Binance Wrapped BTC', 'id': '0x9be89d2a4cd102d8fecc6bf9da793be995c22541'}],
+            'balances': [
+              90175905, 
+              911885899208018333
+            ]
+          }
+        ]
+      }
     ]
 
     for df in zip(df_of_json(json, fpaths), expected):

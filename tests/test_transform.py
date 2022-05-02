@@ -59,7 +59,7 @@ class TestQueryTransform(unittest.TestCase):
       )
     ])
 
-    self.subgraph.transforms = [transform]
+    self.subgraph._transforms = [transform]
     sg = Subgrounds(
       global_transforms=[],
       subgraphs={'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2': self.subgraph}
@@ -133,7 +133,7 @@ class TestQueryTransform(unittest.TestCase):
       Document(url='https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', query=query)
     ])
 
-    self.subgraph.transforms = subgraph_transforms
+    self.subgraph._transforms = subgraph_transforms
     app = Subgrounds(
       global_transforms=[],
       subgraphs={'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2': self.subgraph}
@@ -150,7 +150,7 @@ class TestQueryTransform(unittest.TestCase):
           'reserve': {
             'decimals': 6
           },
-          'id': '0xf7b4c5bfaa6194720d984785827a2b325bd4851cc1735550664ce8d50bf40cf4:2',
+          'id': '13992939:273:0xf7b4c5bfaa6194720d984785827a2b325bd4851cc1735550664ce8d50bf40cf4:325:325',
           'timestamp': 1642019921,
           'adjusted_amount': 52627.231563
         },
@@ -159,7 +159,7 @@ class TestQueryTransform(unittest.TestCase):
           'reserve': {
             'decimals': 6
           },
-          'id': '0x4f05a63d43d0654d4649eafd319040b688ac4805aca0341f587e77db112875e2:2',
+          'id': '13992937:152:0x4f05a63d43d0654d4649eafd319040b688ac4805aca0341f587e77db112875e2:191:191',
           'timestamp': 1642019909,
           'adjusted_amount': 9000.0
         },
@@ -191,22 +191,22 @@ class TestQueryTransform(unittest.TestCase):
     expected = [{
       'x5847f08709be4c59': [
         {
-          'amount': 52627231563,
           'reserve': {
+            'symbol': 'USDC',
             'decimals': 6,
-            'symbol': 'USDC'
           },
-          'id': '0xf7b4c5bfaa6194720d984785827a2b325bd4851cc1735550664ce8d50bf40cf4:2',
+          'amount': 52627231563,
+          'id': '13992939:273:0xf7b4c5bfaa6194720d984785827a2b325bd4851cc1735550664ce8d50bf40cf4:325:325',
           'timestamp': 1642019921,
           'adjusted_amount': 52627.231563
         },
         {
-          'amount': 9000000000,
           'reserve': {
+            'symbol': 'USDC',
             'decimals': 6,
-            'symbol': 'USDC'
           },
-          'id': '0x4f05a63d43d0654d4649eafd319040b688ac4805aca0341f587e77db112875e2:2',
+          'amount': 9000000000,
+          'id': '13992937:152:0x4f05a63d43d0654d4649eafd319040b688ac4805aca0341f587e77db112875e2:191:191',
           'timestamp': 1642019909,
           'adjusted_amount': 9000.0
         },

@@ -70,7 +70,7 @@ class DataFrameColumns:
     Returns:
       pd.DataFrame: The JSON data formatted into a DataFrame
     """
-    cols_data = {col: path_map[col].extract_data(data) for col in self.fpaths if col in path_map}
+    cols_data = {col: path_map[col]._extract_data(data) for col in self.fpaths if col in path_map}
 
     rows_data = []
 
@@ -156,12 +156,15 @@ def columns_of_selections(selections: list[Selection]) -> list[DataFrameColumns]
     list[DataFrameColumns]: The list of DataFrame columns specifications
   """
   def columns_of_selections(selections: list[Selection], keys: list[str] = [], fpaths: list[str] = []) -> list[DataFrameColumns]:
-    non_list_selections = [select for select in selections if not select.contains_list()]
-    non_list_fpaths = list(
-      non_list_selections
-      | map(lambda select: ['_'.join([*keys, *path]) for path in select.data_paths])
-      | traverse
-    )
+    if len(selections) > 0:
+      non_list_selections = [select for select in selections if not select.contains_list()]
+      non_list_fpaths = list(
+        non_list_selections
+        | map(lambda select: ['_'.join([*keys, *path]) for path in select.data_paths])
+        | traverse
+      )
+    else:
+      non_list_fpaths = ['_'.join(keys)]
 
     list_selections = [select for select in selections if select.contains_list()]
 
@@ -211,17 +214,17 @@ def df_of_json(
     pd.DataFrame | list[pd.DataFrame]: The resulting dataframe(s)
   """
   if columns is None:
-    columns = list(fpaths | map(lambda fpath: fpath.longname))
+    columns = list(fpaths | map(lambda fpath: fpath._name()))
 
   col_fpaths = zip(fpaths, loop_generator(columns))
-  col_map = {fpath.dataname: colname for fpath, colname in col_fpaths}
+  col_map = {fpath._name(use_aliases=True): colname for fpath, colname in col_fpaths}
 
-  path_map = {fpath.dataname: fpath for fpath in fpaths}
+  path_map = {fpath._name(use_aliases=True): fpath for fpath in fpaths}
 
   dfs = list(
     fpaths
-    | groupby(lambda fpath: fpath.subgraph.url)
-    | map(lambda group: FieldPath.merge(group[1]))
+    | groupby(lambda fpath: fpath._subgraph._url)
+    | map(lambda group: FieldPath._merge(group[1]))
     | map(columns_of_selections)
     | traverse
     | map(partial(DataFrameColumns.mk_df, data=json_data, path_map=path_map))

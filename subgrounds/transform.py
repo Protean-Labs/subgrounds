@@ -151,11 +151,18 @@ class TypeTransform(DocumentTransform):
     def transform(select: Selection, data: dict[str, Any]) -> None:
       # TODO: Handle NonNull and List more graciously (i.e.: without using TypeRef.root_type_name)
       match (select, data):
+        # Type matches
         case (
           Selection(TypeMeta.FieldMeta(name, _, _, ftype), None, _, [] | None) | Selection(TypeMeta.FieldMeta(_, _, _, ftype), str() as name, _, [] | None),
           dict() as data
         ) if TypeRef.root_type_name(self.type_) == TypeRef.root_type_name(ftype):
-          data[name] = self.f(data[name])
+          match data[name]:
+            case list() as values:
+              data[name] = list(values | map(lambda value: self.f(value) if value is not None else None))
+            case None:
+              data[name] = None
+            case _ as value:
+              data[name] = self.f(value)
 
         case (Selection(_, _, _, [] | None), dict()):
           pass
@@ -262,7 +269,7 @@ class LocalSyntheticField(DocumentTransform):
 
       assert False  # Suppress mypy missing return statement warning
 
-    if self.subgraph.url == doc.url:
+    if self.subgraph._url == doc.url:
       return Document.transform(doc, query_f=lambda query: Query.transform(query, selection_f=transform_on_type))
     else:
       return doc
@@ -319,7 +326,7 @@ class LocalSyntheticField(DocumentTransform):
             case dict():
               list(inner_select | map(partial(transform_on_type, data=data[name])))
 
-    if self.subgraph.url == doc.url:
+    if self.subgraph._url == doc.url:
       for select in doc.query.selection:
         transform_on_type(select, data)
 
@@ -367,14 +374,17 @@ class SplitTransform(RequestTransform):
         case (value, _):
           return value
 
-      assert False
+      assert False  # Suppress mypy missing return statement warning
 
     def transform(docs: list[Document], data: list[dict[str, Any]], acc: list[dict[str, Any]]) -> list[dict[str, Any]]:
       match (docs, data):
         case ([doc, *docs_rest], [d1, d2, *data_rest]) if Query.contains(doc.query, self.query):
           return transform(docs_rest, data_rest, [*acc, merge_data(d1, d2)])
+
         case ([], []):
           return acc
+
+      assert False  # Suppress mypy missing return statement warning
 
     return transform(req.documents, data, [])
 
@@ -382,6 +392,6 @@ class SplitTransform(RequestTransform):
 DEFAULT_GLOBAL_TRANSFORMS: list[RequestTransform] = []
 
 DEFAULT_SUBGRAPH_TRANSFORMS: list[DocumentTransform] = [
-  TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal) if bigdecimal is not None else None),
-  TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint) if bigint is not None else None),
+  TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal)),
+  TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint)),
 ]

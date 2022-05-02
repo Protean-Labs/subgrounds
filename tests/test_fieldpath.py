@@ -1,5 +1,5 @@
 import unittest
-from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection, VariableDefinition
+from subgrounds.query import Argument, DataRequest, Document, InputValue, Query, Selection
 from subgrounds.schema import TypeMeta, TypeRef
 
 from subgrounds.subgraph import FieldPath, Subgraph
@@ -50,7 +50,7 @@ class TestFieldPath(unittest.TestCase):
     )
     query = pairs.id
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(query, expected)
 
   def test_query_building_2(self):
@@ -122,7 +122,7 @@ class TestFieldPath(unittest.TestCase):
       ]
     )
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(query, expected)
 
   def test_query_building_3(self):
@@ -195,7 +195,7 @@ class TestFieldPath(unittest.TestCase):
       pairs.reserveUSD
     ]
 
-    FieldPath.test_mode = True
+    FieldPath.__test_mode = True
     self.assertEqual(query, expected)
 
 
@@ -287,14 +287,11 @@ class TestQueryString(unittest.TestCase):
         ])
       )
     ])
-    
+
     pairs = self.subgraph1.Query.pairs(first=10)
 
     Pair = self.subgraph2.Pair
     Pair.token0Id = Pair.token0.id
-
-    self.subgraph2.Query.pairs(first=10).id,
-    self.subgraph2.Query.pairs.token0Id
 
     app = Subgrounds()
 
@@ -350,7 +347,7 @@ class TestData(unittest.TestCase):
       first=100
     )
 
-    fpath = repays.amount
+    fpath: FieldPath = repays.amount
 
     data = {
       'x84d7be5e0ed4ef8a': [
@@ -361,4 +358,4 @@ class TestData(unittest.TestCase):
       ]
     }
 
-    self.assertEqual(fpath.extract_data(data), expected)
+    self.assertEqual(fpath._extract_data(data), expected)
