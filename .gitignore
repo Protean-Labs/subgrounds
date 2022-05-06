@@ -3,8 +3,8 @@ notes/
 *.json
 *.md
 __pycache__/
-docs/
 dist/
+docs/build
 *.ipynb
 .coverage
 .python-version
