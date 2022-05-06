@@ -10,7 +10,10 @@ Welcome to subgrounds's documentation!
    :maxdepth: 3
    :caption: Contents:
 
+   getting_started
+   basics
    modules
+   troubleshooting
 
 Indices and tables
 ==================

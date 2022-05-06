@@ -1,6 +1,14 @@
 subgrounds package
 ==================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   subgrounds.subgraph
+
 Submodules
 ----------
 
@@ -14,7 +22,6 @@ Submodules
    subgrounds.plotly_wrappers
    subgrounds.query
    subgrounds.schema
-   subgrounds.subgraph
    subgrounds.subgrounds
    subgrounds.transform
    subgrounds.utils
