@@ -13,3 +13,4 @@ subgrounds.egg-info/
 scratch/
 
 !README.md
+!docs/*.md
