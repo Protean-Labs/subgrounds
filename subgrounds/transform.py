@@ -7,9 +7,9 @@ requests (see :class:`RequestTransform`) or on a per-document basis (see
 can be used to perform modifications to queries and their response data.
 
 For example, the :class:`TypeTransform` class is used to tranform the response
-data of :attr:`BigInt` and :attr:`BigDecimal` fields (which are represented as
-strings in the response JSON data) to python :attr:`int` and :attr:`float`
-respectively (see the actual transforms in :attr:`DEFAULT_SUBGRAPH_TRANSFORMS`).
+data of ``BigInt`` and ``BigDecimal`` fields (which are represented as
+strings in the response JSON data) to python ``int`` and ``float``
+respectively (see the actual transforms in ``DEFAULT_SUBGRAPH_TRANSFORMS``).
 
 Transforms are also used to apply :class:`SyntheticField` to queries and the
 response data (see :class:`LocalSyntheticField` transform class). Each
@@ -74,11 +74,11 @@ class RequestTransform(ABC):
     req: DataRequest,
     data: list[dict[str, Any]]
   ) -> list[dict[str, Any]]:
-    """ Method to be applied to all response data :attr:`data` of requests that pass
+    """ Method to be applied to all response data ``data`` of requests that pass
     through the transformation layer.
 
-    :attr:`req` is the initial :class:`DataRequest` object that yielded the
-    resulting JSON data :attr:`data`.
+    ``req`` is the initial :class:`DataRequest` object that yielded the
+    resulting JSON data ``data``.
 
     Args:
       req (DataRequest): Initial data request object
@@ -110,11 +110,11 @@ class DocumentTransform(ABC):
 
   @abstractmethod
   def transform_response(self, req: Document, data: dict[str, Any]) -> dict[str, Any]:
-    """ Method to be applied to all response data :attr:`data` of requests that pass
+    """ Method to be applied to all response data ``data`` of requests that pass
     through the transformation layer.
 
-    :attr:`doc` is the initial :class:`Document` object that yielded the
-    resulting JSON data :attr:`data`.
+    ``doc`` is the initial :class:`Document` object that yielded the
+    resulting JSON data ``data``.
 
     Args:
       doc (Document): Initial document
@@ -132,9 +132,9 @@ class TypeTransform(DocumentTransform):
 
   Attributes:
     type_ (TypeRef.T): Type indicating which scalar values (i.e.: values of that
-      type) should be transformed using the function :attr:`f`
+      type) should be transformed using the function ``f``
     f (Callable[[Any], Any]): Function to be applied to scalar values of type
-      :attr:`type_` in the response data.
+      ``type_`` in the response data.
   """
   type_: TypeRef.T
   f: Callable[[Any], Any]

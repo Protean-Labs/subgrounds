@@ -33,8 +33,8 @@ class Subgrounds:
   subgraphs: dict[str, Subgraph] = field(default_factory=dict)
 
   def load_subgraph(self, url: str, save_schema: bool = False) -> Subgraph:
-    """Performs introspection on the provided GraphQL API `url` to get the
-    schema, stores the schema if :attr:`save_schema` is `True` and returns a
+    """Performs introspection on the provided GraphQL API ``url`` to get the
+    schema, stores the schema if ``save_schema`` is ``True`` and returns a
     generated class representing the subgraph with all its entities.
 
     Args:
@@ -60,8 +60,8 @@ class Subgrounds:
     return sg
 
   def load_api(self, url: str, save_schema: bool = False) -> Subgraph:
-    """Performs introspection on the provided GraphQL API `url` to get the
-    schema, stores the schema if :attr:`save_schema` is `True` and returns a
+    """Performs introspection on the provided GraphQL API ``url`` to get the
+    schema, stores the schema if ``save_schema`` is ``True`` and returns a
     generated class representing the GraphQL endpoint with all its entities.
 
     Args:
@@ -163,10 +163,10 @@ class Subgrounds:
     fpaths: list[FieldPath],
     auto_paginate: bool = True
   ) -> list[dict[str, Any]]:
-    """Combines `Subgrounds.mk_request` and `Subgrounds.execute` into one function.
+    """Combines ``Subgrounds.mk_request`` and ``Subgrounds.execute`` into one function.
 
     Args:
-      fpaths (list[FieldPath]): The `FieldPath` objects that should be included in the request
+      fpaths (list[FieldPath]): The :class:`FieldPath` objects that should be included in the request
       auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
         should automatically paginate the query. Useful for querying non-subgraph
         APIs since automatic pagination is only supported for subgraph APIs.
@@ -191,17 +191,17 @@ class Subgrounds:
     (e.g.: when querying multiple list fields that return different entities),
     then multiple dataframes are returned
 
-    :attr:`fpaths` is a list of :class:`FieldPath` objects that indicate which
+    ``fpaths`` is a list of :class:`FieldPath` objects that indicate which
     data must be queried.
 
-    :attr:`columns` is an optional argument used to rename the dataframes(s)
-    columns. The length of :attr:`columns` must be the same as the number of columns
+    ``columns`` is an optional argument used to rename the dataframes(s)
+    columns. The length of ``columns`` must be the same as the number of columns
     of *all* returned dataframes.
 
-    :attr:`concat` indicates whether or not the resulting dataframes should be
+    ``concat`` indicates whether or not the resulting dataframes should be
     concatenated together. The dataframes must have the same number of columns,
     as well as the same column names and types (the names can be set using the
-    :attr:`columns` argument).
+    ``columns`` argument).
 
     Args:
       fpaths (list[FieldPath]): The `FieldPath` objects that should be included
@@ -256,19 +256,19 @@ class Subgrounds:
     unwrap: bool = True,
     auto_paginate: bool = True
   ) -> str | int | float | bool | list | tuple | None:
-    """Executes one or multiple `FieldPath` objects immediately and return the data (as a tuple if multiple `FieldPath` objects are provided).
+    """Executes one or multiple ``FieldPath`` objects immediately and return the data (as a tuple if multiple ``FieldPath`` objects are provided).
 
     Args:
-      fpath (FieldPath): The `FieldPath` object(s) to query.
+      fpath (FieldPath): The ``FieldPath`` object(s) to query.
       unwrap (bool, optional): Flag indicating whether or not, in the case where
         the returned data is a list of one element, the element itself should be
-        returned instead of the list. Defaults to True.
+        returned instead of the list. Defaults to ``True``.
       auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
         should automatically paginate the query. Useful for querying non-subgraph
         APIs since automatic pagination is only supported for subgraph APIs.
-        Defaults to True.
+        Defaults to ``True``.
     Returns:
-      [type]: The `FieldPath` object(s) data
+      [type]: The ``FieldPath`` object(s) data
 
     Example:
 
