@@ -7,17 +7,17 @@ Pagination is done in two steps:
 1. The input query is transformed such that every field selection in the query
 which yields a list of entities has:
 
-#. An ordering (i.e.: :attr:`orderBy` and :attr:`orderDirection` are specified)
-#. A :attr:`first` argument set to the :attr:`firstN` variable
-#. A :attr:`skip` argument set to the :attr:`skipN` variable
-#. A :attr:`where` filter with the filter name derived from the ordering and the
-   value being a variable named :attr:`lastOrderingValueN`
+#. An ordering (i.e.: ``orderBy`` and ``orderDirection`` are specified)
+#. A ``first`` argument set to the ``firstN`` variable
+#. A ``skip`` argument set to the ``skipN`` variable
+#. A ``where`` filter with the filter name derived from the ordering and the
+   value being a variable named ``lastOrderingValueN``
 
 In other words, the query will be transformed in a form which allows Subgrounds
 to paginate automatically by simply setting the set of pagination variables
-(i.e.: :attr:`firstN`, :attr:`skipN` and :attr:`lastOrderingValueN`) to different
+(i.e.: ``firstN``, ``skipN`` and ``lastOrderingValueN``) to different
 values. Each field that requires pagination (i.e.: each field that yields a list)
-will have its own set of variables, hence the :attr:`N` post-fix.
+will have its own set of variables, hence the ``N`` post-fix.
 
 Example:
 The initial query
@@ -61,7 +61,7 @@ See :class:`PaginationNode`, :func:`preprocess_selection` and
 
 2. Using the PaginationNode tree, a "cursor" (ish) tree is initialized which
 provides a cursor that is used to iterate through the set of pagination arguments
-values (i.e.: :attr:`firstN`, :attr:`skipN`, :attr:`lastOrderingValueN`). This
+values (i.e.: ``firstN``, ``skipN``, ``lastOrderingValueN``). This
 "cursor" maintains a pagination state for each of the pagination nodes in the
 pagination node tree that keeps track (amongst other things) of the number of
 entities queried for each list fields. The cursor is moved forward based on
@@ -107,12 +107,12 @@ class PaginationNode:
     node_idx (int): Index of PaginationNode, used to label pagination arguments
       for this node.
     filter_field (str): Name of the node's filter field, e.g.: if
-      :attr:`filter_name` is :attr:`timestamp_gt`, then :attr:`filter_field`
-      is :attr:`timestamp`
-    first_value (int): Initial value of the :attr:`first` argument
-    skip_value (int): Initial value of the :attr:`skip` argument
+      ``filter_name`` is ``timestamp_gt``, then :attr:`filter_field`
+      is ``timestamp``
+    first_value (int): Initial value of the ``first`` argument
+    skip_value (int): Initial value of the ``skip`` argument
     filter_value (Any): Initial value of the filter argument
-      (i.e.: :attr:`where: {filter: FILTER_VALUE}`)
+      (i.e.: ``where: {filter: FILTER_VALUE}``)
     filter_value_type (TypeRef.T): Type of the filter value
     key_path (list[str]): Location in the list field to which this pagination
       node refers to in the initial query
@@ -161,10 +161,10 @@ def preprocess_selection(
   key_path: list[str],
   counter: count[int]
 ) -> Tuple[Selection, PaginationNode]:
-  """ Returns a tuple :attr:`(select_, node)` where :attr:`select_` is the same
-  selection tree as :attr:`select` except it has been normalized for pagination
-  and :attr:`node` is a :class:`PaginationNode` tree containing all pagination
-  metadata for each selection in :attr:`select` yielding a list of entities.
+  """ Returns a tuple ``(select_, node)`` where ``select_`` is the same
+  selection tree as ``select`` except it has been normalized for pagination
+  and ``node`` is a :class:`PaginationNode` tree containing all pagination
+  metadata for each selection in ``select`` yielding a list of entities.
 
   Args:
     schema (SchemaMeta): _description_
@@ -390,13 +390,13 @@ class Cursor:
     return len(self.inner) == 0
 
   def update(self, data: dict) -> None:
-    """ Moves 'self' cursor forward according to previous response data `data`
+    """ Moves ``self`` cursor forward according to previous response data ``data``
 
     Args:
-        data (dict): Previous response data
+      data (dict): Previous response data
 
     Raises:
-        StopIteration: _description_
+      StopIteration: _description_
     """
     # Current node step
     index_field_data = list(extract_data([*self.page_node.key_path, self.page_node.filter_field], data) | traverse)
@@ -422,11 +422,11 @@ class Cursor:
       raise StopIteration(self)
 
   def step(self, data: dict) -> None:
-    """ Updates either 'self' cursor or inner state machine depending on
+    """ Updates either ``self`` cursor or inner state machine depending on
     whether the inner state machine has reached its limit
 
     Args:
-        data (dict): _description_
+      data (dict): _description_
     """
     if self.is_leaf:
       self.update(data)
@@ -489,7 +489,7 @@ class Cursor:
 
 def trim_document(document: Document, pagination_args: dict[str, Any]) -> Document:
   """ Returns a new Document containing only the selection subtrees of
-  :attr:`document` whose arguments are present in :attr:`pagination_args`.
+  ``document`` whose arguments are present in ``pagination_args``.
 
   Args:
     document (Document): The GraphQL document to be trimmed based on provided
@@ -498,8 +498,8 @@ def trim_document(document: Document, pagination_args: dict[str, Any]) -> Docume
 
   Returns:
     Document: A new document containing only the selection subtrees of
-      :attr:`document` for which the pagination arguments are set in
-      :attr:`pagination_args`.
+      ``document`` for which the pagination arguments are set in
+      ``pagination_args``.
   """
 
   def trim_where_input_object(input_object: InputValue.Object) -> InputValue.Object:
@@ -576,10 +576,10 @@ def merge(
   data1: list[Any] | dict[str, Any] | Any,
   data2: list[Any] | dict[str, Any] | Any
 ) -> list[Any] | dict[str, Any] | Any:
-  """ Merges :attr:`data1` and :attr:`data2` and returns the combined result.
+  """ Merges ``data1`` and ``data2`` and returns the combined result.
 
-  :attr:`data1` and :attr:`data2` must be of the same type. Either both are
-  :attr:`dict`, :attr:`list` or anything else.
+  ``data1`` and ``data2`` must be of the same type. Either both are
+  ``dict``, ``list`` or anything else.
 
   Args:
     data1 (list[Any] | dict[str, Any] | Any): First data blob

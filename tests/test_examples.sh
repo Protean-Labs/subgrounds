@@ -4,7 +4,7 @@ FAILING=0
 
 for f in examples/*.py; do
   cp $f .
-  pipenv run python $(basename $f) &
+  poetry run python $(basename $f) &
   
   # Grace period for the Dash app to startup
   sleep 20
