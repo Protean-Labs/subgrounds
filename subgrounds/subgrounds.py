@@ -32,7 +32,7 @@ class Subgrounds:
   global_transforms: list[RequestTransform] = field(default_factory=lambda: DEFAULT_GLOBAL_TRANSFORMS)
   subgraphs: dict[str, Subgraph] = field(default_factory=dict)
 
-  def load_subgraph(self, url: str, save_schema: bool = False) -> Subgraph:
+  def load_subgraph(self, url: str, save_schema: bool = False, cache_dir: str = 'schemas/') -> Subgraph:
     """Performs introspection on the provided GraphQL API ``url`` to get the
     schema, stores the schema if ``save_schema`` is ``True`` and returns a
     generated class representing the subgraph with all its entities.
@@ -45,13 +45,15 @@ class Subgrounds:
     Returns:
       Subgraph: A generated class representing the subgraph and its entities
     """
-    filename = url.split("/")[-1] + ".json"
+    filename = cache_dir + url.split("/")[-1] + ".json"
     if os.path.isfile(filename):
       with open(filename) as f:
         schema = json.load(f)
     else:
       schema = client.get_schema(url)
       if save_schema:
+        if cache_dir != '.' and not os.path.exists(cache_dir):
+          os.makedirs(cache_dir)
         with open(filename, mode="w") as f:
           json.dump(schema, f)
 
@@ -59,7 +61,7 @@ class Subgrounds:
     self.subgraphs[url] = sg
     return sg
 
-  def load_api(self, url: str, save_schema: bool = False) -> Subgraph:
+  def load_api(self, url: str, save_schema: bool = False, cache_dir: str = 'schemas/') -> Subgraph:
     """Performs introspection on the provided GraphQL API ``url`` to get the
     schema, stores the schema if ``save_schema`` is ``True`` and returns a
     generated class representing the GraphQL endpoint with all its entities.
@@ -72,13 +74,15 @@ class Subgrounds:
     Returns:
       Subgraph: A generated class representing the subgraph and its entities
     """
-    filename = url.split("/")[-1] + ".json"
+    filename = cache_dir + url.split("/")[-1] + ".json"
     if os.path.isfile(filename):
       with open(filename) as f:
         schema = json.load(f)
     else:
       schema = client.get_schema(url)
       if save_schema:
+        if cache_dir != '.' and not os.path.exists(cache_dir):
+          os.makedirs(cache_dir)
         with open(filename, mode="w") as f:
           json.dump(schema, f)
 

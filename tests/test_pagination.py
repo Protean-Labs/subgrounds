@@ -1,12 +1,9 @@
-from pprint import pp
 import unittest
-from subgrounds.client import query
 
 from subgrounds.pagination import (
   Cursor,
   PaginationNode,
   preprocess_document,
-  trim_document,
   merge
 )
 from subgrounds.query import Argument, Document, InputValue, Query, Selection, VariableDefinition
@@ -676,7 +673,7 @@ class TestPaginationArgs(unittest.TestCase):
 
   def test_pagination_args_single_node_no_args_2pages(self):
     expected = [
-      {'first0': 900, 'skip0': 0, 'lastOrderingValue0': None},
+      {'first0': 900, 'skip0': 0},
       {'first0': 200, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'}
     ]
 
@@ -702,7 +699,7 @@ class TestPaginationArgs(unittest.TestCase):
 
   def test_pagination_args_single_node_no_args_1page(self):
     expected = [
-      {'first0': 900, 'skip0': 0, 'lastOrderingValue0': None},
+      {'first0': 900, 'skip0': 0},
     ]
 
     data_and_fails = [
@@ -726,7 +723,7 @@ class TestPaginationArgs(unittest.TestCase):
 
   def test_pagination_args_single_node_no_args_1page_below_limit(self):
     expected = [
-      {'first0': 100, 'skip0': 0, 'lastOrderingValue0': None},
+      {'first0': 100, 'skip0': 0},
     ]
 
     data_and_fails = [
@@ -750,11 +747,11 @@ class TestPaginationArgs(unittest.TestCase):
 
   def test_pagination_args_nested_no_args(self):
     expected = [
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
+      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0},
     ]
 
     data_and_fails = [
@@ -793,15 +790,15 @@ class TestPaginationArgs(unittest.TestCase):
 
   def test_pagination_args_nested_no_args_2(self):
     expected = [
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': None, 'first2': 10, 'skip2': 0, 'lastOrderingValue2': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first2': 10, 'skip2': 0, 'lastOrderingValue2': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first2': 10, 'skip2': 0, 'lastOrderingValue2': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0, 'lastOrderingValue1': None},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first2': 10, 'skip2': 0, 'lastOrderingValue2': None},
+      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
+      {'first0': 1, 'skip0': 0, 'first2': 10, 'skip2': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first2': 10, 'skip2': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first2': 10, 'skip2': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first2': 10, 'skip2': 0},
     ]
 
     data_and_fails = [
@@ -854,7 +851,7 @@ class TestPaginationArgs(unittest.TestCase):
 
   def test_pagination_args_single_node_skip_arg(self):
     expected = [
-      {'first0': 900, 'skip0': 10, 'lastOrderingValue0': None},
+      {'first0': 900, 'skip0': 10},
       {'first0': 600, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'},
     ]
 

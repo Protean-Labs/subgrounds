@@ -2,7 +2,8 @@
 name = "subgrounds"
 version = "0.1.1"
 description = "A framework for querying, manipulating and visualizing data indexed on The Graph network."
-authors = ["Your Name <you@example.com>"]
+authors = []
+repository = "https://github.com/Protean-Labs/subgrounds"
 
 [tool.poetry.dependencies]
 python = "^3.10"
