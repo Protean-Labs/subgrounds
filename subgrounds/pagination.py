@@ -449,29 +449,49 @@ class Cursor:
         dict: _description_
     """
     if self.is_leaf:
-      return {
-        # `first`
-        f'first{self.page_node.node_idx}': self.page_node.first_value - self.queried_entities
-        if self.page_node.first_value - self.queried_entities < PAGE_SIZE
-        else PAGE_SIZE,
+      if self.filter_value is None:
+        return {
+          # `first`
+          f'first{self.page_node.node_idx}': self.page_node.first_value - self.queried_entities
+          if self.page_node.first_value - self.queried_entities < PAGE_SIZE
+          else PAGE_SIZE,
 
-        # `skip`
-        f'skip{self.page_node.node_idx}': self.page_node.skip_value if self.page_count == 0 else 0,
+          # `skip`
+          f'skip{self.page_node.node_idx}': self.page_node.skip_value if self.page_count == 0 else 0,
+        }
+      else:
+        return {
+          # `first`
+          f'first{self.page_node.node_idx}': self.page_node.first_value - self.queried_entities
+          if self.page_node.first_value - self.queried_entities < PAGE_SIZE
+          else PAGE_SIZE,
 
-        # `filter`
-        f'lastOrderingValue{self.page_node.node_idx}': self.filter_value
-      }
+          # `skip`
+          f'skip{self.page_node.node_idx}': self.page_node.skip_value if self.page_count == 0 else 0,
+
+          # `filter`
+          f'lastOrderingValue{self.page_node.node_idx}': self.filter_value
+        }
     else:
-      args = {
-        # `first`
-        f'first{self.page_node.node_idx}': 1,
+      if self.filter_value is None:
+        args = {
+          # `first`
+          f'first{self.page_node.node_idx}': 1,
 
-        # `skip`
-        f'skip{self.page_node.node_idx}': self.page_node.skip_value if self.page_count == 0 else 0,
+          # `skip`
+          f'skip{self.page_node.node_idx}': self.page_node.skip_value if self.page_count == 0 else 0,
+        }
+      else:
+        args = {
+          # `first`
+          f'first{self.page_node.node_idx}': 1,
 
-        # `filter`
-        f'lastOrderingValue{self.page_node.node_idx}': self.filter_value
-      }
+          # `skip`
+          f'skip{self.page_node.node_idx}': self.page_node.skip_value if self.page_count == 0 else 0,
+
+          # `filter`
+          f'lastOrderingValue{self.page_node.node_idx}': self.filter_value
+        }
 
       inner_args = self.inner[self.inner_idx].args()
       return args | inner_args
@@ -507,6 +527,8 @@ def trim_document(document: Document, pagination_args: dict[str, Any]) -> Docume
       (key, value) = keyval
       match value:
         case InputValue.Variable(name) if name in pagination_args and pagination_args[name] is None:
+          return None
+        case InputValue.Variable(name) if name not in pagination_args:
           return None
         case _:
           return (key, value)
