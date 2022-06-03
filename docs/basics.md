@@ -157,6 +157,7 @@ The `query` method returns the data in its simplest form which, depending on the
 ### `Subgrounds.query_df`
 Subgrounds provides a simple way to query subgraph data directly into a pandas `DataFrame` via the `query_df` method. Just like the `query` method, `query_df` takes as argument a list of `FieldPaths` and returns one or more `DataFrames` depending on the shape of the queried data. `query_df` will attempt to flatten all the data to a single `DataFrame` (effectively mimicking the SQL `JOIN` operation) but when that is not possible, two or more `DataFrames` will be returned.
 
+#### Example with single DataFrame returned
 ```python
 >>> uniswapV3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
 
@@ -185,7 +186,7 @@ Subgrounds provides a simple way to query subgraph data directly into a pandas `
 8  0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8                 DAI                WETH
 9  0x7858e59e0c01ea06df3af3d20ac7b0003275d4bf                USDC                USDT
 ```
-
+#### Example with multiple DataFrames returned
 ```python
 >>> uniswapV3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
 
@@ -328,4 +329,79 @@ query {
 <!-- In the cases where the `FieldPaths` originate from different subgraphs, then multiple queries will be executed concurrently: -->
 
 ## SyntheticFields
-This section is under construction!
+One of Subgrounds' unique features is the ability to define schema-based (i.e.: pre-querying) transformations using `SyntheticFields`.
+
+`SyntheticFields` can be created using Python arithmetic operators on relative `FieldPaths` (i.e.: `FieldPaths` starting from an entity and not the root `Query` object) and must be added to the entity which they enhance. Once added to an entity, `SyntheticFields` can be queried just like regular GraphQL fields. The example below demonstrates how to create a simple `SyntheticField` to calculate the swap price of `Swap` events stored on the Sushiswap subgraph:
+```python
+>>> sushiswap = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/sushiswap/exchange')
+
+# Define a synthetic field named price1 (the swap price of token1,
+# in terms of token0) on Swap entities
+>>> sushiswap.Swap.price1 = abs(sushiswap.Swap.amount0Out - sushiswap.Swap.amount0In) / abs(sushiswap.Swap.amount1Out - sushiswap.Swap.amount1In)
+
+# Build query to get the last 10 swaps of the WETH-USDC pair on Sushiswap 
+>>> weth_usdc = sushiswap.Query.pair(id='0x397ff1542f962076d0bfe58ea045ffa2d347aca0')
+
+>>> last_10_swaps = weth_usdc.swaps(
+...   orderBy=sushiswap.Swap.timestamp,
+...   orderDirection='desc',
+...   first=10
+... )
+
+# Query swap prices using the SyntheticField price1 just like they were regular fields
+>>> sg.query_df([
+...   last_10_swaps.timestamp,
+...   last_10_swaps.price1
+... ])
+   pair_swaps_timestamp  pair_swaps_price1
+0            1654267855        1762.526840
+1            1654267855        1760.132097
+2            1654267766        1747.485689
+3            1654267562        1758.131683
+4            1654267528        1758.081544
+5            1654267493        1742.260312
+6            1654267493        1749.891244
+7            1654267493        1755.254957
+8            1654267364        1748.934985
+9            1654267356        1750.284126
+```
+
+`SyntheticFields` can also be created using the constructor, allowing for much more complex transformations.
+```python
+>>> from datetime import datetime
+>>> from subgrounds.subgraph import SyntheticField
+
+>>> sushiswap = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/sushiswap/exchange')
+
+# Create a SyntheticField on the Swap entity called `datetime`, which will format 
+# the timestamp field into something more human readable
+>>> sushiswap.Swap.datetime = SyntheticField(
+...   lambda timestamp: str(datetime.fromtimestamp(timestamp)),
+...   SyntheticField.STRING,
+...   sushiswap.Swap.timestamp
+... )
+
+>>> last_10_swaps = sushiswap.Query.swaps(
+...   orderBy=sushiswap.Swap.timestamp,
+...   orderDirection='desc',
+...   first=10
+... )
+
+>>> sg.query_df([
+...   last_10_swaps.datetime,
+...   last_10_swaps.to,
+...   last_10_swaps.pair.token0.symbol,
+...   last_10_swaps.pair.token1.symbol
+... ])
+        swaps_datetime                                    swaps_to swaps_pair_token0_symbol swaps_pair_token1_symbol
+0  2022-06-03 11:04:25  0x98c3d3183c4b8a650614ad179a1a98be0a8d6b8e                     OOKI                     WETH
+1  2022-06-03 11:03:29  0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f                    CHIMP                     WETH
+2  2022-06-03 11:03:29  0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f                     WETH                     USDT
+3  2022-06-03 11:02:59  0x0eae044f00b0af300500f090ea00027097d03000                     ICHI                     WETH
+4  2022-06-03 11:02:59  0xfb3bd022d5dacf95ee28a6b07825d4ff9c5b3814                     USDC                     WETH
+5  2022-06-03 11:02:59  0x11111112542d85b3ef69ae05771c2dccff4faa26                     WETH                     USDT
+6  2022-06-03 11:02:21  0xd7c09e006a2891880331b0f6224071c1e890a98a                     WETH                     ROOK
+7  2022-06-03 11:02:21  0x60c809705e045572ffe3c44badd4d680165960fa                      OHM                      DAI
+8  2022-06-03 11:01:00  0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f                      BIT                     WETH
+9  2022-06-03 11:00:54  0xdef171fe48cf0115b1d80b88dc8eab59176fee57                     NEWO                     USDC
+```
