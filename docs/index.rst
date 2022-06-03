@@ -7,8 +7,9 @@ subgrounds
 
   getting_started
   basics
-  modules
+  API reference <modules>
   troubleshooting
+  examples
 
 Indices and tables
 ==================
