@@ -325,8 +325,6 @@ class Subgrounds:
   def query_df_iter(
     self,
     fpaths: list[FieldPath],
-    columns: Optional[list[str]] = None,
-    concat: bool = False,
     auto_paginate: bool = True
   ) -> Iterator[pd.DataFrame]:
     """Same as `query_df` except an iterator over the response data pages is returned
@@ -345,7 +343,7 @@ class Subgrounds:
     """
     fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
     for page in self.query_json_iter(fpaths, auto_paginate=auto_paginate):
-      yield df_of_json(page, fpaths, columns, concat)
+      yield df_of_json(page, fpaths, None, False)
 
   def query(
     self,
@@ -455,4 +453,3 @@ class Subgrounds:
         yield data[0]
       else:
         yield data
-
