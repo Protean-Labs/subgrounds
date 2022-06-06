@@ -6,7 +6,8 @@ querying The Graph with Subgrounds.
 
 from dataclasses import dataclass, field
 from functools import reduce
-from typing import Any, Optional
+import functools
+from typing import Any, Iterator, Optional
 from pipe import map, groupby, traverse, where
 import os
 import json
@@ -162,6 +163,52 @@ class Subgrounds:
 
     return transform_req(self.global_transforms, req)
 
+  def execute_iter(self, req: DataRequest, auto_paginate: bool = True) -> Iterator[dict[str, Any]]:
+    """ Same as `execute`, except that an iterator is returned which will iterate
+    the data pages.
+
+    Args:
+      req (DataRequest): The :class:`DataRequest` object to be executed
+      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
+        should automatically paginate the query. Useful for querying non-subgraph
+        APIs since automatic pagination is only supported for subgraph APIs.
+        Defaults to True.
+
+    Returns:
+      Iterator[dict]: An iterator over the reponse data pages
+    """
+    def execute_document(doc: Document) -> Iterator[dict[str, Any]]:
+      subgraph: Subgraph = next(
+        self.subgraphs.values()
+        | where(lambda sg: sg._url == doc.url)
+      )
+      if auto_paginate and subgraph._is_subgraph:
+        yield from pagination.paginate_iter(subgraph._schema, doc)
+      else:
+        yield client.query(doc.url, doc.graphql, variables=doc.variables)
+
+    def transform_doc(transforms: list[DocumentTransform], doc: Document) -> Iterator[dict[str, Any]]:
+      logger.debug(f'execute.transform_doc: doc = \n{doc.graphql}')
+      match transforms:
+        case []:
+          yield from execute_document(doc)
+        case [transform, *rest]:
+          new_doc = transform.transform_document(doc)
+          for data in transform_doc(rest, new_doc):
+            yield transform.transform_response(doc, data)
+
+    def transform_req(transforms: list[RequestTransform], req: DataRequest) -> Iterator[dict[str, Any]]:
+      match transforms:
+        case []:
+          for doc in req.documents:
+            yield from transform_doc(self.subgraphs[doc.url]._transforms, doc)
+        case [transform, *rest]:
+          new_req = transform.transform_request(req)
+          for data in transform_req(rest, new_req):
+            yield transform.transform_response(req, data)
+
+    yield from transform_req(self.global_transforms, req)
+
   def query_json(
     self,
     fpaths: list[FieldPath],
@@ -182,6 +229,27 @@ class Subgrounds:
     fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
     req = self.mk_request(fpaths)
     return self.execute(req, auto_paginate=auto_paginate)
+
+  def query_json_iter(
+    self,
+    fpaths: list[FieldPath],
+    auto_paginate: bool = True
+  ) -> Iterator[dict[str, Any]]:
+    """Same as `query_json` except an iterator over the response data pages is returned.
+
+    Args:
+      fpaths (list[FieldPath]): The :class:`FieldPath` objects that should be included in the request
+      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
+        should automatically paginate the query. Useful for querying non-subgraph
+        APIs since automatic pagination is only supported for subgraph APIs.
+        Defaults to True.
+
+    Returns:
+      list[dict[str, Any]]: The reponse data
+    """
+    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    req = self.mk_request(fpaths)
+    yield from self.execute_iter(req, auto_paginate=auto_paginate)
 
   def query_df(
     self,
@@ -254,6 +322,29 @@ class Subgrounds:
     json_data = self.query_json(fpaths, auto_paginate=auto_paginate)
     return df_of_json(json_data, fpaths, columns, concat)
 
+  def query_df_iter(
+    self,
+    fpaths: list[FieldPath],
+    auto_paginate: bool = True
+  ) -> Iterator[pd.DataFrame]:
+    """Same as `query_df` except an iterator over the response data pages is returned
+    Args:
+      fpaths (list[FieldPath]): The `FieldPath` objects that should be included
+        in the request
+      columns (Optional[list[str]], optional): The column labels. Defaults to None.
+      merge (bool, optional): Whether or not to merge resulting dataframes.
+      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
+        should automatically paginate the query. Useful for querying non-subgraph
+        APIs since automatic pagination is only supported for subgraph APIs.
+        Defaults to True.
+
+    Returns:
+      Iterator[pd.DataFrame]: An iterator over the response data pages, each as a  DataFrame
+    """
+    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    for page in self.query_json_iter(fpaths, auto_paginate=auto_paginate):
+      yield df_of_json(page, fpaths, None, False)
+
   def query(
     self,
     fpath: FieldPath | list[FieldPath],
@@ -309,18 +400,56 @@ class Subgrounds:
     else:
       return data
 
-  # def query_timeseries(
-  #   self,
-  #   x: FieldPath,
-  #   y: FieldPath | list[FieldPath],
-  #   interval: str,
-  #   cumulative: bool
-  # ):
-  #   # fpaths = list([x, y] | traverse)
-  #   # df = self.query_df(fpaths)[0]
+  def query_iter(
+    self,
+    fpath: FieldPath | list[FieldPath],
+    unwrap: bool = True,
+    auto_paginate: bool = True
+  ) -> str | int | float | bool | list | tuple | None:
+    """Same as `query` except an iterator over the resonse data pages is returned.
 
-  #   # match interval:
-  #   #   case 'hour':
-  #   #     tmin
+    Args:
+      fpath (FieldPath): The ``FieldPath`` object(s) to query.
+      unwrap (bool, optional): Flag indicating whether or not, in the case where
+        the returned data is a list of one element, the element itself should be
+        returned instead of the list. Defaults to ``True``.
+      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
+        should automatically paginate the query. Useful for querying non-subgraph
+        APIs since automatic pagination is only supported for subgraph APIs.
+        Defaults to ``True``.
+    Returns:
+      Iterator[type]: An iterator over the ``FieldPath`` object(s)' data pages
 
-  #   raise NotImplementedError
+    Example:
+
+    >>> from subgrounds.subgrounds import Subgrounds
+    >>> sg = Subgrounds()
+    >>> univ3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
+    >>> univ3.Swap.price = abs(univ3.Swap.amount0) / abs(univ3.Swap.amount1)
+    >>> eth_usdc_last = univ3.Query.swaps(
+    ...   orderBy=univ3.Swap.timestamp,
+    ...   orderDirection='desc',
+    ...   first=1,
+    ...   where=[
+    ...     univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
+    ...   ]
+    ... ).price
+    >>> sg.query(eth_usdc_last)
+    2628.975030015892
+
+    """
+    def f(fpath: FieldPath, blob: dict[str, Any]) -> dict[str, Any]:
+      data = fpath._extract_data(blob)
+      if type(data) == list and len(data) == 1 and unwrap:
+        return data[0]
+      else:
+        return data
+
+    fpaths = list(fpath | map(FieldPath._auto_select) | traverse)
+    for page in self.query_json_iter(fpaths, auto_paginate=auto_paginate):
+      data = tuple(fpaths | map(functools.partial(f, blob=page)))
+
+      if len(data) == 1:
+        yield data[0]
+      else:
+        yield data

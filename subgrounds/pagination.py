@@ -81,7 +81,7 @@ from dataclasses import dataclass, field
 from functools import reduce
 from itertools import count
 from pipe import map, traverse, where
-from typing import Any, Optional, Tuple
+from typing import Any, Iterator, Optional, Tuple
 
 from subgrounds.query import (
   Argument,
@@ -97,6 +97,12 @@ from subgrounds.utils import extract_data, union
 
 DEFAULT_NUM_ENTITIES = 100
 PAGE_SIZE = 900
+
+
+class PaginationError(RuntimeError):
+  def __init__(self, message: Any, cursor: Cursor):
+    super().__init__(message)
+    self.cursor = cursor
 
 
 @dataclass(frozen=True)
@@ -674,3 +680,36 @@ def paginate(schema: SchemaMeta, doc: Document) -> dict[str, Any]:
           break
 
     return data
+
+
+def paginate_iter(schema: SchemaMeta, doc: Document) -> Iterator[dict[str, Any]]:
+  """ Executes the request document `doc` based on the GraphQL schema `schema` and returns
+  the response as a JSON dictionary.
+
+  Args:
+    schema (SchemaMeta): The GraphQL schema on which the request document is based
+    doc (Document): The request document
+
+  Returns:
+    dict[str, Any]: The response data as a JSON dictionary
+  """
+  new_doc, pagination_nodes = preprocess_document(schema, doc)
+
+  if pagination_nodes == []:
+    yield client.query(doc.url, doc.graphql, variables=doc.variables)
+  else:
+    # data: dict[str, Any] = {}
+    for page_node in pagination_nodes:
+      arg_gen = Cursor(page_node)
+
+      while True:
+        try:
+          args = arg_gen.args()
+          trimmed_doc = trim_document(new_doc, args)
+          page_data = client.query(trimmed_doc.url, trimmed_doc.graphql, variables=trimmed_doc.variables | args)
+          yield page_data
+          arg_gen.step(page_data)
+        except StopIteration:
+          break
+        except Exception as exn:
+          raise PaginationError(exn.args[0], arg_gen)
