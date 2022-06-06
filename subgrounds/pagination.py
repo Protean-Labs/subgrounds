@@ -99,6 +99,12 @@ DEFAULT_NUM_ENTITIES = 100
 PAGE_SIZE = 900
 
 
+class PaginationError(RuntimeError):
+  def __init__(self, message: Any, cursor: Cursor):
+    super().__init__(message)
+    self.cursor = cursor
+
+
 @dataclass(frozen=True)
 class PaginationNode:
   """ Class representing the pagination config for a single GraphQL list field.
@@ -705,5 +711,5 @@ def paginate_iter(schema: SchemaMeta, doc: Document) -> Iterator[dict[str, Any]]
           arg_gen.step(page_data)
         except StopIteration:
           break
-
-    # return data
+        except Exception as exn:
+          raise PaginationError(exn.args[0], arg_gen)
