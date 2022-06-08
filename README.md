@@ -120,7 +120,7 @@ app.layout = html.Div(
 See the `examples/` directory for an evergrowing list of examples. -->
 
 
-# Acknowledgments
+## Acknowledgments
 This software project would not be possible without the support of The Graph Foundation. You can learn more about The Graph and its mission [here](https://thegraph.com/en/).
 
 This project also builds on the excellent work by the good folks over at Plotly. Lean more about Dash and Plotly [here](https://plotly.com/).
