@@ -2,7 +2,7 @@ import pytest
 
 from subgrounds.schema import (SchemaMeta, TypeMeta,  # input_value_of_argument
                                TypeRef)
-from subgrounds.subgraph import Subgraph
+from subgrounds.subgraph import Subgraph, FieldPath
 
 
 @pytest.fixture
@@ -124,8 +124,21 @@ def schema(
 
 @pytest.fixture
 def subgraph(schema):
-  return Subgraph("", schema)
+  return Subgraph("www.abc.xyz/graphql", schema)
+
+
+@pytest.fixture
+def subgraph_diff_url(schema):
+  return Subgraph("www.foo.xyz/graphql", schema)
 
 
 def identity(x):
   return x
+
+
+def fieldpath_test_mode(func):
+  def wrapper(*args, **kwargs):
+    FieldPath.__test_mode = True
+    func(*args, **kwargs)
+
+  return wrapper

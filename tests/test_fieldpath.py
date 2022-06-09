@@ -197,37 +197,4 @@ def test_fieldpath_building_3(subgraph):
   assert query == expected
 
 
-def test_mk_request_1(subgraph):
-    expected = DataRequest.single_query(
-      'www.abc.xyz/graphql',
-      Query(selection=[
-        Selection(
-          TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-            TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-            TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair')),
-          alias='x7ecb1bc5fd9e0dcf',
-          arguments=[
-            Argument("first", InputValue.Int(10))
-          ],
-          selection=[
-            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
-            Selection(TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))
-          ]
-        )
-      ])
-    )
 
-    app = Subgrounds()
-
-    pairs = subgraph.Query.pairs(first=10)
-
-    req = app.mk_request([
-      pairs.id,
-      pairs.reserveUSD
-    ])
-
-    assert req == expected
