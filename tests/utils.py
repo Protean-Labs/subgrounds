@@ -1,16 +1,34 @@
-from subgrounds.schema import (
-  TypeMeta,
-  SchemaMeta,
-  TypeRef,
-  # input_value_of_argument
-)
-from subgrounds.subgraph import Subgraph
-
 import pytest
+
+from subgrounds.schema import (SchemaMeta, TypeMeta,  # input_value_of_argument
+                               TypeRef)
+from subgrounds.subgraph import Subgraph
 
 
 @pytest.fixture
-def swap_typemeta():
+def pairs_fieldmeta():
+  return TypeMeta.FieldMeta('pairs', '', [
+    TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+    TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+    TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
+    TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
+    TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+  ], TypeRef.non_null_list('Pair'))
+
+
+@pytest.fixture
+def swaps_fieldmeta():
+  return TypeMeta.FieldMeta('swaps', '', [
+    TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+    TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+    TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
+    TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
+    TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
+  ], TypeRef.non_null_list('Swap'))
+
+
+@pytest.fixture
+def swap_objectmeta():
   return TypeMeta.ObjectMeta('Swap', '', fields=[
     TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
     TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt')),
@@ -22,7 +40,7 @@ def swap_typemeta():
 
 
 @pytest.fixture
-def token_typemeta():
+def token_objectmeta():
   return TypeMeta.ObjectMeta('Token', '', fields=[
     TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
     TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')),
@@ -32,7 +50,7 @@ def token_typemeta():
 
 
 @pytest.fixture
-def pair_typemeta():
+def pair_objectmeta():
   return TypeMeta.ObjectMeta('Pair', '', fields=[
     TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
     TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
@@ -45,7 +63,13 @@ def pair_typemeta():
 
 
 @pytest.fixture
-def schema(swap_typemeta, token_typemeta, pair_typemeta):
+def schema(
+  pairs_fieldmeta,
+  swaps_fieldmeta,
+  swap_objectmeta,
+  token_objectmeta,
+  pair_objectmeta
+):
   return SchemaMeta(query_type='Query', type_map={
     'Int': TypeMeta.ScalarMeta('Int', ''),
     'Float': TypeMeta.ScalarMeta('Float', ''),
@@ -57,22 +81,10 @@ def schema(swap_typemeta, token_typemeta, pair_typemeta):
       TypeMeta.EnumValueMeta('desc', '')
     ]),
     'Query': TypeMeta.ObjectMeta('Query', '', fields=[
-      TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-        TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-        TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-      ], TypeRef.non_null_list('Pair')),
-      TypeMeta.FieldMeta('swaps', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
-        TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
-        TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-      ], TypeRef.non_null_list('Swap')),
+      pairs_fieldmeta,
+      swaps_fieldmeta,
     ]),
-    'Swap': swap_typemeta,
+    'Swap': swap_objectmeta,
     'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
       TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
       TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
@@ -85,8 +97,8 @@ def schema(swap_typemeta, token_typemeta, pair_typemeta):
       TypeMeta.ArgumentMeta('amount1In', '', TypeRef.Named('BigDecimal'), None),
       TypeMeta.ArgumentMeta('amount1Out', '', TypeRef.Named('BigDecimal'), None),
     ]),
-    'Token': token_typemeta,
-    'Pair': pair_typemeta,
+    'Token': token_objectmeta,
+    'Pair': pair_objectmeta,
     'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
       TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
       TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
