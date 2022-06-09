@@ -1,147 +1,75 @@
-import operator
-import unittest
+import operator as op
 from dataclasses import dataclass
 
 import pytest
 
 from subgrounds.utils import extract_data, flatten_dict, intersection, rel_complement, union
+from tests.utils import identity
 
 
-def test_rel_complement_1():
-  l1 = [1, 2, 3]
-  l2 = [3, 4, 5]
-  assert rel_complement(l1, l2) == [1, 2]
+@dataclass
+class Foo:
+  id: int
+  txt: str
 
 
-def test_rel_complement_2():
-  l1 = [3, 4]
-  l2 = [3, 4, 5]
-  assert rel_complement(l1, l2) == []
+@pytest.mark.parametrize("test_input, key, expected", [
+  (([1, 2, 3], [3, 4, 5]), identity, [1, 2]),
+  (([3, 4], [3, 4, 5]), identity, []),
+  (([Foo(1, 'hello'), Foo(2, 'bob'), Foo(6, 'world!')], [Foo(5, 'abcd'), Foo(6, 'message')]), op.attrgetter('id'), [Foo(1, 'hello'), Foo(2, 'bob')])
+])
+def test_rel_complement(test_input, key, expected):
+  l1, l2 = test_input
+  assert rel_complement(l1, l2, key=key) == expected
 
 
-def test_rel_complement_3():
-  @dataclass
-  class X:
-    id: int
-    txt: str
-
-  l1 = [X(1, 'hello'), X(2, 'bob'), X(6, 'world!')]
-  l2 = [X(5, 'abcd'), X(6, 'message')]
-
-  assert rel_complement(l1, l2, key=lambda x: x.id) == [X(1, 'hello'), X(2, 'bob')]
-
-
-def test_intersection_1():
-  l1 = [1, 2, 3]
-  l2 = [3, 4, 5]
-  assert intersection(l1, l2) == [3]
+@pytest.mark.parametrize("test_input, key, combine, expected", [
+  (([1, 2, 3], [3, 4, 5]), identity, lambda x, _: x, [3]),
+  (([1, 2, 3], [3, 4, 5]), identity, op.add, [6]),
+  (([1, 2], [3, 4, 5]), identity, lambda x, _: x, []),
+  (([Foo(1, 'hello'), Foo(2, 'bob'), Foo(6, 'world!')], [Foo(5, 'abcd'), Foo(6, 'message')]), op.attrgetter('id'), lambda x, y: Foo(x.id, f'{x.txt} {y.txt}'), [Foo(6, 'world! message')])
+])
+def test_intersection(test_input, key, combine, expected):
+  l1, l2 = test_input
+  assert intersection(l1, l2, key=key, combine=combine) == expected
 
 
-def test_intersection_2():
-  l1 = [1, 2, 3]
-  l2 = [3, 4, 5]
-  assert intersection(l1, l2, combine=operator.add) == [6]
+@pytest.mark.parametrize("test_input, key, combine, expected", [
+  (([1, 2, 3], [3, 4, 5]), identity, lambda x, _: x, [1, 2, 3, 4, 5]),
+  (([1, 2, 3], [3, 4, 5]), identity, op.add, [1, 2, 6, 4, 5]),
+  (([Foo(1, 'hello'), Foo(2, 'bob'), Foo(6, 'world!')], [Foo(5, 'abcd'), Foo(6, 'message')]), op.attrgetter('id'), lambda x, y: Foo(x.id, f'{x.txt} {y.txt}'), [
+    Foo(1, 'hello'),
+    Foo(2, 'bob'),
+    Foo(6, 'world! message'),
+    Foo(5, 'abcd')
+  ])
+])
+def test_union(test_input, key, combine, expected):
+  l1, l2 = test_input
+  assert union(l1, l2, key=key, combine=combine) == expected
 
 
-def test_intersection_3():
-  l1 = [1, 2]
-  l2 = [3, 4, 5]
-  assert intersection(l1, l2) == []
-
-
-def test_intersection_4():
-  @dataclass
-  class X:
-    id: int
-    txt: str
-
-  l1 = [X(1, 'hello'), X(2, 'bob'), X(6, 'world!')]
-  l2 = [X(5, 'abcd'), X(6, 'message')]
-
-  assert intersection(l1, l2, key=lambda x: x.id, combine=lambda x, y: X(x.id, f'{x.txt} {y.txt}')) == [X(6, 'world! message')]
-
-
-def test_union_1():
-  l1 = [1, 2, 3]
-  l2 = [3, 4, 5]
-  assert union(l1, l2) == [1, 2, 3, 4, 5]
-
-
-def test_union_2():
-  l1 = [1, 2, 3]
-  l2 = [3, 4, 5]
-  assert union(l1, l2, combine=operator.add) == [1, 2, 6, 4, 5]
-
-
-def test_union_3():
-  @dataclass
-  class X:
-    id: int
-    txt: str
-
-  l1 = [X(1, 'hello'), X(2, 'bob'), X(6, 'world!')]
-  l2 = [X(5, 'abcd'), X(6, 'message')]
-
-  expected = [
-    X(1, 'hello'),
-    X(2, 'bob'),
-    X(6, 'world! message'),
-    X(5, 'abcd')
-  ]
-
-  assert union(l1, l2, key=lambda x: x.id, combine=lambda x, y: X(x.id, f'{x.txt} {y.txt}')) == expected
-
-
-def test_extract_data_1():
-  expected = [1, 2, 3]
-
-  data = {
+@pytest.mark.parametrize("test_input, path, expected", [
+  ({
     'a': [
       {'b': {'c': 1}},
       {'b': {'c': 2}},
       {'b': {'c': 3}},
     ]
-  }
-
-  path = ['a', 'b', 'c']
-
-  assert extract_data(path, data) == expected
-
-
-def test_extract_data_2():
-  expected = []
-
-  data = {
+  }, ['a', 'b', 'c'], [1, 2, 3]),
+  ({
     'a': []
-  }
-
-  path = ['a', 'b', 'c']
-
-  assert extract_data(path, data) == expected
-
-
-def test_extract_data_3():
-  expected = []
-
-  data = {
+  }, ['a', 'b', 'c'], []),
+  ({
     'a': []
-  }
+  }, ['a'], [])
+])
+def test_extract_data(test_input, path, expected):
+  assert extract_data(path, test_input) == expected
 
-  path = ['a']
 
-  assert extract_data(path, data) == expected
-
-
-def tests_flatten_dict_1():
-  expected = {
-    'x': 1,
-    'a_b_c': 10,
-    'd_e': 'hello',
-    'd_f': 'world',
-    'foo': True
-  }
-
-  data = {
+@pytest.mark.parametrize("test_input, expected", [
+  ({
     'x': 1,
     'a': {
       'b': {
@@ -153,6 +81,13 @@ def tests_flatten_dict_1():
       'f': 'world'
     },
     'foo': True
-  }
-
-  assert flatten_dict(data) == expected
+  }, {
+    'x': 1,
+    'a_b_c': 10,
+    'd_e': 'hello',
+    'd_f': 'world',
+    'foo': True
+  })
+])
+def tests_flatten_dict(test_input, expected):
+  assert flatten_dict(test_input) == expected
