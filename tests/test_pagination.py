@@ -638,6 +638,230 @@ def test_normalize_doc(schema, test_input, expected):
   assert preprocess_document(schema, test_input) == expected
 
 
+def gen_swaps(pair_id, n):
+  for i in range(n):
+    yield {'id': f'swap_{pair_id}{i}', 'timestamp': i}
+
+
+def gen_users(pair_id, n):
+  for i in range(n):
+    yield {'id': f'user_{pair_id}{i}', 'volume': i}
+
+
+# TODO: Add assertion to check cursor state contained in StopIteration exception
+@pytest.mark.parametrize("data_and_stop, page_node, expected", [
+  # Test cursor, 1 pagination node, no args, 2 pages
+  (
+    [
+      ({'swaps': list(gen_swaps('a', 900))}, False),
+      ({'swaps': []}, True)
+    ],
+    PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=1100,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    ),
+    [
+      {'first0': 900, 'skip0': 0},
+      {'first0': 200, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'}
+    ]
+  ),
+  # Test cursor, 1 pagination node, no args, 1 page
+  (
+    [
+      ({'swaps': list(gen_swaps('a', 10))}, True),
+    ],
+    PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=1100,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    ),
+    [
+      {'first0': 900, 'skip0': 0},
+    ]
+  ),
+  # Test cursor, 1 pagination node, no args, 1 page below limit
+  (
+    [
+      ({'swaps': list(gen_swaps('a', 100))}, True),
+    ],
+    PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=100,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    ),
+    [
+      {'first0': 100, 'skip0': 0},
+    ]
+  ),
+  # Test cursor, nested pagination nodes, no args
+  (
+    [
+      ({'pairs': [{'id': 'a', 'swaps': list(gen_swaps('a', 900))}]}, False),
+      ({'pairs': [{'id': 'a', 'swaps': list(gen_swaps('a', 100))}]}, False),
+      ({'pairs': [{'id': 'b', 'swaps': list(gen_swaps('b', 100))}]}, False),
+      ({'pairs': [{'id': 'c', 'swaps': list(gen_swaps('c', 10))}]}, False),
+      ({'pairs': [{'id': 'd', 'swaps': list(gen_swaps('d', 0))}]}, True),
+    ],
+    PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=4,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['pairs'],
+      inner=[
+        PaginationNode(
+          node_idx=1,
+          filter_field='timestamp',
+          first_value=7000,
+          skip_value=0,
+          filter_value=None,
+          filter_value_type=TypeRef.Named('BigInt'),
+          key_path=['pairs', 'swaps'],
+          inner=[]
+        )
+      ]
+    ),
+    [
+      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0},
+    ]
+  ),
+  # Test cursor, nested pagination nodes with neighbors, no args
+  (
+    [
+      ({'pairs': [{'id': 'a', 'swaps': list(gen_swaps('a', 900))}]}, False),
+      ({'pairs': [{'id': 'a', 'swaps': list(gen_swaps('a', 100))}]}, False),
+      ({'pairs': [{'id': 'a', 'users': list(gen_users('a', 9))}]}, False),
+      ({'pairs': [{'id': 'b', 'swaps': list(gen_swaps('b', 100))}]}, False),
+      ({'pairs': [{'id': 'b', 'users': list(gen_users('b', 9))}]}, False),
+      ({'pairs': [{'id': 'c', 'swaps': list(gen_swaps('c', 10))}]}, False),
+      ({'pairs': [{'id': 'c', 'users': list(gen_users('c', 10))}]}, False),
+      ({'pairs': [{'id': 'd', 'swaps': list(gen_swaps('d', 0))}]}, False),
+      ({'pairs': [{'id': 'd', 'users': list(gen_users('d', 5))}]}, True),
+    ],
+    PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=4,
+      skip_value=0,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['pairs'],
+      inner=[
+        PaginationNode(
+          node_idx=1,
+          filter_field='timestamp',
+          first_value=7000,
+          skip_value=0,
+          filter_value=None,
+          filter_value_type=TypeRef.Named('BigInt'),
+          key_path=['pairs', 'swaps'],
+          inner=[],
+        ),
+        PaginationNode(
+          node_idx=2,
+          filter_field='volume',
+          first_value=10,
+          skip_value=0,
+          filter_value=None,
+          filter_value_type=TypeRef.Named('BigInt'),
+          key_path=['pairs', 'users'],
+          inner=[],
+        ),
+      ]
+    ),
+    [
+      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
+      {'first0': 1, 'skip0': 0, 'first2': 10, 'skip2': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first2': 10, 'skip2': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first2': 10, 'skip2': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0},
+      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first2': 10, 'skip2': 0},
+    ]
+  ),
+  # Test cursor, 1 pagination node, `skip` argument specified
+  (
+    [
+      ({'swaps': list(gen_swaps('a', 900))}, False),
+      ({'swaps': list(gen_swaps('a', 500))}, True),
+    ],
+    PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=1500,
+      skip_value=10,
+      filter_value=None,
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    ),
+    [
+      {'first0': 900, 'skip0': 10},
+      {'first0': 600, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'},
+    ]
+  ),
+  # Test cursor, 1 pagination node, `where` argument specified
+  (
+    [
+      ({'swaps': list(gen_swaps('a', 900))}, False),
+      ({'swaps': list(gen_swaps('a', 500))}, True),
+    ],
+    PaginationNode(
+      node_idx=0,
+      filter_field='id',
+      first_value=1500,
+      skip_value=0,
+      filter_value='0',
+      filter_value_type=TypeRef.Named('String'),
+      key_path=['swaps'],
+      inner=[]
+    ),
+    [
+      {'first0': 900, 'skip0': 0, 'lastOrderingValue0': '0'},
+      {'first0': 600, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'},
+    ]
+  )
+])
+def test_pagination_cursor(data_and_stop, page_node, expected):
+  cursor = Cursor(page_node)
+
+  for args, (data, stop) in zip(expected, data_and_stop):
+    assert cursor.args() == args
+
+    if stop:
+      with pytest.raises(StopIteration):
+        cursor.step(data)
+
+    else:
+      cursor.step(data)
+
+
+# TODO: Add tests for `subgrounds.pagination.trim_document`
+
 @pytest.mark.parametrize("data1, data2, expected", [
   (
     {},
