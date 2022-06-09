@@ -21,6 +21,7 @@ pylint = "^2.13.8"
 ipykernel = "^6.13.0"
 mudkip = "^0.5.3"
 myst-nb = "0.13.2"
+pytest = "^7.1.2"
 
 
 [tool.mudkip]
