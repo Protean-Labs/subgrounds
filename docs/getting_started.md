@@ -10,7 +10,7 @@ Subgrounds can be installed via ``pip`` with the following command:
 ```
 
 ```{eval-rst}
-.. Note:: If you run into problems during installation, see `Set up an isolated environment`
+.. Note:: If you run into problems during installation, see :ref:`Set up an isolated environment <isolated_environment_setup>`.
 ```
 
 ## Simple example
