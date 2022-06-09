@@ -1,20 +1,32 @@
-import unittest
+import pytest
 
-from subgrounds.pagination import (
-  Cursor,
-  PaginationNode,
-  preprocess_document,
-  merge
-)
-from subgrounds.query import Argument, Document, InputValue, Query, Selection, VariableDefinition
+from subgrounds.pagination import (Cursor, PaginationNode, merge,
+                                   preprocess_document)
+from subgrounds.query import (Argument, Document, InputValue, Query, Selection,
+                              VariableDefinition)
 from subgrounds.schema import TypeMeta, TypeRef
+from tests.utils import *
 
-from tests.utils import schema
 
-
-class TestPreprocessDocument(unittest.TestCase):
-  def test_normalize_doc_no_args(self):
-    expected = (
+@pytest.mark.parametrize("test_input, expected", [
+  # Test normalization with no args specified, no nested lists
+  (
+    Document(url='www.abc.xyz/graphql', query=Query(
+      name=None,
+      selection=[Selection(
+        fmeta=TypeMeta.FieldMeta('pairs', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+        ], TypeRef.non_null_list('Pair')),
+        selection=[
+          Selection(
+            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          )
+        ]
+      )]
+    )),
+    (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
         selection=[Selection(
@@ -48,8 +60,10 @@ class TestPreprocessDocument(unittest.TestCase):
         PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
       ]
     )
-
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
+  ),
+  # Test normalization with no args specified, with 1 nested list
+  (
+    Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
         fmeta=TypeMeta.FieldMeta('pairs', '', [
@@ -59,16 +73,21 @@ class TestPreprocessDocument(unittest.TestCase):
         ], TypeRef.non_null_list('Pair')),
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+            fmeta=TypeMeta.FieldMeta('swaps', '', [
+              TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
+            ], TypeRef.non_null_list('Swap')),
+            selection=[
+              Selection(
+                fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+              )
+            ]
           )
         ]
       )]
-    ))
-
-    self.assertEqual(preprocess_document(schema(), doc), expected)
-
-  def test_normalize_doc_no_args_nested_1(self):
-    expected = (
+    )),
+    (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
         selection=[Selection(
@@ -124,36 +143,48 @@ class TestPreprocessDocument(unittest.TestCase):
         PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'swaps'], [])
       ])]
     )
-
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
+  ),
+  # Test normalization with no args specified, with 1 nested list, 1 neighbor list
+  (
+    Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
-      selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
-        selection=[
-          Selection(
-            fmeta=TypeMeta.FieldMeta('swaps', '', [
-              TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-            ], TypeRef.non_null_list('Swap')),
-            selection=[
-              Selection(
-                fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-              )
-            ]
-          )
-        ]
-      )]
-    ))
-
-    self.assertEqual(preprocess_document(schema(), doc), expected)
-
-  def test_normalize_doc_no_args_nested_2(self):
-    expected = (
+      selection=[
+        Selection(
+          fmeta=TypeMeta.FieldMeta('pairs', '', [
+            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+          ], TypeRef.non_null_list('Pair')),
+          selection=[
+            Selection(
+              fmeta=TypeMeta.FieldMeta('swaps', '', [
+                TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+                TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
+              ], TypeRef.non_null_list('Swap')),
+              selection=[
+                Selection(
+                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                )
+              ]
+            ),
+          ]
+        ),
+        Selection(
+          fmeta=TypeMeta.FieldMeta('swaps', '', [
+            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
+          ], TypeRef.non_null_list('Swap')),
+          selection=[
+            Selection(
+              fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+            )
+          ]
+        ),
+      ]
+    )),
+    (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
         selection=[
@@ -238,50 +269,28 @@ class TestPreprocessDocument(unittest.TestCase):
         PaginationNode(2, 'id', 100, 0, None, TypeRef.Named('String'), ['swaps'], [])
       ]
     )
-
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
+  ),
+  # Test normalization with `first` arg specified, no nested lists
+  (
+    Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
-      selection=[
-        Selection(
-          fmeta=TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-          ], TypeRef.non_null_list('Pair')),
-          selection=[
-            Selection(
-              fmeta=TypeMeta.FieldMeta('swaps', '', [
-                TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-              ], TypeRef.non_null_list('Swap')),
-              selection=[
-                Selection(
-                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-                )
-              ]
-            ),
-          ]
-        ),
-        Selection(
-          fmeta=TypeMeta.FieldMeta('swaps', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-          ], TypeRef.non_null_list('Swap')),
-          selection=[
-            Selection(
-              fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-            )
-          ]
-        ),
-      ]
-    ))
-
-    self.assertEqual(preprocess_document(schema(), doc), expected)
-
-  def test_normalize_doc_first_arg(self):
-    expected = (
+      selection=[Selection(
+        fmeta=TypeMeta.FieldMeta('pairs', '', [
+          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+        ], TypeRef.non_null_list('Pair')),
+        arguments=[
+          Argument('first', InputValue.Int(455)),
+        ],
+        selection=[
+          Selection(
+            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          )
+        ]
+      )]
+    )),
+    (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
         selection=[Selection(
@@ -313,8 +322,10 @@ class TestPreprocessDocument(unittest.TestCase):
       )),
       [PaginationNode(0, 'id', 455, 0, None, TypeRef.Named('String'), ['pairs'], [])]
     )
-
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
+  ),
+  # Test normalization with `skip` arg specified, no nested lists
+  (
+    Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
         fmeta=TypeMeta.FieldMeta('pairs', '', [
@@ -323,7 +334,7 @@ class TestPreprocessDocument(unittest.TestCase):
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
         arguments=[
-          Argument('first', InputValue.Int(455)),
+          Argument('skip', InputValue.Int(10)),
         ],
         selection=[
           Selection(
@@ -331,12 +342,8 @@ class TestPreprocessDocument(unittest.TestCase):
           )
         ]
       )]
-    ))
-
-    self.assertEqual(preprocess_document(schema(), doc), expected)
-
-  def test_normalize_doc_skip_arg(self):
-    expected = (
+    )),
+    (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
         selection=[Selection(
@@ -366,10 +373,14 @@ class TestPreprocessDocument(unittest.TestCase):
           VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
         ]
       )),
-      [PaginationNode(0, 'id', 100, 10, None, TypeRef.Named('String'), ['pairs'], [])]
+      [
+        PaginationNode(0, 'id', 100, 10, None, TypeRef.Named('String'), ['pairs'], [])
+      ]
     )
-
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
+  ),
+  # Test normalization with `orderBy` arg specified, no nested lists
+  (
+    Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
         fmeta=TypeMeta.FieldMeta('pairs', '', [
@@ -378,7 +389,7 @@ class TestPreprocessDocument(unittest.TestCase):
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
         arguments=[
-          Argument('skip', InputValue.Int(10)),
+          Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
         ],
         selection=[
           Selection(
@@ -386,12 +397,8 @@ class TestPreprocessDocument(unittest.TestCase):
           )
         ]
       )]
-    ))
-
-    self.assertEqual(preprocess_document(schema(), doc), expected)
-
-  def test_normalize_doc_orderby_arg(self):
-    expected = (
+    )),
+    (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
         selection=[Selection(
@@ -420,10 +427,14 @@ class TestPreprocessDocument(unittest.TestCase):
           VariableDefinition('lastOrderingValue0', TypeRef.Named('BigInt')),
         ]
       )),
-      [PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])]
+      [
+        PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])
+      ]
     )
-
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
+  ),
+  # Test normalization with `orderDirection` arg specified, no nested lists
+  (
+    Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
         fmeta=TypeMeta.FieldMeta('pairs', '', [
@@ -432,7 +443,7 @@ class TestPreprocessDocument(unittest.TestCase):
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
         arguments=[
-          Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
+          Argument('orderDirection', InputValue.Enum('desc')),
         ],
         selection=[
           Selection(
@@ -440,12 +451,8 @@ class TestPreprocessDocument(unittest.TestCase):
           )
         ]
       )]
-    ))
-
-    self.assertEqual(preprocess_document(schema(), doc), expected)
-
-  def test_normalize_doc_orderdir_arg(self):
-    expected = (
+    )),
+    (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
         selection=[Selection(
@@ -473,10 +480,14 @@ class TestPreprocessDocument(unittest.TestCase):
           VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
         ]
       )),
-      [PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])]
+      [
+        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      ]
     )
-
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
+  ),
+  # Test normalization with `orderDirection` and `orderBy` args specified, no nested lists
+  (
+    Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
         fmeta=TypeMeta.FieldMeta('pairs', '', [
@@ -485,6 +496,7 @@ class TestPreprocessDocument(unittest.TestCase):
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
         arguments=[
+          Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
           Argument('orderDirection', InputValue.Enum('desc')),
         ],
         selection=[
@@ -493,12 +505,8 @@ class TestPreprocessDocument(unittest.TestCase):
           )
         ]
       )]
-    ))
-
-    self.assertEqual(preprocess_document(schema(), doc), expected)
-
-  def test_normalize_doc_orderby_orderdir_arg(self):
-    expected = (
+    )),
+    (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
         selection=[Selection(
@@ -529,8 +537,10 @@ class TestPreprocessDocument(unittest.TestCase):
       )),
       [PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])]
     )
-
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
+  ),
+  # Test normalization with no args specified, 1 nested lists 1 level down
+  (
+    Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
         fmeta=TypeMeta.FieldMeta('pairs', '', [
@@ -538,22 +548,28 @@ class TestPreprocessDocument(unittest.TestCase):
           TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
           TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
         ], TypeRef.non_null_list('Pair')),
-        arguments=[
-          Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
-          Argument('orderDirection', InputValue.Enum('desc')),
-        ],
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+            fmeta=TypeMeta.FieldMeta('foo', '', [], TypeRef.Named('Foo')),
+            selection=[
+              Selection(
+                fmeta=TypeMeta.FieldMeta('swaps', '', [
+                  TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+                  TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+                  TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
+                ], TypeRef.non_null_list('Swap')),
+                selection=[
+                  Selection(
+                    fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                  )
+                ]
+              )
+            ]
           )
         ]
       )]
-    ))
-
-    self.assertEqual(preprocess_document(schema(), doc), expected)
-
-  def test_normalize_doc_key_path(self):
-    expected = (
+    )),
+    (
       Document(url='www.abc.xyz/graphql', query=Query(
         name=None,
         selection=[Selection(
@@ -616,383 +632,39 @@ class TestPreprocessDocument(unittest.TestCase):
         ])
       ]
     )
-
-    doc = Document(url='www.abc.xyz/graphql', query=Query(
-      name=None,
-      selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
-        selection=[
-          Selection(
-            fmeta=TypeMeta.FieldMeta('foo', '', [], TypeRef.Named('Foo')),
-            selection=[
-              Selection(
-                fmeta=TypeMeta.FieldMeta('swaps', '', [
-                  TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-                  TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-                  TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-                ], TypeRef.non_null_list('Swap')),
-                selection=[
-                  Selection(
-                    fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-                  )
-                ]
-              )
-            ]
-          )
-        ]
-      )]
-    ))
-
-    self.assertEqual(preprocess_document(schema(), doc), expected)
+  )
+])
+def test_normalize_doc(schema, test_input, expected):
+  assert preprocess_document(schema, test_input) == expected
 
 
-class TestPaginationArgs(unittest.TestCase):
-  @staticmethod
-  def swaps_gen(pair_id, n):
-    for i in range(n):
-      yield {'id': f'swap_{pair_id}{i}', 'timestamp': i}
-
-  @staticmethod
-  def users_gen(pair_id, n):
-    for i in range(n):
-      yield {'id': f'user_{pair_id}{i}', 'volume': i}
-
-  def __test_args(self, arg_gen, expected, data_and_fails):
-    for args, (data, fails) in zip(expected, data_and_fails):
-      self.assertEqual(arg_gen.args(), args)
-
-      if fails:
-        with self.assertRaises(StopIteration):
-          arg_gen.step(data)
-      else:
-        arg_gen.step(data)
-
-  def test_pagination_args_single_node_no_args_2pages(self):
-    expected = [
-      {'first0': 900, 'skip0': 0},
-      {'first0': 200, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'}
-    ]
-
-    data_and_fails = [
-      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}, False),
-      ({'swaps': []}, True)
-    ]
-
-    page_node = PaginationNode(
-      node_idx=0,
-      filter_field='id',
-      first_value=1100,
-      skip_value=0,
-      filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
-      key_path=['swaps'],
-      inner=[]
-    )
-
-    arg_gen = Cursor(page_node)
-
-    self.__test_args(arg_gen, expected, data_and_fails)
-
-  def test_pagination_args_single_node_no_args_1page(self):
-    expected = [
-      {'first0': 900, 'skip0': 0},
-    ]
-
-    data_and_fails = [
-      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 10))}, True),
-    ]
-
-    page_node = PaginationNode(
-      node_idx=0,
-      filter_field='id',
-      first_value=1100,
-      skip_value=0,
-      filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
-      key_path=['swaps'],
-      inner=[]
-    )
-
-    arg_gen = Cursor(page_node)
-
-    self.__test_args(arg_gen, expected, data_and_fails)
-
-  def test_pagination_args_single_node_no_args_1page_below_limit(self):
-    expected = [
-      {'first0': 100, 'skip0': 0},
-    ]
-
-    data_and_fails = [
-      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 100))}, True),
-    ]
-
-    page_node = PaginationNode(
-      node_idx=0,
-      filter_field='id',
-      first_value=100,
-      skip_value=0,
-      filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
-      key_path=['swaps'],
-      inner=[]
-    )
-
-    arg_gen = Cursor(page_node)
-
-    self.__test_args(arg_gen, expected, data_and_fails)
-
-  def test_pagination_args_nested_no_args(self):
-    expected = [
-      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0},
-      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0},
-    ]
-
-    data_and_fails = [
-      ({'pairs': [{'id': 'a', 'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}]}, False),
-      ({'pairs': [{'id': 'a', 'swaps': list(TestPaginationArgs.swaps_gen('a', 100))}]}, False),
-      ({'pairs': [{'id': 'b', 'swaps': list(TestPaginationArgs.swaps_gen('b', 100))}]}, False),
-      ({'pairs': [{'id': 'c', 'swaps': list(TestPaginationArgs.swaps_gen('c', 10))}]}, False),
-      ({'pairs': [{'id': 'd', 'swaps': list(TestPaginationArgs.swaps_gen('d', 0))}]}, True),
-    ]
-
-    page_node = PaginationNode(
-      node_idx=0,
-      filter_field='id',
-      first_value=4,
-      skip_value=0,
-      filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
-      key_path=['pairs'],
-      inner=[
-        PaginationNode(
-          node_idx=1,
-          filter_field='timestamp',
-          first_value=7000,
-          skip_value=0,
-          filter_value=None,
-          filter_value_type=TypeRef.Named('BigInt'),
-          key_path=['pairs', 'swaps'],
-          inner=[]
-        )
+@pytest.mark.parametrize("data1, data2, expected", [
+  (
+    {},
+    {
+      'pairs': [
+        {'swaps': [
+          {'id': 'A1'},
+          {'id': 'A2'},
+          {'id': 'A3'},
+          {'id': 'A4'},
+        ]},
+        {'swaps': [
+          {'id': 'B1'},
+          {'id': 'B2'},
+          {'id': 'B3'},
+          {'id': 'B4'},
+        ]},
+        {'swaps': [
+          {'id': 'C1'},
+          {'id': 'C2'},
+          {'id': 'C3'},
+          {'id': 'C4'},
+          {'id': 'C5'},
+        ]},
       ]
-    )
-
-    arg_gen = Cursor(page_node)
-
-    self.__test_args(arg_gen, expected, data_and_fails)
-
-  def test_pagination_args_nested_no_args_2(self):
-    expected = [
-      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0},
-      {'first0': 1, 'skip0': 0, 'first1': 900, 'skip1': 0, 'lastOrderingValue1': 899},
-      {'first0': 1, 'skip0': 0, 'first2': 10, 'skip2': 0},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first1': 900, 'skip1': 0},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'a', 'first2': 10, 'skip2': 0},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first1': 900, 'skip1': 0},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'b', 'first2': 10, 'skip2': 0},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first1': 900, 'skip1': 0},
-      {'first0': 1, 'skip0': 0, 'lastOrderingValue0': 'c', 'first2': 10, 'skip2': 0},
-    ]
-
-    data_and_fails = [
-      ({'pairs': [{'id': 'a', 'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}]}, False),
-      ({'pairs': [{'id': 'a', 'swaps': list(TestPaginationArgs.swaps_gen('a', 100))}]}, False),
-      ({'pairs': [{'id': 'a', 'users': list(TestPaginationArgs.users_gen('a', 9))}]}, False),
-      ({'pairs': [{'id': 'b', 'swaps': list(TestPaginationArgs.swaps_gen('b', 100))}]}, False),
-      ({'pairs': [{'id': 'b', 'users': list(TestPaginationArgs.users_gen('b', 9))}]}, False),
-      ({'pairs': [{'id': 'c', 'swaps': list(TestPaginationArgs.swaps_gen('c', 10))}]}, False),
-      ({'pairs': [{'id': 'c', 'users': list(TestPaginationArgs.users_gen('c', 10))}]}, False),
-      ({'pairs': [{'id': 'd', 'swaps': list(TestPaginationArgs.swaps_gen('d', 0))}]}, False),
-      ({'pairs': [{'id': 'd', 'users': list(TestPaginationArgs.users_gen('d', 5))}]}, True),
-    ]
-
-    page_node = PaginationNode(
-      node_idx=0,
-      filter_field='id',
-      first_value=4,
-      skip_value=0,
-      filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
-      key_path=['pairs'],
-      inner=[
-        PaginationNode(
-          node_idx=1,
-          filter_field='timestamp',
-          first_value=7000,
-          skip_value=0,
-          filter_value=None,
-          filter_value_type=TypeRef.Named('BigInt'),
-          key_path=['pairs', 'swaps'],
-          inner=[],
-        ),
-        PaginationNode(
-          node_idx=2,
-          filter_field='volume',
-          first_value=10,
-          skip_value=0,
-          filter_value=None,
-          filter_value_type=TypeRef.Named('BigInt'),
-          key_path=['pairs', 'users'],
-          inner=[],
-        ),
-      ]
-    )
-
-    arg_gen = Cursor(page_node)
-
-    self.__test_args(arg_gen, expected, data_and_fails)
-
-  def test_pagination_args_single_node_skip_arg(self):
-    expected = [
-      {'first0': 900, 'skip0': 10},
-      {'first0': 600, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'},
-    ]
-
-    data_and_fails = [
-      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}, False),
-      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 500))}, True),
-    ]
-
-    page_node = PaginationNode(
-      node_idx=0,
-      filter_field='id',
-      first_value=1500,
-      skip_value=10,
-      filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
-      key_path=['swaps'],
-      inner=[]
-    )
-
-    arg_gen = Cursor(page_node)
-
-    self.__test_args(arg_gen, expected, data_and_fails)
-
-  def test_pagination_args_single_node_filter_arg(self):
-    expected = [
-      {'first0': 900, 'skip0': 0, 'lastOrderingValue0': '0'},
-      {'first0': 600, 'skip0': 0, 'lastOrderingValue0': 'swap_a899'},
-    ]
-
-    data_and_fails = [
-      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 900))}, False),
-      ({'swaps': list(TestPaginationArgs.swaps_gen('a', 500))}, True),
-    ]
-
-    page_node = PaginationNode(
-      node_idx=0,
-      filter_field='id',
-      first_value=1500,
-      skip_value=0,
-      filter_value='0',
-      filter_value_type=TypeRef.Named('String'),
-      key_path=['swaps'],
-      inner=[]
-    )
-
-    arg_gen = Cursor(page_node)
-
-    self.__test_args(arg_gen, expected, data_and_fails)
-
-# class TestTrimDocument(unittest.TestCase):
-#   def test_trim_docs_1(self):
-#     expected = Document(url='www.abc.xyz/graphql', query=Query(
-#       name=None,
-#       selection=[
-#         Selection(
-#           fmeta=TypeMeta.FieldMeta('pairs', '', [
-#             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-#             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-#           ], TypeRef.non_null_list('Pair')),
-#           arguments=[
-#             Argument('first', InputValue.Variable('first1')),
-#             Argument('skip', InputValue.Variable('skip1')),
-#           ],
-#           selection=[
-#             Selection(
-#               fmeta=TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
-#               arguments=[
-#                 Argument('first', InputValue.Variable('first0')),
-#                 Argument('skip', InputValue.Variable('skip0')),
-#               ],
-#               selection=[
-#                 Selection(
-#                   fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-#                 )
-#               ]
-#             )
-#           ]
-#         ),
-#       ],
-#       variables=[
-#         VariableDefinition('first1', TypeRef.Named('Int')),
-#         VariableDefinition('skip1', TypeRef.Named('Int')),
-#         VariableDefinition('first0', TypeRef.Named('Int')),
-#         VariableDefinition('skip0', TypeRef.Named('Int')),
-#       ]
-#     ), variables={'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 0})
-
-#     doc = Document(url='www.abc.xyz/graphql', query=Query(
-#       name=None,
-#       selection=[
-#         Selection(
-#           fmeta=TypeMeta.FieldMeta('pairs', '', [
-#             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-#             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-#           ], TypeRef.non_null_list('Pair')),
-#           arguments=[
-#             Argument('first', InputValue.Variable('first1')),
-#             Argument('skip', InputValue.Variable('skip1')),
-#           ],
-#           selection=[
-#             Selection(
-#               fmeta=TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap')),
-#               arguments=[
-#                 Argument('first', InputValue.Variable('first0')),
-#                 Argument('skip', InputValue.Variable('skip0')),
-#               ],
-#               selection=[
-#                 Selection(
-#                   fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-#                 )
-#               ]
-#             )
-#           ]
-#         ),
-#         Selection(
-#           fmeta=TypeMeta.FieldMeta('swaps', '', [
-#             TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-#             TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-#           ], TypeRef.non_null_list('Swap')),
-#           arguments=[
-#             Argument('first', InputValue.Variable('first2')),
-#             Argument('skip', InputValue.Variable('skip2')),
-#           ],
-#           selection=[
-#             Selection(
-#               fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
-#             )
-#           ]
-#         ),
-#       ]
-#     ))
-
-#     self.assertEqual(
-#       trim_document(doc, {'first1': 1, 'skip1': 0, 'first0': 20, 'skip0': 0}),
-#       expected
-#     )
-
-
-class TestMerge(unittest.TestCase):
-  def test_merge_empty(self):
-    expected = {
+    },
+    {
       'pairs': [
         {'swaps': [
           {'id': 'A1'},
@@ -1015,23 +687,23 @@ class TestMerge(unittest.TestCase):
         ]},
       ]
     }
-
-    data1 = {}
-    data2 = {
+  ),
+  (
+    {
       'pairs': [
-        {'swaps': [
+        {'id': 'p0', 'swaps': [
           {'id': 'A1'},
           {'id': 'A2'},
           {'id': 'A3'},
           {'id': 'A4'},
         ]},
-        {'swaps': [
+        {'id': 'p1', 'swaps': [
           {'id': 'B1'},
           {'id': 'B2'},
           {'id': 'B3'},
           {'id': 'B4'},
         ]},
-        {'swaps': [
+        {'id': 'p2', 'swaps': [
           {'id': 'C1'},
           {'id': 'C2'},
           {'id': 'C3'},
@@ -1039,12 +711,31 @@ class TestMerge(unittest.TestCase):
           {'id': 'C5'},
         ]},
       ]
-    }
-
-    self.assertEqual(merge(data1, data2), expected)
-
-  def test_merge_overlap(self):
-    expected = {
+    },
+    {
+      'pairs': [
+        {'id': 'p3', 'swaps': [
+          {'id': 'D1'},
+          {'id': 'D2'},
+          {'id': 'D3'},
+          {'id': 'D4'},
+        ]},
+        {'id': 'p4', 'swaps': [
+          {'id': 'E1'},
+          {'id': 'E2'},
+          {'id': 'E3'},
+          {'id': 'E4'},
+        ]},
+        {'id': 'p5', 'swaps': [
+          {'id': 'F1'},
+          {'id': 'F2'},
+          {'id': 'F3'},
+          {'id': 'F4'},
+          {'id': 'F5'},
+        ]},
+      ]
+    },
+    {
       'pairs': [
         {'id': 'p0', 'swaps': [
           {'id': 'A1'},
@@ -1086,22 +777,23 @@ class TestMerge(unittest.TestCase):
         ]},
       ]
     }
-
-    data1 = {
+  ),
+  (
+    {
       'pairs': [
-        {'id': 'p0', 'swaps': [
+        {'swaps': [
           {'id': 'A1'},
           {'id': 'A2'},
           {'id': 'A3'},
           {'id': 'A4'},
         ]},
-        {'id': 'p1', 'swaps': [
+        {'swaps': [
           {'id': 'B1'},
           {'id': 'B2'},
           {'id': 'B3'},
           {'id': 'B4'},
         ]},
-        {'id': 'p2', 'swaps': [
+        {'swaps': [
           {'id': 'C1'},
           {'id': 'C2'},
           {'id': 'C3'},
@@ -1109,36 +801,17 @@ class TestMerge(unittest.TestCase):
           {'id': 'C5'},
         ]},
       ]
-    }
-
-    data2 = {
-      'pairs': [
-        {'id': 'p3', 'swaps': [
-          {'id': 'D1'},
-          {'id': 'D2'},
-          {'id': 'D3'},
-          {'id': 'D4'},
-        ]},
-        {'id': 'p4', 'swaps': [
-          {'id': 'E1'},
-          {'id': 'E2'},
-          {'id': 'E3'},
-          {'id': 'E4'},
-        ]},
-        {'id': 'p5', 'swaps': [
-          {'id': 'F1'},
-          {'id': 'F2'},
-          {'id': 'F3'},
-          {'id': 'F4'},
-          {'id': 'F5'},
-        ]},
+    },
+    {
+      'mints': [
+        {'id': 'M1'},
+        {'id': 'M2'},
+        {'id': 'M3'},
+        {'id': 'M4'},
+        {'id': 'M5'},
       ]
-    }
-
-    self.assertEqual(merge(data1, data2), expected)
-
-  def test_merge_no_overlap(self):
-    expected = {
+    },
+    {
       'pairs': [
         {'swaps': [
           {'id': 'A1'},
@@ -1168,8 +841,9 @@ class TestMerge(unittest.TestCase):
         {'id': 'M5'},
       ]
     }
-
-    data1 = {
+  ),
+  (
+    {
       'pairs': [
         {'swaps': [
           {'id': 'A1'},
@@ -1190,10 +864,7 @@ class TestMerge(unittest.TestCase):
           {'id': 'C4'},
           {'id': 'C5'},
         ]},
-      ]
-    }
-
-    data2 = {
+      ],
       'mints': [
         {'id': 'M1'},
         {'id': 'M2'},
@@ -1201,12 +872,17 @@ class TestMerge(unittest.TestCase):
         {'id': 'M4'},
         {'id': 'M5'},
       ]
-    }
-
-    self.assertEqual(merge(data1, data2), expected)
-
-  def test_merge_partial_overlap(self):
-    expected = {
+    },
+    {
+      'mints': [
+        {'id': 'N1'},
+        {'id': 'N2'},
+        {'id': 'N3'},
+        {'id': 'N4'},
+        {'id': 'N5'},
+      ]
+    },
+    {
       'pairs': [
         {'swaps': [
           {'id': 'A1'},
@@ -1241,52 +917,61 @@ class TestMerge(unittest.TestCase):
         {'id': 'N5'},
       ]
     }
-
-    data1 = {
+  ),
+  (
+    {
+      'token': {
+        'symbol': 'USDC'
+      },
       'pairs': [
-        {'swaps': [
+        {'id': 'p0', 'swaps': [
           {'id': 'A1'},
           {'id': 'A2'},
           {'id': 'A3'},
           {'id': 'A4'},
         ]},
-        {'swaps': [
+        {'id': 'p1', 'swaps': [
           {'id': 'B1'},
           {'id': 'B2'},
           {'id': 'B3'},
           {'id': 'B4'},
         ]},
-        {'swaps': [
+        {'id': 'p2', 'swaps': [
           {'id': 'C1'},
           {'id': 'C2'},
           {'id': 'C3'},
           {'id': 'C4'},
           {'id': 'C5'},
         ]},
-      ],
-      'mints': [
-        {'id': 'M1'},
-        {'id': 'M2'},
-        {'id': 'M3'},
-        {'id': 'M4'},
-        {'id': 'M5'},
       ]
-    }
-
-    data2 = {
-      'mints': [
-        {'id': 'N1'},
-        {'id': 'N2'},
-        {'id': 'N3'},
-        {'id': 'N4'},
-        {'id': 'N5'},
+    },
+    {
+      'token': {
+        'symbol': 'USDC'
+      },
+      'pairs': [
+        {'id': 'p3', 'swaps': [
+          {'id': 'D1'},
+          {'id': 'D2'},
+          {'id': 'D3'},
+          {'id': 'D4'},
+        ]},
+        {'id': 'p4', 'swaps': [
+          {'id': 'E1'},
+          {'id': 'E2'},
+          {'id': 'E3'},
+          {'id': 'E4'},
+        ]},
+        {'id': 'p5', 'swaps': [
+          {'id': 'F1'},
+          {'id': 'F2'},
+          {'id': 'F3'},
+          {'id': 'F4'},
+          {'id': 'F5'},
+        ]},
       ]
-    }
-
-    self.assertEqual(merge(data1, data2), expected)
-
-  def test_merge_non_list_data(self):
-    expected = {
+    },
+    {
       'token': {
         'symbol': 'USDC'
       },
@@ -1331,11 +1016,9 @@ class TestMerge(unittest.TestCase):
         ]},
       ]
     }
-
-    data1 = {
-      'token': {
-        'symbol': 'USDC'
-      },
+  ),
+  (
+    {
       'pairs': [
         {'id': 'p0', 'swaps': [
           {'id': 'A1'},
@@ -1357,93 +1040,80 @@ class TestMerge(unittest.TestCase):
           {'id': 'C5'},
         ]},
       ]
-    }
-
-    data2 = {
-      'token': {
-        'symbol': 'USDC'
-      },
-      'pairs': [
-        {'id': 'p3', 'swaps': [
-          {'id': 'D1'},
-          {'id': 'D2'},
-          {'id': 'D3'},
-          {'id': 'D4'},
-        ]},
-        {'id': 'p4', 'swaps': [
-          {'id': 'E1'},
-          {'id': 'E2'},
-          {'id': 'E3'},
-          {'id': 'E4'},
-        ]},
-        {'id': 'p5', 'swaps': [
-          {'id': 'F1'},
-          {'id': 'F2'},
-          {'id': 'F3'},
-          {'id': 'F4'},
-          {'id': 'F5'},
-        ]},
-      ]
-    }
-    self.assertEqual(merge(data1, data2), expected)
-
-  def test_merge_empty_list(self):
-    expected = {
-      'pairs': [
-        {'id': 'p0', 'swaps': [
-          {'id': 'A1'},
-          {'id': 'A2'},
-          {'id': 'A3'},
-          {'id': 'A4'},
-        ]},
-        {'id': 'p1', 'swaps': [
-          {'id': 'B1'},
-          {'id': 'B2'},
-          {'id': 'B3'},
-          {'id': 'B4'},
-        ]},
-        {'id': 'p2', 'swaps': [
-          {'id': 'C1'},
-          {'id': 'C2'},
-          {'id': 'C3'},
-          {'id': 'C4'},
-          {'id': 'C5'},
-        ]},
-      ]
-    }
-
-    data1 = {
-      'pairs': [
-        {'id': 'p0', 'swaps': [
-          {'id': 'A1'},
-          {'id': 'A2'},
-          {'id': 'A3'},
-          {'id': 'A4'},
-        ]},
-        {'id': 'p1', 'swaps': [
-          {'id': 'B1'},
-          {'id': 'B2'},
-          {'id': 'B3'},
-          {'id': 'B4'},
-        ]},
-        {'id': 'p2', 'swaps': [
-          {'id': 'C1'},
-          {'id': 'C2'},
-          {'id': 'C3'},
-          {'id': 'C4'},
-          {'id': 'C5'},
-        ]},
-      ]
-    }
-
-    data2 = {
+    },
+    {
       'pairs': []
+    },
+    {
+      'pairs': [
+        {'id': 'p0', 'swaps': [
+          {'id': 'A1'},
+          {'id': 'A2'},
+          {'id': 'A3'},
+          {'id': 'A4'},
+        ]},
+        {'id': 'p1', 'swaps': [
+          {'id': 'B1'},
+          {'id': 'B2'},
+          {'id': 'B3'},
+          {'id': 'B4'},
+        ]},
+        {'id': 'p2', 'swaps': [
+          {'id': 'C1'},
+          {'id': 'C2'},
+          {'id': 'C3'},
+          {'id': 'C4'},
+          {'id': 'C5'},
+        ]},
+      ]
     }
-
-    self.assertEqual(merge(data1, data2), expected)
-
-  def test_merge_union(self):
-    expected = {
+  ),
+  (
+    {
+      'pairs': [
+        {
+          'id': 'abc',
+          'swaps': [
+            {'id': 'A1'},
+            {'id': 'A2'},
+            {'id': 'A3'},
+            {'id': 'A4'},
+          ]
+        },
+        {
+          'id': 'xyz',
+          'swaps': [
+            {'id': 'B1'},
+            {'id': 'B2'},
+            {'id': 'B3'},
+            {'id': 'B4'},
+          ]
+        },
+      ]
+    },
+    {
+      'pairs': [
+        {
+          'id': 'abc',
+          'mints': [
+            {'id': 'M1'},
+            {'id': 'M2'},
+            {'id': 'M3'},
+            {'id': 'M4'},
+          ]
+        },
+        {
+          'id': 'xyz',
+          'mints': [
+            {'id': 'N1'},
+            {'id': 'N2'},
+            {'id': 'N3'},
+            {'id': 'N4'},
+          ]
+        },
+      ]
+    },
+    {
       'pairs': [
         {
           'id': 'abc',
@@ -1477,51 +1147,7 @@ class TestMerge(unittest.TestCase):
         },
       ]
     }
-
-    data1 = {
-      'pairs': [
-        {
-          'id': 'abc',
-          'swaps': [
-            {'id': 'A1'},
-            {'id': 'A2'},
-            {'id': 'A3'},
-            {'id': 'A4'},
-          ]
-        },
-        {
-          'id': 'xyz',
-          'swaps': [
-            {'id': 'B1'},
-            {'id': 'B2'},
-            {'id': 'B3'},
-            {'id': 'B4'},
-          ]
-        },
-      ]
-    }
-
-    data2 = {
-      'pairs': [
-        {
-          'id': 'abc',
-          'mints': [
-            {'id': 'M1'},
-            {'id': 'M2'},
-            {'id': 'M3'},
-            {'id': 'M4'},
-          ]
-        },
-        {
-          'id': 'xyz',
-          'mints': [
-            {'id': 'N1'},
-            {'id': 'N2'},
-            {'id': 'N3'},
-            {'id': 'N4'},
-          ]
-        },
-      ]
-    }
-
-    self.assertEqual(merge(data1, data2), expected)
+  )
+])
+def test_merge_pages(data1, data2, expected):
+  assert merge(data1, data2) == expected
