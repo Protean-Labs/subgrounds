@@ -375,6 +375,24 @@ def preprocess_document(
 
 @dataclass
 class Cursor:
+  """ Class used to generate the pagination variables for a given tree of
+  ``PaginationNode`` objects.
+
+  Attributes:
+    page_node: The ``PaginationNode`` object which this cursor is iterating
+      through.
+    inner: The cursors for nested ``PaginationNodes``, if any.
+    inner_idx: The index of the inner ``PaginationNode`` through which this cursor
+      iterating.
+    filter_value: The previous page's index value used to query the next data page.
+      Depends on ``page_node.filter_field``, e.g.: if ``page_node.filter_field``
+      is ``timestamp_gt``, then ``filter_value`` will be the highest timestamp
+      the entities returned in the previous data page.
+    queried_entities: Counter keeping track of the total number of queried entities.
+    stop: Flag indicating whether or not to stop the cursor.
+    page_count: Counter keeping track of the total number data pages queried.
+    keys: Set keeping track of the keys of all queried entities to avoid duplicates.
+  """
   page_node: PaginationNode
 
   inner: list[Cursor]
@@ -700,16 +718,16 @@ def paginate_iter(schema: SchemaMeta, doc: Document) -> Iterator[dict[str, Any]]
   else:
     # data: dict[str, Any] = {}
     for page_node in pagination_nodes:
-      arg_gen = Cursor(page_node)
+      cursor = Cursor(page_node)
 
       while True:
         try:
-          args = arg_gen.args()
+          args = cursor.args()
           trimmed_doc = trim_document(new_doc, args)
           page_data = client.query(trimmed_doc.url, trimmed_doc.graphql, variables=trimmed_doc.variables | args)
           yield page_data
-          arg_gen.step(page_data)
+          cursor.step(page_data)
         except StopIteration:
           break
         except Exception as exn:
-          raise PaginationError(exn.args[0], arg_gen)
+          raise PaginationError(exn.args[0], cursor)
