@@ -7,6 +7,7 @@ from hashlib import blake2b
 from pipe import map, traverse
 import logging
 import warnings
+from datetime import datetime
 
 from subgrounds.query import Query, Selection, arguments_of_field_args
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef
@@ -630,6 +631,15 @@ class SyntheticField(FieldOperatorMixin):
 
   @staticmethod
   def constant(value: str | int | float | bool) -> SyntheticField:
+    """ Returns a constant SyntehticField with value ``value``. Useful for injecting
+    additional static data to a schema.
+
+    Args:
+      value (str | int | float | bool): The constant field's value
+
+    Returns:
+      SyntheticField: The constant SyntheticField
+    """
     match value:
       case str():
         return SyntheticField(lambda: value, SyntheticField.STRING, [])
@@ -639,3 +649,21 @@ class SyntheticField(FieldOperatorMixin):
         return SyntheticField(lambda: value, SyntheticField.FLOAT, [])
       case bool():
         return SyntheticField(lambda: value, SyntheticField.BOOL, [])
+
+  @staticmethod
+  def datetime_of_timestamp(timestamp: FieldPath | SyntheticField) -> SyntheticField:
+    """ Returns a SyntheticField that will transform the ``FieldPath`` ``timestamp``
+    into a human-readable ISO8601 string.
+
+    Args:
+      timestamp (FieldPath | SyntheticField): A ``FieldPath`` pointing to a
+      Unix timestamp field.
+
+    Returns:
+      SyntheticField: An ISO8601 datetime string SyntheticField.
+    """
+    return SyntheticField(
+      lambda timestamp: str(datetime.fromtimestamp(timestamp)),
+      SyntheticField.STRING,
+      timestamp
+    )
