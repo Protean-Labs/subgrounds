@@ -240,10 +240,7 @@ class LocalSyntheticField(DocumentTransform):
     self.args = args
 
   def transform_document(self, doc: Document) -> Document:
-    logger.debug(f'LocalSyntheticField.transform_document: fmeta = {self.fmeta}, object = {self.type_}')
-
     def transform(select: Selection) -> Selection | list[Selection]:
-      logger.debug(f'LocalSyntheticField.transform_document.transform: select = {select}, args = {self.args}')
       match select:
         # case Selection(TypeMeta.FieldMeta(name) as fmeta, _, _, [] | None) if name == self.fmeta.name and fmeta.type_.name == self.type_.name:
         case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == self.fmeta.name:
@@ -275,10 +272,7 @@ class LocalSyntheticField(DocumentTransform):
       return doc
 
   def transform_response(self, doc: Document, data: dict[str, Any]) -> dict[str, Any]:
-    logger.debug(f'LocalSyntheticField.transform_response: fmeta = {self.fmeta}, object = {self.type_}')
-
     def transform(select: Selection, data: dict) -> None:
-      logger.debug(f'LocalSyntheticField.transform_response.transform: select = {select}, data = {data}')
       match (select, data):
         case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
           arg_values = flatten(list(self.args | map(partial(select_data, data=data))))
@@ -306,7 +300,6 @@ class LocalSyntheticField(DocumentTransform):
           raise Exception(f"transform_response: invalid selection {select} for data {data}")
 
     def transform_on_type(select: Selection, data: dict) -> None:
-      logger.debug(f'LocalSyntheticField.transform_response.transform_on_type: select = {select}, data = {data}')
       match select:
         case Selection(TypeMeta.FieldMeta(_, _, _, type_), None, _, _) | Selection(TypeMeta.FieldMeta(_, _, _, type_), _, _, _) if type_.name == self.type_.name:
           # for select in inner_select:

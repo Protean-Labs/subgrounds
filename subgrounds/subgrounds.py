@@ -188,7 +188,7 @@ class Subgrounds:
         yield client.query(doc.url, doc.graphql, variables=doc.variables)
 
     def transform_doc(transforms: list[DocumentTransform], doc: Document) -> Iterator[dict[str, Any]]:
-      logger.debug(f'execute.transform_doc: doc = \n{doc.graphql}')
+      logger.debug(f'execute_iter.transform_doc: doc = \n{doc.graphql}')
       match transforms:
         case []:
           yield from execute_document(doc)
