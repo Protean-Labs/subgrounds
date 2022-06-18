@@ -41,7 +41,7 @@ jobs:
 
     - name: Install dependencies
       if: steps.cache-pipenv.outputs.cache-hit != 'true'
-      run: poetry install
+      run: poetry install -E dash
 
     - name: Run unit tests
       run: poetry run nose2
