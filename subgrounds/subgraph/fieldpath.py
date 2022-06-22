@@ -667,3 +667,30 @@ class SyntheticField(FieldOperatorMixin):
       SyntheticField.STRING,
       timestamp
     )
+
+  @staticmethod
+  def map(
+    dict: dict[Any, Any],
+    type_: TypeRef.T,
+    fpath: FieldPath | SyntheticField,
+    default: Optional[Any] = None
+  ) -> SyntheticField:
+    """ Returns a SyntheticField that will map the values of ``fpath`` using the
+    key value pairs in ``dict``. If a value is not in the dictionary, then
+    ``default`` will be used instead.
+
+    Args:
+      dict (dict[Any, Any]): The dictionary containing the key value pairs used
+      to map ``fpath``'s values
+      type_ (TypeRef.T): The type of the resulting field
+      fpath (FieldPath | SyntheticField): The FieldPath whose values will be
+      mapped using the dictionary
+
+    Returns:
+        SyntheticField: A SyntheticField
+    """
+    return SyntheticField(
+      lambda value: dict[value] if value in dict else default,
+      type_,
+      fpath
+    )
