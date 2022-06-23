@@ -15,7 +15,7 @@ Subgrounds can be installed via ``pip`` with the following command:
 
 ## Simple example
 ```python
->>> from subgrounds.subgrounds import Subgrounds
+>>> from subgrounds import Subgrounds
 
 # Initialize Subgrounds
 >>> sg = Subgrounds()
