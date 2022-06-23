@@ -31,8 +31,8 @@ class Object:
     return self._subgraph._schema
 
   def _select(self, name: str) -> FieldPath:
-    """ Selects the field from :attr:`self` with name :attr:`name` and returns
-    the field as a :class:`FieldPath`.
+    """ Selects the field from ``self`` with name ``name`` and returns the field
+    as a :class:`FieldPath`.
 
     Args:
       name (str): The name of the field
