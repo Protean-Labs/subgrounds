@@ -21,6 +21,9 @@ Subgrounds is still in the very early stages of development. APIs can and will c
 Subgrounds is available on PyPi. To install it, run the following:<br>
 `pip install subgrounds`.
 
+Subgrounds also comes bundled with some handy `dash` wrappers. To use those wrappers, you can install the extra `dash` dependencies.<br>
+`pip install subgrounds[dash]`.
+
 ## Simple example
 ```python
 >>> from subgrounds.subgrounds import Subgrounds
