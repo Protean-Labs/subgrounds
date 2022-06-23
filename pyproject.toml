@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "subgrounds"
-version = "0.1.1"
-description = "A framework for querying, manipulating and visualizing data indexed on The Graph network."
+version = "0.2.0"
+description = "A Pythonic data access layer for applications querying data from The Graph Network."
 authors = []
 repository = "https://github.com/Protean-Labs/subgrounds"
 
@@ -9,7 +9,6 @@ repository = "https://github.com/Protean-Labs/subgrounds"
 python = "^3.10"
 requests = "^2.27.1"
 pandas = "^1.4.2"
-# pipe = "^1.6.0"
 pipe = "^2.0"
 dash = { version = "^2.3.1", optional = true }
 
