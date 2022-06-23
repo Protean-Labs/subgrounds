@@ -1,7 +1,7 @@
 """ Schema data structure module
 
 This module contains various data structures in the form of dataclasses that
-are used to represent GraphQL schemas in Subgrounds.
+are used to represent GraphQL schemas in Subgrounds using an AST-like approach.
 """
 
 from __future__ import annotations

@@ -6,7 +6,7 @@ The `Subgrounds` class provides the toplevel Subgrounds API and most Subgrounds 
 
 The code cell below demonstrates how to initialize your `Subgrounds` object and load a GraphQL API.
 ```python
->>> from subgrounds.subgrounds import Subgrounds
+>>> from subgrounds import Subgrounds
 
 # Initialize Subgrounds
 >>> sg = Subgrounds()

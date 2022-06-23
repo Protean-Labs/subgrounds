@@ -290,33 +290,39 @@ class Subgrounds:
 
     Example:
 
-    >>> from subgrounds.subgrounds import Subgrounds
-    >>> sg = Subgrounds()
-    >>> univ3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
-    >>> univ3.Swap.price = abs(univ3.Swap.amount0) / abs(univ3.Swap.amount1)
-    >>> eth_usdc = univ3.Query.swaps(
-    ...   orderBy=univ3.Swap.timestamp,
-    ...   orderDirection='desc',
-    ...   first=10,
-    ...   where=[
-    ...     univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
-    ...   ]
-    ... )
-    >>> sg.query_df([
-    ...   eth_usdc.timestamp,
-    ...   eth_usdc.price
-    ... ])
-      swaps_timestamp  swaps_price
-    0       1643213811  2618.886394
-    1       1643213792  2618.814281
-    2       1643213792  2617.500494
-    3       1643213763  2615.458495
-    4       1643213763  2615.876574
-    5       1643213739  2615.352390
-    6       1643213678  2615.205713
-    7       1643213370  2614.115746
-    8       1643213210  2613.077301
-    9       1643213196  2610.686563
+    .. code-block:: python
+
+        >>> from subgrounds import Subgrounds
+        >>> sg = Subgrounds()
+        >>> univ3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
+
+        # Define price SyntheticField
+        >>> univ3.Swap.price = abs(univ3.Swap.amount0) / abs(univ3.Swap.amount1)
+
+        # Query last 10 swaps from the ETH/USDC pool
+        >>> eth_usdc = univ3.Query.swaps(
+        ...   orderBy=univ3.Swap.timestamp,
+        ...   orderDirection='desc',
+        ...   first=10,
+        ...   where=[
+        ...     univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
+        ...   ]
+        ... )
+        >>> sg.query_df([
+        ...   eth_usdc.timestamp,
+        ...   eth_usdc.price
+        ... ])
+          swaps_timestamp  swaps_price
+        0       1643213811  2618.886394
+        1       1643213792  2618.814281
+        2       1643213792  2617.500494
+        3       1643213763  2615.458495
+        4       1643213763  2615.876574
+        5       1643213739  2615.352390
+        6       1643213678  2615.205713
+        7       1643213370  2614.115746
+        8       1643213210  2613.077301
+        9       1643213196  2610.686563
     """
     fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
     json_data = self.query_json(fpaths, auto_paginate=auto_paginate)
@@ -367,20 +373,28 @@ class Subgrounds:
 
     Example:
 
-    >>> from subgrounds.subgrounds import Subgrounds
-    >>> sg = Subgrounds()
-    >>> univ3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
-    >>> univ3.Swap.price = abs(univ3.Swap.amount0) / abs(univ3.Swap.amount1)
-    >>> eth_usdc_last = univ3.Query.swaps(
-    ...   orderBy=univ3.Swap.timestamp,
-    ...   orderDirection='desc',
-    ...   first=1,
-    ...   where=[
-    ...     univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
-    ...   ]
-    ... ).price
-    >>> sg.query(eth_usdc_last)
-    2628.975030015892
+    .. code-block:: python
+
+      >>> from subgrounds import Subgrounds
+      >>> sg = Subgrounds()
+      >>> univ3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
+
+      # Define price SyntheticField
+      >>> univ3.Swap.price = abs(univ3.Swap.amount0) / abs(univ3.Swap.amount1)
+
+      # Construct FieldPath to get price of last swap on ETH/USDC pool
+      >>> eth_usdc_last = univ3.Query.swaps(
+      ...   orderBy=univ3.Swap.timestamp,
+      ...   orderDirection='desc',
+      ...   first=1,
+      ...   where=[
+      ...     univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
+      ...   ]
+      ... ).price
+
+      # Query last price FieldPath
+      >>> sg.query(eth_usdc_last)
+      2628.975030015892
 
     """
     fpaths = list(fpath | map(FieldPath._auto_select) | traverse)
@@ -419,24 +433,6 @@ class Subgrounds:
         Defaults to ``True``.
     Returns:
       Iterator[type]: An iterator over the ``FieldPath`` object(s)' data pages
-
-    Example:
-
-    >>> from subgrounds.subgrounds import Subgrounds
-    >>> sg = Subgrounds()
-    >>> univ3 = sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
-    >>> univ3.Swap.price = abs(univ3.Swap.amount0) / abs(univ3.Swap.amount1)
-    >>> eth_usdc_last = univ3.Query.swaps(
-    ...   orderBy=univ3.Swap.timestamp,
-    ...   orderDirection='desc',
-    ...   first=1,
-    ...   where=[
-    ...     univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
-    ...   ]
-    ... ).price
-    >>> sg.query(eth_usdc_last)
-    2628.975030015892
-
     """
     def f(fpath: FieldPath, blob: dict[str, Any]) -> dict[str, Any]:
       data = fpath._extract_data(blob)
