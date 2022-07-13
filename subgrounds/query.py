@@ -21,11 +21,10 @@ A typical Subgrounds request will have the following dataclass hierarchy:
 """
 
 from __future__ import annotations
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from functools import partial, reduce
-from typing import Any, Callable, Optional, Protocol
-from pipe import map, traverse, where, take
+from typing import Any, Callable, Iterable, Iterator, Literal, Optional, Protocol, TypeVar, runtime_checkable
+from pipe import map, traverse, where, take, Pipe
 import warnings
 
 from subgrounds.schema import (
@@ -35,6 +34,7 @@ from subgrounds.schema import (
 )
 from subgrounds.utils import (
   extract_data,
+  filter_map,
   filter_none,
   identity,
   rel_complement,
@@ -50,17 +50,15 @@ warnings.simplefilter('default')
 # Query definitions, data structures and types
 # ================================================================
 class InputValue:
-  # @dataclass(frozen=True)
-  class T(ABC):
+  class T(Protocol):
     @property
-    @abstractmethod
     def graphql(self) -> str:
       """ Returns a GraphQL string representation of the input value
 
       Returns:
         str: The GraphQL string representation of the input value
       """
-      pass
+      ...
 
     @property
     def is_variable(self) -> bool:
@@ -69,7 +67,7 @@ class InputValue:
       Returns:
         bool: True i.f.f. the input value is of type Variable, otherwise False
       """
-      return False
+      ...
 
     @property
     def is_number(self) -> bool:
@@ -78,16 +76,29 @@ class InputValue:
       Returns:
         bool: True i.f.f. the input value is of type Float or Int, otherwise False
       """
-      return False
+      ...
+
+    def iter(self) -> Iterator[InputValue.T]: ...
 
   @dataclass(frozen=True)
-  class Null(T):
+  class Null:
     @property
     def graphql(self) -> str:
       return "null"
 
+    @property
+    def is_variable(self) -> bool:
+      return False
+
+    @property
+    def is_number(self) -> bool:
+      return False
+
+    def iter(self) -> Iterator[InputValue.T]:
+      yield self
+
   @dataclass(frozen=True)
-  class Int(T):
+  class Int:
     value: int
 
     @property
@@ -95,11 +106,18 @@ class InputValue:
       return str(self.value)
 
     @property
+    def is_variable(self) -> bool:
+      return False
+
+    @property
     def is_number(self) -> bool:
       return True
 
+    def iter(self) -> Iterator[InputValue.T]:
+      yield self
+
   @dataclass(frozen=True)
-  class Float(T):
+  class Float:
     value: float
 
     @property
@@ -107,35 +125,75 @@ class InputValue:
       return str(self.value)
 
     @property
+    def is_variable(self) -> bool:
+      return False
+
+    @property
     def is_number(self) -> bool:
       return True
 
+    def iter(self) -> Iterator[InputValue.T]:
+      yield self
+
   @dataclass(frozen=True)
-  class String(T):
+  class String:
     value: str
 
     @property
     def graphql(self) -> str:
       return f"\"{self.value}\""
 
+    @property
+    def is_variable(self) -> bool:
+      return False
+
+    @property
+    def is_number(self) -> bool:
+      return False
+
+    def iter(self) -> Iterator[InputValue.T]:
+      yield self
+
   @dataclass(frozen=True)
-  class Boolean(T):
+  class Boolean:
     value: bool
 
     @property
     def graphql(self) -> str:
       return str(self.value).lower()
 
+    @property
+    def is_variable(self) -> bool:
+      return False
+
+    @property
+    def is_number(self) -> bool:
+      return False
+
+    def iter(self) -> Iterator[InputValue.T]:
+      yield self
+
   @dataclass(frozen=True)
-  class Enum(T):
+  class Enum:
     value: str
 
     @property
     def graphql(self) -> str:
       return self.value
 
+    @property
+    def is_variable(self) -> bool:
+      return False
+
+    @property
+    def is_number(self) -> bool:
+      return False
+
+    def iter(self) -> Iterator[InputValue.T]:
+      yield self
+
   @dataclass(frozen=True)
-  class Variable(T):
+  class Variable:
     name: str
 
     @property
@@ -146,22 +204,54 @@ class InputValue:
     def is_variable(self) -> bool:
       return True
 
+    @property
+    def is_number(self) -> bool:
+      return False
+
+    def iter(self) -> Iterator[InputValue.T]:
+      yield self
+
   @dataclass(frozen=True)
-  class List(T):
+  class List:
     value: list[InputValue.T]
 
     @property
     def graphql(self) -> str:
       return f"[{', '.join([val.graphql for val in self.value])}]"
 
+    @property
+    def is_variable(self) -> bool:
+      return False
+
+    @property
+    def is_number(self) -> bool:
+      return False
+
+    def iter(self) -> Iterator[InputValue.T]:
+      yield self
+      for val in self.value:
+        yield from val.iter()
+
   @dataclass(frozen=True)
-  class Object(T):
+  class Object:
     value: dict[str, InputValue.T]
 
     @property
     def graphql(self) -> str:
       return f"{{{', '.join([f'{key}: {value.graphql}' for key, value in self.value.items()])}}}"
 
+    @property
+    def is_variable(self) -> bool:
+      return False
+
+    @property
+    def is_number(self) -> bool:
+      return False
+
+    def iter(self) -> Iterator[InputValue.T]:
+      yield self
+      for val in self.value.values():
+        yield from val.iter()
 
 @dataclass(frozen=True)
 class VariableDefinition:
@@ -209,6 +299,55 @@ class Argument:
   def graphql(self) -> str:
     return f"{self.name}: {self.value.graphql}"
 
+  def iter(self) -> Iterator[InputValue.T]:
+    yield from self.value.iter()
+
+  def iter_vars(self) -> Iterator[InputValue.Variable]:
+    for iv in self.value.iter():
+      match iv:
+        case InputValue.Variable():
+          yield iv
+        case _:
+          continue
+
+  def for_all(self, predicate: Callable[[InputValue.T], bool]) -> bool:
+    return all(
+      self.iter()
+      | map(predicate)
+    )
+
+  def for_all_vars(self, predicate: Callable[[InputValue.Variable], bool]) -> bool:
+    return all(
+      self.iter_vars()
+      | map(predicate)
+    )
+
+  def exists(self, predicate: Callable[[InputValue.T], bool]) -> bool:
+    return any(
+      self.iter()
+      | map(predicate)
+    )
+
+  def exists_vars(self, predicate: Callable[[InputValue.Variable], bool]) -> bool:
+    return any(
+      self.iter_vars()
+      | map(predicate)
+    )
+
+  def find(self, predicate: Callable[[InputValue.T], bool]) -> Optional[InputValue.T]:
+    try:
+      return next(self.iter() | where(predicate))
+    except StopIteration:
+      return None
+
+  def find_vars(self, predicate: Callable[[InputValue.Variable], bool]) -> Optional[InputValue.T]:
+    try:
+      return next(self.iter_vars() | where(predicate))
+    except StopIteration:
+      return None
+
+  def all_defined(self, variables: Iterator[str]) -> bool:
+    return self.for_all_vars(lambda var: var.name in variables)
 
 @dataclass(frozen=True)
 class Selection:
@@ -280,27 +419,269 @@ class Selection:
 
     return list(f(self))
 
-  def contains_list(self: Selection, recurse: bool = True) -> bool:
-    """ Returns True i.f.f. the selection :attr:`self` selects a field of type
-    list. If :attr:`recurse` is set to True, then the method also checks for
-    list fields in nested selections.
+  # ================================================================
+  # Generic functions
+  # ================================================================
+  def iter(self) -> Iterator[Selection]:
+    """Returns an iterator over all ``Selections`` of the current selection tree."""
+    yield self
+    for inner in self.selection:
+      yield from inner.iter()
+
+  def iter_args(self, recurse: bool = True) -> Iterator[Argument]:
+    """Returns an iterator over all ``Arguments`` of the current ``Selection``.
+    
+    If ``recurse == True``, then the iterator also includes ``Arguments`` of
+    inner ``Selections``.
+    """
+    for arg in self.arguments:
+      yield arg
+
+    if recurse:
+      for inner in self.selection:
+        yield from inner.iter_args()
+
+  def filter(self, predicate: Callable[[Selection], bool]) -> Optional[Selection]:
+    """ Returns a new ``Selection`` object containing all attributes of the current
+    ``Selection`` if ``predicate(self) == True`` and ``None`` otherwise. The function
+    if also applied recursively to inner ``Selections``.
 
     Args:
-      self (Selection): The selection to traverse
-      recurse (bool, optional): Flag indicating if the method should be executed
-        on the nested selections. Defaults to True.
+        predicate (Callable[[Selection], bool]): _description_
 
     Returns:
-      bool: True if selection (or possibly nested selections) selects a list
-      field. False otherwise.
+        Optional[Selection]: _description_
     """
-    if self.fmeta.type_.is_list:
+    if predicate(self):
+      return Selection(
+        fmeta=self.fmeta,
+        alias=self.alias,
+        arguments=self.arguments,
+        selection=list(
+          self.selection
+          | filter_map(partial(Selection.filter, predicate=predicate))
+        )
+      )
+    else:
+      return None
+
+  def filter_args(self, predicate: Callable[[Argument], bool], recurse: bool = True) -> Selection:
+    """ Returns a new ``Selection`` object which contains all attributes of 
+    the current ``Selection`` except for ``Arguments`` for which 
+    ``predicate(arg) == True``. 
+    
+    If ``recurse == True``, then the function is applied recursively to 
+    inner ``Selections``
+
+    Args:
+        predicate (Callable[[Argument], bool]): _description_
+        recurse (bool, optional): _description_. Defaults to True.
+
+    Returns:
+        Selection: _description_
+    """
+    return Selection(
+      fmeta=self.fmeta,
+      alias=self.alias,
+      arguments=list(
+        self.arguments
+        | where(predicate)
+      ),
+      selection=list(
+        self.selection
+        | map(partial(Selection.filter_args, predicate=predicate))
+      ) if recurse else self.selection
+    )
+
+
+  def map(
+    self,
+    map_f: Callable[[Selection], Selection],
+    priority: Literal['self'] | Literal['children'] = 'self'
+  ) -> Selection:
+    """Returns a new ``Selection`` object containing the same selection tree
+    as the current ``Selection`` where each ``Selection`` object ``s`` is 
+    ``map_f(s)``
+
+    Args:
+        map_f (Callable[[Selection], Selection]): Mapping function to apply
+          to each ``Selection``
+
+    Returns:
+        Selection: _description_
+    """
+    match priority:
+      case 'self':
+        new_selection = map_f(self)
+        
+        return Selection(
+          fmeta=new_selection.fmeta,
+          alias=new_selection.alias,
+          arguments=new_selection.arguments,
+          selection=list(
+            self.selection
+            | map(partial(Selection.map, map_f=map_f, priority=priority))
+          )
+        )
+
+      case 'children':        
+        new_selection = Selection(
+          fmeta=self.fmeta,
+          alias=self.alias,
+          arguments=self.arguments,
+          selection=list(
+            self.selection
+            | map(partial(Selection.map, map_f=map_f, priority=priority))
+          )
+        )
+
+        return map_f(new_selection)
+      
+      case _:
+        raise Exception(f"map: invalid priority {priority}")
+
+  def map_args(self, map_f: Callable[[Argument], Argument | list[Argument]], recurse: bool = True) -> Selection:
+    """ Replaces each ``Argument`` ``arg`` in the current ``Selection`` with ``map_f(arg)``
+    and returns a new ``Selection`` object containinf the modified arguments.
+
+    If ``recurse == True``, then the function is applied recursively to inner
+    ``Selections``.
+
+    Args:
+        map_f (Callable[[Argument], Argument | list[Argument]]): _description_
+        recurse (bool, optional): _description_. Defaults to True.
+
+    Returns:
+        Selection: _description_
+    """
+    return Selection(
+      fmeta=self.fmeta,
+      alias=self.alias,
+      arguments=list(self.arguments | map(map_f)),
+      selection=list(
+        self.selection
+        | map(partial(Selection.map_args, map_f=map_f))
+        | traverse
+      ) if recurse else self.selection
+    )
+
+  def filter_map(self, map_f: Callable[[Selection], Optional[Selection]]) -> Optional[Selection]:
+    new_selection = map_f(self)
+    
+    if new_selection is not None:
+      return Selection(
+        fmeta=new_selection.fmeta,
+        alias=new_selection.alias,
+        arguments=new_selection.arguments,
+        selection=list(
+          self.selection
+          | filter_map(partial(Selection.filter_map, map_f=map_f))
+        )
+      )
+    else:
+      return None
+
+  def filter_map_args(self, map_f: Callable[[Argument], Optional[Argument | list[Argument]]], recurse: bool = True) -> Selection:
+    return Selection(
+      fmeta=self.fmeta,
+      alias=self.alias,
+      arguments=list(
+        self.arguments
+        | filter_map(map_f)
+        | traverse
+      ),
+      selection=list(
+        self.selection
+        | map(partial(Selection.filter_map_args, map_f=map_f))
+      ) if recurse else self.selection
+    )
+
+  def for_all(self, predicate: Callable[[Selection], bool]) -> bool:
+    if predicate(self):
+      return all(
+        self.selection
+        | map(partial(Selection.for_all, predicate=predicate))
+      )
+    else:
+      return False
+
+  def for_all_args(self, predicate: Callable[[Argument], bool], recurse: bool = True) -> bool:
+    if all(self.arguments | map(predicate)):
+      if recurse:
+        return all(
+          self.selection
+          | map(partial(Selection.for_all_args, predicate=predicate))
+        )
+      else:
+        return True
+    else:
+      return False
+
+  def exists(self, predicate: Callable[[Selection], bool]) -> bool:
+    if predicate(self):
+      return True
+    else:
+      return any(
+        self.selection
+        | map(partial(Selection.exists, predicate=predicate))
+      )
+
+  def exists_args(self, predicate: Callable[[Argument], bool], recurse: bool = True) -> bool:
+    if any(self.arguments | map(predicate)):
       return True
     else:
       if recurse:
-        return any(self.selection | map(Selection.contains_list))
+        return any(
+          self.selection
+          | map(partial(Selection.exists_args, predicate=predicate))
+        )
       else:
         return False
+
+  def find(self, predicate: Callable[[Selection], bool]) -> Optional[Selection]:
+    try:
+      return next(self.iter() | where(predicate))
+    except StopIteration:
+      return None
+
+  def find_args(self, predicate: Callable[[Argument], bool], recurse: bool = True) -> Optional[Argument]:
+    try:
+      return next(self.iter_args(recurse=recurse) | where(predicate))
+    except StopIteration:
+      return None
+
+  def find_all(self, predicate: Callable[[Selection], bool]) -> list[Selection]:
+    return list(self.iter() | where(predicate))
+
+  def find_all_args(self, predicate: Callable[[Argument], bool], recurse: bool = True) -> list[Argument]:
+    return list(self.iter_args(recurse=recurse) | where(predicate))
+
+  T = TypeVar('T')
+  def fold(
+    self,
+    fold_f: Callable[[Selection, list[Selection], list[T]], T | list[T]],
+    parents: list[Selection] = []
+  ) -> T | list[T]:
+    inner = list(
+      self.selection
+      | map(partial(Selection.fold, fold_f=fold_f, parents=[*parents, self]))
+      | traverse
+    )
+    return fold_f(self, parents, inner)
+
+  def contains_list(self: Selection) -> bool:
+    """ Returns True i.f.f. the selection :attr:`self` selects a field of type
+    list.
+
+    Args:
+      self (Selection): The selection to traverse
+
+    Returns:
+      bool: True if selection or nested selections selects a list field. False otherwise.
+    """
+    return self.exists(
+      lambda select: select.fmeta.type_.is_list
+    )
 
   def split(self: Selection) -> list[Selection]:
     """ Returns a list of selections where each of the selections corresponds
@@ -385,7 +766,6 @@ class Selection:
     without the selections in :attr:`selections_to_remove`.
 
     Args:
-      self (Selection): The selection to trim down
       to_remove (Selection | list[Selection]): The selection(s) to remove from
         :attr:`self`
 
@@ -417,9 +797,22 @@ class Selection:
           ))
         )
 
-  def variable_args(self: Selection, recurse: bool = True) -> list[Argument]:
-    var_args = list(self.arguments | where(lambda arg: type(arg.value) == InputValue.Variable))
-    return list(self.selection | map(Selection.variable_args) | traverse) + var_args
+  def variable_args(self, recurse: bool = True) -> Iterator[Argument]:
+    """ Returns all arguments in the current selection which have been given a
+    variable as value. 
+    
+    If ``recurse == True``, then the function is applied recursively to inner
+    selections.
+
+    Args:
+        recurse (bool, optional): _description_. Defaults to True.
+
+    Returns:
+        list[Argument]: _description_
+    """
+    for arg in self.iter_args(recurse=recurse):
+      if type(arg.value) == InputValue.Variable:
+        yield arg
 
   def infer_variable_definitions(self: Selection) -> list[VariableDefinition]:
     def vardef_of_arg(arg):
@@ -514,23 +907,13 @@ class Selection:
     Returns:
       bool: True i.f.f. there is an argument named :attr:`argname` in :attr:`self`
     """
-    try:
-      next(filter(lambda arg: arg.name == argname, self.arguments))
-      return True
-    except StopIteration:
-      if recurse:
-        return any(
-          self.selection
-          | map(partial(Selection.contains_argument, argname=argname))
-        )
-      else:
-        return False
+    return self.exists_args(lambda arg: arg.name == argname, recurse=recurse)
 
   def get_argument(
     self: Selection,
     argname: str,
     recurse: bool = True
-  ) -> Argument:
+  ) -> Optional[Argument]:
     """ Returns an Argument object corresponding to the argument in the Selection
     object :attr:`select` with name :attr:`argname`. If :attr:`select` does not
     contain such an argument and :attr:`recurse` is True, then the function is
@@ -551,26 +934,13 @@ class Selection:
     Returns:
       Argument: The argument in :attr:`select` with name :attr:`argname` (if any).
     """
-    try:
-      return next(self.arguments | where(lambda arg: arg.name == argname))
-    except StopIteration:
-      if recurse:
-        try:
-          return next(
-            self.selection
-            | map(partial(Selection.get_argument, argname=argname))
-            | where(lambda x: x is not None)
-          )
-        except StopIteration:
-          raise KeyError(f'Selection.get_argument: no argument named {argname} found in selection')
-      else:
-        raise KeyError(f'Selection.get_argument: no argument named {argname} found in selection')
+    return self.find_args(lambda arg: arg.name == argname, recurse=recurse)
 
   def get_argument_by_variable(
     self: Selection,
     varname: str,
     recurse: bool = True
-  ) -> Argument:
+  ) -> Optional[Argument]:
     """ Returns an Argument object corresponding to the argument in the Selection
     object :attr:`select` whose value is a variable named :attr:`varname`. If
     :attr:`select` does not contain such an argument and :attr:`recurse` is True,
@@ -592,21 +962,14 @@ class Selection:
       Argument: The argument in :attr:`select` with variable value named
         :attr:`varname` if it exists
     """
-    try:
-      return next(self.arguments | where(lambda arg: arg.value.name == varname))
-    except (StopIteration, AttributeError):
-      if recurse:
-        try:
-          return next(
-            self.selection
-            | map(partial(Selection.get_argument, varname=varname))
-            | where(lambda x: x is not None)
-          )
-        except StopIteration:
-          raise KeyError(f'Selection.get_argument_by_variable: no argument with variable value named {varname} found in selection')
-      else:
-        raise KeyError(f'Selection.get_argument_by_variable: no argument with variable value named {varname} found in selection')
+    return self.find_args(
+      lambda arg: arg.exists_vars(
+        lambda var: var.name == varname
+      ),
+      recurse=recurse
+    )
 
+  # TODO: Replace substitute_arg calls by map_args call 
   def substitute_arg(
     self: Selection,
     argname: str,
@@ -629,18 +992,9 @@ class Selection:
     Returns:
       Selection: _description_
     """
-    return Selection(
-      fmeta=self.fmeta,
-      alias=self.alias,
-      arguments=list(
-        self.arguments
-        | map(lambda arg: replacement if arg.name == argname else arg)
-        | traverse
-      ),
-      selection=list(
-        self.selection
-        | map(partial(Selection.substitute_arg, argname=argname, replacement=replacement))
-      ) if recurse else self.selection
+    return self.map_args(
+      lambda arg: replacement if arg.name == argname else arg,
+      recurse=recurse
     )
 
   def select(self: Selection, other: Selection) -> Selection:
@@ -661,6 +1015,26 @@ class Selection:
           ))
         )
       )
+
+  def prune_undefined(self, variables: Iterator[str]) -> Optional[Selection]:
+    """ Return a new ``Selection`` containing the subtree of the current ``Selection``
+    where all argument ``InputValues`` are defined, i.e.: each argument's ``InputValue``
+    is either 1) not of type ``InputValue.Variable``; or 2) of type ``InputValue.Variable``
+    and the variable name is contained in ``variables``.
+
+    Args:
+        variables (Iterator[str]): An iterator over defined variables
+
+    Returns:
+        Selection: A new pruned ``Selection`` object
+    """
+    return self.filter(
+      lambda select: select.for_all_args(
+        lambda arg: arg.all_defined(variables),
+        recurse=False
+      )
+    )
+
 
   # TODO: Function to recover an approximate selection from a JSON data object
   # @staticmethod
@@ -694,8 +1068,226 @@ class Query:
 
     return f'query{args_str} {{\n{selection_str}\n}}'
 
+  # ================================================================
+  # Generic functions
+  # ================================================================
+  def iter(self) -> Iterator[Selection]:
+    """ Returns an iterator over all ``Selections`` of the selection tree of 
+    the current ``Query``."""
+    for select in self.selection:
+      yield from select.iter()
+
+  def iter_args(self) -> Iterator[Argument]:
+    """ Returns an iterator over all ``Arguments`` of the selection tree of 
+    the current ``Query``."""
+    for select in self.selection:
+      yield from select.iter_args()
+
+  def iter_vardefs(self) -> Iterator[VariableDefinition]:
+    """ Returns an iterator over all ``VariableDefinitions`` of the selection tree of 
+    the current ``Query``."""
+    for vardef in self.variables:
+      yield vardef
+
+  def filter(self, predicate: Callable[[Selection], bool]) -> Query:
+    """ Returns a new ``Query`` object containing all selections ``s`` that satisfy
+    ``predicate(s) == True``.
+
+    Args:
+        predicate (Callable[[Selection], bool]): _description_
+
+    Returns:
+        Query: _description_
+    """
+    return Query(
+      name=self.name,
+      selection=list(
+        self.selection
+        | filter_map(partial(Selection.filter, predicate=predicate))
+      ),
+      variables=self.variables
+    )
+
+  def filter_args(self, predicate: Callable[[Argument], bool]) -> Query:
+    """ Returns a new ``Query`` object containing all selections arguments ``arg`` that satisfy
+    ``predicate(arg) == True``.
+
+    Args:
+        predicate (Callable[[Argument], bool]): _description_
+
+    Returns:
+        Query: _description_
+    """
+    return Query(
+      name=self.name,
+      selection=list(
+        self.selection
+        | map(partial(Selection.filter_args, predicate=predicate))
+      ),
+      variables=self.variables
+    )
+
+  def filter_vardefs(self, predicate: Callable[[VariableDefinition], bool]) -> Query:
+    return Query(
+      name=self.name,
+      selection=self.selection,
+      variables=list(
+        self.variables
+        | where(predicate)
+      )
+    )
+
+  def map(
+    self,
+    map_f: Callable[[Selection], Selection],
+    priority: Literal['self'] | Literal['children']
+  ) -> Query:
+    """ Applies the function ``map_f`` to each ``Selection`` in the current 
+    ``Query`` and returns a new ``Query`` object containing the resulting ``Selections``.
+
+    Args:
+        map_f (Callable[[Selection], Selection]): Mapping function to apply
+          to each ``Selection``
+
+    Returns:
+        Query: _description_
+    """    
+    return Query(
+      name=self.name,
+      selection=list(
+        self.selection
+        | map(partial(Selection.map, map_f=map_f, priority=priority))
+      ),
+      variables=self.variables
+    )
+
+  def map_args(self, map_f: Callable[[Argument], Argument]) -> Query:
+    """ Applies the function ``map_f`` to each ``Argument`` in the current 
+    ``Query`` and returns a new ``Query`` object containing the resulting ``Arguments``.
+
+    Args:
+        map_f (Callable[[Argument], Argument]): _description_
+        recurse (bool, optional): _description_. Defaults to True.
+
+    Returns:
+        Selection: _description_
+    """
+    return Query(
+      name=self.name,
+      selection=list(
+        self.selection
+        | map(partial(Selection.map_args, map_f=map_f))
+      ),
+      variables=self.variables
+    )
+
+  def map_vardefs(self, map_f: Callable[[VariableDefinition], VariableDefinition]) -> Query:
+    return Query(
+      name=self.name,
+      selection=self.selection,
+      variables=list(self.variables | map(map_f))
+    )
+
+  def filter_map(self, map_f: Callable[[Selection], Optional[Selection]]) -> Query:
+    return Query(
+      name=self.name,
+      selection=list(
+        self.selection
+        | filter_map(partial(Selection.filter_map, map_f=map_f))
+      ),
+      variables=self.variables
+    )
+
+  def filter_map_args(self, map_f: Callable[[Argument], Optional[Argument]]) -> Query:
+    return Query(
+      name=self.name,
+      selection=list(
+        self.selection
+        | map(partial(Selection.filter_map_args, map_f=map_f))
+      ),
+      variables=self.variables
+    )
+
+  def filter_map_vardefs(self, map_f: Callable[[VariableDefinition], Optional[VariableDefinition]]) -> Query:
+    return Query(
+      name=self.name,
+      selection=self.selection,
+      variables=list(
+        self.variables
+        | filter_map(map_f)
+      )
+    )
+
+  def for_all(self, predicate: Callable[[Selection], bool]) -> bool:
+    return all(
+      self.selection
+      | map(partial(Selection.for_all, predicate=predicate))
+    )
+
+  def for_all_args(self, predicate: Callable[[Argument], bool]) -> bool:
+    return all(
+      self.selection
+      | map(partial(Selection.for_all_args, predicate=predicate))
+    )
+
+  def for_all_vardefs(self, predicate: Callable[[VariableDefinition], bool]) -> bool:
+    return all(
+      self.variables
+      | map(predicate)
+    )
+
+  def exists(self, predicate: Callable[[Selection], bool]) -> bool:
+    return any(
+      self.selection
+      | map(partial(Selection.exists, predicate=predicate))
+    )
+
+  def exists_args(self, predicate: Callable[[Argument], bool]) -> bool:
+    return any(
+      self.selection
+      | map(partial(Selection.exists_args, predicate=predicate))
+    )
+
+  def exists_vardefs(self, predicate: Callable[[VariableDefinition], bool]) -> bool:
+    return any(
+      self.variables
+      | map(predicate)
+    )
+
+  def find(self, predicate: Callable[[Selection], bool]) -> Optional[Selection]:
+    try:
+      return next(self.iter() | where(predicate))
+    except StopIteration:
+      return None
+
+  def find_args(self, predicate: Callable[[Argument], bool]) -> Optional[Argument]:
+    try:
+      return next(self.iter_args() | where(predicate))
+    except StopIteration:
+      return None
+
+  def find_vardefs(self, predicate: Callable[[VariableDefinition], bool]) -> Optional[VariableDefinition]:
+    try:
+      return next(self.iter_vardefs() | where(predicate))
+    except StopIteration:
+      return None
+
+  T = TypeVar('T')
+  def fold(
+    self,
+    fold_f: Callable[[Selection, list[Selection], list[T]], T | list[T]],
+  ) -> list[T]:
+    return list(
+      self.selection
+      | map(partial(Selection.fold, fold_f=fold_f))
+    )
+
   def infer_variable_definitions(self: Query) -> list[VariableDefinition]:
-    return list(self.selection | map(Selection.infer_variable_definitions) | traverse)
+    return list(
+      self.selection
+      | map(Selection.infer_variable_definitions)
+      | traverse
+    )
 
   def add(
     self: Query,
@@ -729,6 +1321,18 @@ class Query:
             combine=Selection.combine
           )
         )
+    
+  def add_vardefs(self, vardefs: list[VariableDefinition]) -> Query:
+    return Query(
+      name=self.name,
+      selection=self.selection,
+      variables=union(
+        self.variables,
+        vardefs,
+        key=lambda vardef: vardef.name,
+        combine=lambda _, x: x
+      )
+    )
 
   def remove(
     self: Query,
@@ -815,23 +1419,19 @@ class Query:
       | map(lambda select: Selection.contains(select, selection))
     )
 
-  @staticmethod
-  def contains_argument(query: Query, arg_name: str) -> bool:
-    return any(query.selection | map(partial(Selection.contains_argument, arg_name=arg_name)))
+  def contains_argument(self, argname: str) -> bool:
+    return self.exists_args(lambda arg: arg.name == argname)
 
-  @staticmethod
-  def get_argument(query: Query, target: str) -> Optional[Argument]:
-    try:
-      return next(
-        query.selection
-        | map(partial(Selection.get_argument, target=target))
-        | where(lambda x: x is not None)
-      )
-    except StopIteration:
-      return None
+  def get_argument(self, argname: str) -> Optional[Argument]:
+    return self.find_args(lambda arg: arg.name == argname)
 
+  # TODO: Replace substitute_arg calls by map_args call 
   @staticmethod
-  def substitute_arg(query: Query, arg_name: str, replacement: Argument | list[Argument]) -> Query:
+  def substitute_arg(
+    query: Query,
+    arg_name: str,
+    replacement: Argument | list[Argument]
+  ) -> Query:
     return Query(
       name=query.name,
       selection=list(
@@ -883,6 +1483,12 @@ class Query:
       variables=query.variables
     )
 
+  def prune_undefined(self, variables: Iterator[str]) -> Query:
+    return self.filter_map(
+      partial(Selection.prune_undefined, variables=variables)
+    ).filter_vardefs(
+      lambda vardef: vardef.name in variables
+    )
 
 @dataclass(frozen=True)
 class Fragment:
@@ -902,7 +1508,7 @@ class Fragment:
 
   @staticmethod
   def combine(frag: Fragment, other: Fragment) -> Fragment:
-    pass
+    raise NotImplementedError('Fragment.combine')
 
   @staticmethod
   def transform(frag: Fragment, f: Callable[[Selection], Selection]) -> Fragment:
@@ -932,6 +1538,49 @@ class Document:
   def mk_single_query(url: str, query: Query) -> Document:
     return Document(url, query)
 
+  def filter(self, predicate: Callable[[Selection], bool]) -> Document:
+    return Document(
+      url=self.url,
+      query=self.query.filter(predicate),
+      fragments=self.fragments,     # TODO: Add filtering to fragments
+      variables=self.variables
+    )
+
+  def filter_args(self, predicate: Callable[[Argument], bool]) -> Document:
+    return Document(
+      url=self.url,
+      query=self.query.filter_args(predicate),
+      fragments=self.fragments,     # TODO: Add filtering to fragments
+      variables=self.variables
+    )
+
+  def map(self, map_f: Callable[[Selection], Selection]) -> Document:
+    """ Applies the function ``map_f`` to each ``Selection`` in the current 
+    ``Document`` and returns a new ``Document`` object containing the resulting ``Selections``.
+
+    Args:
+        map_f (Callable[[Selection], Selection]): Mapping function to apply
+          to each ``Selection``
+
+    Returns:
+        Query: _description_
+    """    
+    return Document(
+      url=self.url,
+      query=self.query.map(map_f),
+      fragments=self.fragments,     # TODO: Add mapping to fragments
+      variables=self.variables
+    )
+
+  def filter_map(self, map_f: Callable[[Selection], Optional[Selection]]) -> Document:
+    return Document(
+      url=self.url,
+      query=self.query.filter_map(map_f),
+      fragments=self.fragments,     # TODO: Add mapping to fragments
+      variables=self.variables
+    )
+
+
   @staticmethod
   def combine(doc: Document, other: Document) -> Document:
     return Document(
@@ -956,6 +1605,24 @@ class Document:
       query=query_f(doc.query),
       fragments=list(doc.fragments | map(fragment_f)),
       variables=doc.variables
+    )
+
+  def prune_undefined(self, variables: Iterator[str]) -> Document:
+    """ Returns a new ``Document`` object that contains the subset of the current
+    ``Document``'s query containing only the ``Selections`` for which all its 
+    arguments are defined (i.e.: either constants or variables in ``variables``).
+
+    Args:
+        variables (dict[str, Any]): _description_
+
+    Returns:
+        Document: _description_
+    """
+    return Document(
+      url=self.url,
+      query=self.query.prune_undefined(variables),
+      fragments=self.fragments,
+      variables=variables
     )
 
 
