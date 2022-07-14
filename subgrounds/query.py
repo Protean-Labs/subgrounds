@@ -1441,6 +1441,7 @@ class Query:
       variables=query.variables
     )
 
+  # TODO: Cleanup select
   @staticmethod
   def contains(query: Query, other: Query) -> bool:
     """ Returns True i.f.f. all selections in `other` are contained in `query`. In other words,
@@ -1458,6 +1459,7 @@ class Query:
     """
     return all(other.selection | map(partial(Query.contains_selection, query)))
 
+  # TODO: Cleanup select
   @staticmethod
   def select(query: Query, other: Query) -> Query:
     """ Returns a new Query
@@ -1506,10 +1508,12 @@ class Fragment:
     )
     return f"""fragment {self.name} on {TypeRef.root_type_name(self.type_)} {{\n{selection_str}\n}}"""
 
+  # TODO: Cleanup combine
   @staticmethod
   def combine(frag: Fragment, other: Fragment) -> Fragment:
     raise NotImplementedError('Fragment.combine')
 
+  # TODO: Cleanup transform
   @staticmethod
   def transform(frag: Fragment, f: Callable[[Selection], Selection]) -> Fragment:
     return Fragment(
@@ -1581,6 +1585,7 @@ class Document:
     )
 
 
+  # TODO: Cleanup combine
   @staticmethod
   def combine(doc: Document, other: Document) -> Document:
     return Document(
@@ -1594,6 +1599,7 @@ class Document:
       )
     )
 
+  # TODO: Cleanup transform
   @staticmethod
   def transform(
     doc: Document,
