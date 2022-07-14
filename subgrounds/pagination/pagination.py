@@ -133,11 +133,11 @@ def paginate(
     normalized_doc = normalize(schema, doc, pagination_nodes)
     data: dict[str, Any] = {}
     for page_node in pagination_nodes:
-      arg_gen = pagination_strategy(page_node)
+      cursor = Cursor.from_pagination_nodes(page_node)
+      cursor, args = pagination_strategy(cursor)
 
       while True:
         try:
-          args = arg_gen.args()
           trimmed_doc = prune_doc(normalized_doc, args)
           page_data = client.query(
             url=trimmed_doc.url,
@@ -145,13 +145,12 @@ def paginate(
             variables=trimmed_doc.variables | args
           )
           data = merge(data, page_data)
-          arg_gen.step(page_data)
+          cursor, args = pagination_strategy(cursor, page_data)
         except StopIteration:
           break
 
     return data
 
-import pprint 
 
 def paginate_iter(
   schema: SchemaMeta,
@@ -175,23 +174,17 @@ def paginate_iter(
     yield client.query(doc.url, doc.graphql, variables=doc.variables)
   else:
     normalized_doc = normalize(schema, doc, pagination_nodes)
-    # data: dict[str, Any] = {}
+
     for page_node in pagination_nodes:
       cursor = Cursor.from_pagination_nodes(page_node)
       cursor, args = pagination_strategy(cursor)
 
       while True:
         try:
-          print(args)
-          pprint.pp(cursor)
-          # args = cursor.args()
           trimmed_doc = prune_doc(normalized_doc, args)
           page_data = client.query(trimmed_doc.url, trimmed_doc.graphql, variables=trimmed_doc.variables | args)
           yield page_data
           cursor, args = pagination_strategy(cursor, page_data)
-          # print(args)
-          # pprint.pp(cursor)
-          # # cursor.step(page_data)
         except StopIteration:
           break
         except Exception as exn:
