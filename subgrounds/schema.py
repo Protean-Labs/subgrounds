@@ -257,7 +257,7 @@ class TypeMeta:
 
     @property
     def is_object(self) -> bool:
-      return False
+      return True
 
     def field(self: TypeMeta.InterfaceMeta, fname: str) -> TypeMeta.FieldMeta:
       """ Returns the field definition of interface `self` with name `fname`, if any.
