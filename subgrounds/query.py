@@ -1,22 +1,23 @@
 """ Query data structure module
 
 This module contains various data structures in the form of dataclasses that
-are used to represent GraphQL queries in Subgrounds. To the extent possible,
-these dataclasses are immutable (i.e.: :attr:`frozen=True`) to enforce a
-functional programming style and reduce side-effects.
+are used to represent GraphQL queries in Subgrounds using an AST-like approach.
+To the extent possible, these dataclasses are immutable (i.e.: :attr:`frozen=True`)
+to enforce a functional programming style and reduce side-effects.
 
 A typical Subgrounds request will have the following dataclass hierarchy:
+
 .. code-block:: none
 
   DataRequest
-    Document
-      Query
-        VariableDefinition
-          InputValue
-        Selection
-          Argument
-            InputValue
-          Selection
+  └── Document
+      └── Query
+          ├── VariableDefinition
+          │   └── InputValue
+          └── Selection
+              ├── Argument
+              │   └── InputValue
+              └── Selection
 """
 
 from __future__ import annotations
