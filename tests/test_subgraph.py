@@ -6,7 +6,7 @@ from subgrounds.query import Argument, DataRequest, InputValue, Query, Selection
 from subgrounds.subgrounds import Subgrounds
 from subgrounds.utils import identity
 
-from tests.utils import schema
+# from tests.conftest import schema
 
 
 class TestAddType(unittest.TestCase):

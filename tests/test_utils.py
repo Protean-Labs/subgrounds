@@ -5,7 +5,7 @@ import pytest
 
 from subgrounds.utils import (extract_data, flatten_dict, intersection,
                               rel_complement, union)
-from tests.utils import identity
+from tests.conftest import identity
 
 
 @dataclass

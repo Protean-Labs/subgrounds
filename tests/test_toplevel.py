@@ -9,7 +9,7 @@ from subgrounds.query import (Argument, DataRequest, Document, InputValue,
 from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.subgraph import FieldPath, Subgraph
 from subgrounds.subgrounds import Subgrounds
-from tests.utils import *
+# from tests.conftest import *
 
 
 def test_mk_request_1(subgraph):

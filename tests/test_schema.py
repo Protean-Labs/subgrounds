@@ -3,7 +3,7 @@ import pytest
 from subgrounds.query import (Argument, InputValue, arguments_of_field_args,
                               input_value_of_argument)
 from subgrounds.schema import TypeMeta, TypeRef
-from tests.utils import *
+# from tests.conftest import *
 
 
 @pytest.mark.parametrize("argmeta, argvalue, expected", [

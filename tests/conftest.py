@@ -3,7 +3,7 @@ import pytest
 from subgrounds.schema import (SchemaMeta, TypeMeta,  # input_value_of_argument
                                TypeRef)
 from subgrounds.subgraph import Subgraph, FieldPath
-
+from subgrounds import Subgrounds
 
 @pytest.fixture
 def pairs_fieldmeta():
@@ -130,6 +130,11 @@ def subgraph(schema):
 @pytest.fixture
 def subgraph_diff_url(schema):
   return Subgraph("www.foo.xyz/graphql", schema)
+
+
+@pytest.fixture
+def sg():
+  return Subgrounds()
 
 
 def identity(x):

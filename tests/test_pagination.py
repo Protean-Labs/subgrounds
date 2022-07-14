@@ -5,7 +5,8 @@ from subgrounds.pagination import (Cursor, PaginationNode, merge,
 from subgrounds.query import (Argument, Document, InputValue, Query, Selection,
                               VariableDefinition)
 from subgrounds.schema import TypeMeta, TypeRef
-from tests.utils import *
+
+# from tests.conftest import *
 
 
 @pytest.mark.parametrize("test_input, expected", [

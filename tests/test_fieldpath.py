@@ -6,7 +6,7 @@ from subgrounds.schema import TypeMeta, TypeRef
 from subgrounds.subgraph import FieldPath, Subgraph
 from subgrounds.subgrounds import Subgrounds
 
-from tests.utils import *
+# from tests.conftest import *
 
 
 def test_fieldpath_building_1(subgraph):
