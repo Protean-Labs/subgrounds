@@ -902,12 +902,3 @@ def test_synthetic_field_6(subgraph: Subgraph):
 
   assert sfield._f(100, 2) == 1
   assert sfield._deps == expected_deps
-
-
-
-
-# @pytest.mark.parametrize("", "expected", [])
-# def test_add_syntheticfield_transform(
-#   mocker,
-#   subgraph: Subgraph,
-# ):

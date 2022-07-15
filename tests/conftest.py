@@ -1,3 +1,4 @@
+import json
 import pytest
 
 from subgrounds.schema import (SchemaMeta, TypeMeta,  # input_value_of_argument
@@ -133,8 +134,49 @@ def subgraph_diff_url(schema):
 
 
 @pytest.fixture
-def sg():
-  return Subgrounds()
+def sg(subgraph: Subgraph, subgraph_diff_url: Subgraph):
+  return Subgrounds(
+    subgraphs={
+      subgraph._url: subgraph,
+      subgraph_diff_url._url: subgraph_diff_url
+    }
+  )
+
+
+@pytest.fixture
+def klima_bridged_carbon_subgraph(mocker, sg: Subgrounds):
+  with open("tests/schemas/cujowolf_polygon-bridged-carbon.json", "r") as f:
+    schema = json.load(f)
+  
+  mocker.patch("subgrounds.client.get_schema", return_value=schema)
+  return sg.load_subgraph('https://api.thegraph.com/subgraphs/name/cujowolf/polygon-bridged-carbon')
+
+
+@pytest.fixture
+def univ2_subgraph(mocker, sg: Subgrounds):
+  with open("tests/schemas/uniswap_uniswap-v2.json", "r") as f:
+    schema = json.load(f)
+  
+  mocker.patch("subgrounds.client.get_schema", return_value=schema)
+  return sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2')
+
+
+@pytest.fixture
+def univ3_subgraph(mocker, sg: Subgrounds):
+  with open("tests/schemas/uniswap_uniswap-v3.json", "r") as f:
+    schema = json.load(f)
+  
+  mocker.patch("subgrounds.client.get_schema", return_value=schema)
+  return sg.load_subgraph('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3')
+
+
+@pytest.fixture
+def curve_subgraph(mocker, sg: Subgrounds):
+  with open("tests/schemas/gvladika_curve.json", "r") as f:
+    schema = json.load(f)
+  
+  mocker.patch("subgrounds.client.get_schema", return_value=schema)
+  return sg.load_subgraph('https://api.thegraph.com/subgraphs/name/gvladika/curve')
 
 
 def identity(x):
