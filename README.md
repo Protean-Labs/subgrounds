@@ -62,7 +62,7 @@ Protean Labs was started by web3 data enthusiasts to build open source tooling f
 
 
 ## Community
-- [**Discord**](https://discord.gg/uxCv2M9J): Playgrounds' official discord server
+- [**Discord**](https://discord.gg/v4r4zhBAh2): Playgrounds' official discord server
 - [**Twitter (Playgrounds)**](https://twitter.com/Playgrounds0x): Playgrounds' official Twitter account
 - [**Twitter (Protean Labs)**](https://twitter.com/protean_labs): Protean Labs' official Twitter account
 
