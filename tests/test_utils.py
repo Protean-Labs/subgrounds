@@ -1,147 +1,108 @@
-import operator
-import unittest
+import operator as op
 from dataclasses import dataclass
 
-from subgrounds.utils import extract_data, flatten_dict, intersection, rel_complement, union
+import pytest
+
+from subgrounds.utils import (extract_data, flatten_dict, intersection,
+                              rel_complement, union)
+from tests.conftest import identity
 
 
-class TestSetUtils(unittest.TestCase):
-  def test_rel_complement_1(self):
-    l1 = [1, 2, 3]
-    l2 = [3, 4, 5]
-    self.assertEqual(rel_complement(l1, l2), [1, 2])
-
-  def test_rel_complement_2(self):
-    l1 = [3, 4]
-    l2 = [3, 4, 5]
-    self.assertEqual(rel_complement(l1, l2), [])
-
-  def test_rel_complement_3(self):
-    @dataclass
-    class X:
-      id: int
-      txt: str
-
-    l1 = [X(1, 'hello'), X(2, 'bob'), X(6, 'world!')]
-    l2 = [X(5, 'abcd'), X(6, 'message')]
-
-    self.assertEqual(rel_complement(l1, l2, key=lambda x: x.id), [X(1, 'hello'), X(2, 'bob')])
-
-  def test_intersection_1(self):
-    l1 = [1, 2, 3]
-    l2 = [3, 4, 5]
-    self.assertEqual(intersection(l1, l2), [3])
-
-  def test_intersection_2(self):
-    l1 = [1, 2, 3]
-    l2 = [3, 4, 5]
-    self.assertEqual(intersection(l1, l2, combine=operator.add), [6])
-
-  def test_intersection_3(self):
-    l1 = [1, 2]
-    l2 = [3, 4, 5]
-    self.assertEqual(intersection(l1, l2), [])
-
-  def test_intersection_4(self):
-    @dataclass
-    class X:
-      id: int
-      txt: str
-
-    l1 = [X(1, 'hello'), X(2, 'bob'), X(6, 'world!')]
-    l2 = [X(5, 'abcd'), X(6, 'message')]
-
-    self.assertEqual(intersection(l1, l2, key=lambda x: x.id, combine=lambda x, y: X(x.id, f'{x.txt} {y.txt}')), [X(6, 'world! message')])
-
-  def test_union_1(self):
-    l1 = [1, 2, 3]
-    l2 = [3, 4, 5]
-    self.assertEqual(union(l1, l2), [1, 2, 3, 4, 5])
-
-  def test_union_2(self):
-    l1 = [1, 2, 3]
-    l2 = [3, 4, 5]
-    self.assertEqual(union(l1, l2, combine=operator.add), [1, 2, 6, 4, 5])
-
-  def test_union_3(self):
-    @dataclass
-    class X:
-      id: int
-      txt: str
-
-    l1 = [X(1, 'hello'), X(2, 'bob'), X(6, 'world!')]
-    l2 = [X(5, 'abcd'), X(6, 'message')]
-
-    expected = [
-      X(1, 'hello'),
-      X(2, 'bob'),
-      X(6, 'world! message'),
-      X(5, 'abcd')
-    ]
-
-    self.assertEqual(union(l1, l2, key=lambda x: x.id, combine=lambda x, y: X(x.id, f'{x.txt} {y.txt}')), expected)
+@dataclass
+class Foo:
+    id: int
+    txt: str
 
 
-class TestExtractData(unittest.TestCase):
-  def test_extract_data_1(self):
-    expected = [1, 2, 3]
+@pytest.mark.parametrize(
+    "l1, l2, key, expected",
+    [
+        ([1, 2, 3], [3, 4, 5], identity, [1, 2]),
+        ([3, 4], [3, 4, 5], identity, []),
+        (
+            [Foo(1, "hello"), Foo(2, "bob"), Foo(6, "world!")],
+            [Foo(5, "abcd"), Foo(6, "message")],
+            op.attrgetter("id"),
+            [Foo(1, "hello"), Foo(2, "bob")],
+        ),
+    ],
+)
+def test_rel_complement(l1, l2, key, expected):
+    assert rel_complement(l1, l2, key=key) == expected
 
-    data = {
-      'a': [
-        {'b': {'c': 1}},
-        {'b': {'c': 2}},
-        {'b': {'c': 3}},
-      ]
-    }
 
-    path = ['a', 'b', 'c']
+@pytest.mark.parametrize(
+    "l1, l2, key, combine, expected",
+    [
+        ([1, 2, 3], [3, 4, 5], identity, lambda x, _: x, [3]),
+        ([1, 2, 3], [3, 4, 5], identity, op.add, [6]),
+        ([1, 2], [3, 4, 5], identity, lambda x, _: x, []),
+        (
+            [Foo(1, "hello"), Foo(2, "bob"), Foo(6, "world!")],
+            [Foo(5, "abcd"), Foo(6, "message")],
+            op.attrgetter("id"),
+            lambda x, y: Foo(x.id, f"{x.txt} {y.txt}"),
+            [Foo(6, "world! message")],
+        ),
+    ],
+)
+def test_intersection(l1, l2, key, combine, expected):
+    assert intersection(l1, l2, key=key, combine=combine) == expected
 
-    self.assertEqual(extract_data(path, data), expected)
 
-  def test_extract_data_2(self):
-    expected = []
+@pytest.mark.parametrize(
+    "l1, l2, key, combine, expected",
+    [
+        ([1, 2, 3], [3, 4, 5], identity, lambda x, _: x, [1, 2, 3, 4, 5]),
+        ([1, 2, 3], [3, 4, 5], identity, op.add, [1, 2, 6, 4, 5]),
+        (
+            [Foo(1, "hello"), Foo(2, "bob"), Foo(6, "world!")],
+            [Foo(5, "abcd"), Foo(6, "message")],
+            op.attrgetter("id"),
+            lambda x, y: Foo(x.id, f"{x.txt} {y.txt}"),
+            [Foo(1, "hello"), Foo(2, "bob"), Foo(6, "world! message"), Foo(5, "abcd")],
+        ),
+    ],
+)
+def test_union(l1, l2, key, combine, expected):
+    assert union(l1, l2, key=key, combine=combine) == expected
 
-    data = {
-      'a': []
-    }
 
-    path = ['a', 'b', 'c']
+@pytest.mark.parametrize(
+    "test_input, path, expected",
+    [
+        (
+            {
+                "a": [
+                    {"b": {"c": 1}},
+                    {"b": {"c": 2}},
+                    {"b": {"c": 3}},
+                ]
+            },
+            ["a", "b", "c"],
+            [1, 2, 3],
+        ),
+        ({"a": []}, ["a", "b", "c"], []),
+        ({"a": []}, ["a"], []),
+    ],
+)
+def test_extract_data(test_input, path, expected):
+    assert extract_data(path, test_input) == expected
 
-    self.assertEqual(extract_data(path, data), expected)
 
-  def test_extract_data_3(self):
-    expected = []
-
-    data = {
-      'a': []
-    }
-
-    path = ['a']
-
-    self.assertEqual(extract_data(path, data), expected)
-
-class TestFlattenDict(unittest.TestCase):
-  def tests_flatten_dict_1(self):
-    expected = {
-      'x': 1,
-      'a_b_c': 10,
-      'd_e': 'hello',
-      'd_f': 'world',
-      'foo': True
-    }
-
-    data = {
-      'x': 1,
-      'a': {
-        'b': {
-          'c': 10
-        }
-      },
-      'd': {
-        'e': 'hello',
-        'f': 'world'
-      },
-      'foo': True
-    }
-
-    self.assertEqual(flatten_dict(data), expected)
+@pytest.mark.parametrize(
+    "test_input, expected",
+    [
+        (
+            {
+                "x": 1,
+                "a": {"b": {"c": 10}},
+                "d": {"e": "hello", "f": "world"},
+                "foo": True,
+            },
+            {"x": 1, "a_b_c": 10, "d_e": "hello", "d_f": "world", "foo": True},
+        )
+    ],
+)
+def tests_flatten_dict(test_input, expected):
+    assert flatten_dict(test_input) == expected
