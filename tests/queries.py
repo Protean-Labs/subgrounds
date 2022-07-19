@@ -303,3 +303,67 @@ def doc8():
       ]
     )]
   ))
+
+
+def doc9():
+  """
+  query {
+    pair(id: "0x786b582a0bbcac5d192d7e039f49c116ac5f05a8") {
+      id
+    }
+  }
+  """
+  return Document(url='www.abc.xyz/graphql', query=Query(
+    name=None,
+    selection=[Selection(
+      fmeta=TypeMeta.FieldMeta('pair', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None)
+      ], TypeRef.Named('Pair')),
+      arguments=[
+        Argument('id', InputValue.String('0x786b582a0bbcac5d192d7e039f49c116ac5f05a8'))
+      ],
+      selection=[
+        Selection(
+          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
+          selection=[]
+        )
+      ]
+    )]
+  ))
+
+
+def doc10():
+  """
+  query {
+    pair(id: "0x786b582a0bbcac5d192d7e039f49c116ac5f05a8") {
+      swaps {
+        id
+      }
+    }
+  }
+  """
+  return Document(url='www.abc.xyz/graphql', query=Query(
+    name=None,
+    selection=[Selection(
+      fmeta=TypeMeta.FieldMeta('pair', '', [
+        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None)
+      ], TypeRef.Named('Pair')),
+      arguments=[
+        Argument('id', InputValue.String('0x786b582a0bbcac5d192d7e039f49c116ac5f05a8'))
+      ],
+      selection=[
+        Selection(
+          fmeta=TypeMeta.FieldMeta('swaps', '', [
+            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
+          ], TypeRef.non_null_list('Swap')),
+          selection=[
+            Selection(
+              fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+            )
+          ]
+        )
+      ]
+    )]
+  ))

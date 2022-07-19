@@ -13,12 +13,9 @@ from subgrounds.query import (
   Document,
   InputValue,
   Selection,
-  Query,
   VariableDefinition
 )
-import subgrounds.client as client
 from subgrounds.schema import SchemaMeta, TypeMeta, TypeRef
-from subgrounds.utils import extract_data, union
 
 @dataclass(frozen=True)
 class PaginationNode:
@@ -177,7 +174,10 @@ def generate_pagination_nodes(schema: SchemaMeta, document: Document) -> list[Pa
     else:
       return children
 
-  return document.query.fold(fold_f)
+  return list(
+    document.query.fold(fold_f)
+    | traverse
+  )
 
 
 def normalize(

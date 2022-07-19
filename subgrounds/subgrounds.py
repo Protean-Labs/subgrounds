@@ -16,7 +16,7 @@ import logging
 import warnings
 
 from subgrounds.dataframe_utils import df_of_json
-from subgrounds.pagination.strategies import greedy_strategy
+from subgrounds.pagination.strategies import GreedyStrategy
 from subgrounds.query import DataRequest, Document, Query
 from subgrounds.schema import mk_schema
 from subgrounds.subgraph.fieldpath import FieldPath
@@ -135,7 +135,7 @@ class Subgrounds:
         | where(lambda sg: sg._url == doc.url)
       )
       if auto_paginate and subgraph._is_subgraph:
-        return paginate(subgraph._schema, doc, pagination_strategy=greedy_strategy)
+        return paginate(subgraph._schema, doc, pagination_strategy=GreedyStrategy)
       else:
         return client.query(doc.url, doc.graphql, variables=doc.variables)
 
@@ -184,7 +184,7 @@ class Subgrounds:
         | where(lambda sg: sg._url == doc.url)
       )
       if auto_paginate and subgraph._is_subgraph:
-        yield from paginate_iter(subgraph._schema, doc, pagination_strategy=greedy_strategy)
+        yield from paginate_iter(subgraph._schema, doc, pagination_strategy=GreedyStrategy)
       else:
         yield client.query(doc.url, doc.graphql, variables=doc.variables)
 
