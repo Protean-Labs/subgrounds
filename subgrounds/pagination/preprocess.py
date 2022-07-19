@@ -231,7 +231,7 @@ def normalize(
             name=orderBy_value,
             description='',
             arguments=[],
-            type_=TypeRef.Named(current_type.type_of_field(orderBy_value))
+            type_=current_type.type_of_field(orderBy_value)
           ))
         )
 

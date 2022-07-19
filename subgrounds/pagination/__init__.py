@@ -5,4 +5,4 @@ from subgrounds.pagination.pagination import (
   PaginationStrategy
 )
 
-from subgrounds.pagination.strategies import legacy_strategy, greedy_strategy
+from subgrounds.pagination.strategies import LegacyStrategy, GreedyStrategy
