@@ -97,9 +97,35 @@ class PaginationError(RuntimeError):
 
 
 class PaginationStrategy(Protocol):
-  def __init__(self, schema: SchemaMeta, document: Document) -> None: ...
+  def __init__(self, schema: SchemaMeta, document: Document) -> None:
+    """ Initializes the pagination strategy. If there is no need for pagination given
+    the provided :class:`Document` ``document``, then the constructor should raise a 
+    :class:`SkipPagination` exception.
 
-  def step(self, page_data: Optional[dict[str, Any]] = None) -> Tuple[Document, dict[str, Any]]: ...
+    Args:
+        schema (SchemaMeta): The schema of the API against which ``document`` will be executed
+        document (Document): The query document
+    """
+    ...
+
+  def step(self, page_data: Optional[dict[str, Any]] = None) -> Tuple[Document, dict[str, Any]]:
+    """ Returns the new query document and its variables which will be executed to get the next 
+    page of data. If this is the first query made as part of the pagination strategy, then
+    ``page_data`` will be ``None``.
+
+    If pagination should be interupted (e.g.: if enough entities have been queried), then this method
+    should raise a :class:`StopPagination` exception.
+
+    Args:
+        page_data (Optional[dict[str, Any]], optional): The previous query's response data.
+        If this is the first query (i.e.: the first page of data), then it will be None.
+        Defaults to None.
+
+    Returns:
+        Tuple[Document, dict[str, Any]]: A tuple containing the query document
+        to fetch the next page of data and the variables for that document.
+    """
+    ...
 
 
 def paginate(
