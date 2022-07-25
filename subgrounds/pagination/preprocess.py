@@ -1,11 +1,12 @@
+""" Helper functions and classes used by Subgrounds' own pagination strategies.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from functools import reduce
-from genericpath import exists
 from itertools import count
-from pipe import map, traverse, where
-from typing import Any, Iterator, Optional, Protocol, Tuple
+from pipe import map, traverse
+from typing import Any
 from subgrounds.pagination.utils import DEFAULT_NUM_ENTITIES
 
 from subgrounds.query import (

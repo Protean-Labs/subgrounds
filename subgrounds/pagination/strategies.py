@@ -1,3 +1,72 @@
+""" Subgrounds pagination strategies
+
+This module implements functions and data structures used to implement the
+two ``PaginationStrategies`` that Subgrounds offers.
+
+For both strategies, pagination is done in four steps:
+
+#. Generate one or many :class:`PaginationNode` objects per query document.
+   These are tree-like data structures that extract all information about pagination
+   fields (i.e.: fields that return lists of entities) while maintaining the nestedness
+   relationship between each pagination field (i.e.: which is nested in which).
+
+#. The query document is normalized such that every pagination field in the query has:
+   
+    #. An ordering (i.e.: ``orderBy`` and ``orderDirection`` are specified)
+    #. A ``first`` argument set to the ``firstN`` variable
+    #. A ``skip`` argument set to the ``skipN`` variable
+    #. A ``where`` filter with the filter name derived from the ordering and the
+       value being a variable named ``lastOrderingValueN``
+ 
+   In other words, the query will be transformed in a form which allows Subgrounds
+   to paginate automatically by simply setting the set of pagination variables
+   (i.e.: ``firstN``, ``skipN`` and ``lastOrderingValueN``) to different
+   values. Each field that requires pagination (i.e.: each field that yields a list)
+   will have its own set of variables, hence the ``N`` post-fix.
+ 
+   Example:
+   The initial query
+ 
+   .. code-block:: none
+ 
+     query {
+       items(
+         orderBy: timestamp,
+         orderDirection: desc,
+         first: 10000
+       ) {
+         foo
+       }
+     }
+ 
+   will be transformed to
+ 
+   .. code-block:: none
+ 
+     query($first0: Int, $skip0: Int, $lastOrderingValue0: BigInt) {
+       items(
+         orderBy: timestamp,
+         orderDirection: desc,
+         first: $first0,
+         skip: $skip0,
+         where: {
+           timestamp_lt: $lastOrderingValue0
+         }
+       ) {
+         foo
+       }
+     }
+
+#. For each data page, generate the values for the pagination variables (i.e.:
+   ``firstN``, ``skipN`` and ```lastOrderingValueN```)
+
+#. If some variables are undefined (i.e.: they are present in the query document,
+   but not given a value as part of step 3), then the document is pruned and all
+   selections (and sub-selections) containing undefined variables are removed.
+
+Depending on the strategy, the variable values computed at step 3 will change.
+"""
+
 from __future__ import annotations
 from ast import Tuple
 from dataclasses import dataclass, field
