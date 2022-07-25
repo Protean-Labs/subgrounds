@@ -55,6 +55,11 @@ field_paths = [
 df = sg.query_df(field_paths, pagination_strategy=ShallowStrategy) 
 ```
 
+Note that pagination can be explicitely disabled by setting `pagination_strategy` to `None`, in which case the query will be executed as-is:
+```python
+df = sg.query_df(field_paths, pagination_strategy=ShallowStrategy) 
+```
+
 ### Custom pagination strategy
 Subgrounds allows developers to create their own pagination strategy by creating a class that implements the `PaginationStrategy` protocol:
 ```python
