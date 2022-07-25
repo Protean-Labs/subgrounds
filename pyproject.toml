@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "subgrounds"
-version = "0.2.0"
+version = "1.0.0"
 description = "A Pythonic data access layer for applications querying data from The Graph Network."
 authors = []
 repository = "https://github.com/Protean-Labs/subgrounds"
