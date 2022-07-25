@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced topics &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="subgrounds" href="../modules/" />
+    <link rel="prev" title="Subgrounds basics" href="../basics/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced topics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pagination">Pagination</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#available-pagination-strategies">Available pagination strategies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-pagination-strategy">Custom pagination strategy</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+      <li>Advanced topics</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/advanced.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="advanced-topics">
+<h1>Advanced topics<a class="headerlink" href="#advanced-topics" title="Permalink to this headline"></a></h1>
+<section id="pagination">
+<h2>Pagination<a class="headerlink" href="#pagination" title="Permalink to this headline"></a></h2>
+<p>By default, Subgrounds handles GraphQL query pagination automatically. That is, if a query selects more than 1000 entities using the <code class="docutils literal notranslate"><span class="pre">first</span></code> argument (1000 being The Graph's limit to the <code class="docutils literal notranslate"><span class="pre">first</span></code> argument), then Subgrounds will automatically split the query into multiple queries that each query at most 1000 entities.</p>
+<p>Pagination is performed by Subgrounds with the use of a pagination strategy: a class that implements the <code class="docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> protocol. Subgrounds provides two pagination strategies out of the box, however, users wishing to implement their own strategy should create a class that implements the aforementioned protocol (see below).</p>
+<p>If at some point during the pagination process, an unhandled exception occurs, Subgrounds will raise a <code class="docutils literal notranslate"><span class="pre">PaginationError</span></code> exception containing the initial exception message as well as the <code class="docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> object in the state it was in when the error occured, which, in the case of iterative querying (e.g.: when using <code class="docutils literal notranslate"><span class="pre">query_df_iter</span></code>), could be useful to recover and start pagination from a later stage.</p>
+<section id="available-pagination-strategies">
+<h3>Available pagination strategies<a class="headerlink" href="#available-pagination-strategies" title="Permalink to this headline"></a></h3>
+<p>Subgrounds provides two pagination strategies out of the box:</p>
+<ol>
+<li><p><code class="docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>: A pagination strategy that implements the pagination algorithm that was used by default prior to this update. This pagination strategy supports pagination on nested fields, but is quite slow. Below is an example of a query for which you should use this strategy:</p>
+<div class="highlight-graphql notranslate"><div class="highlight"><pre><span></span>query {
+  liquidityPools(first: 10) {
+    swaps(first: 5000) {
+      id
+    }
+  }
+}
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ShallowStrategy</span></code>: A new pagination strategy that is faster than the <code class="docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>, but does not paginate on nested list fields. In other words, this strategy is best when nested list fields select fewer than 1000 entities. Below is an example of a query for which you should use this strategy:</p>
+<div class="highlight-graphql notranslate"><div class="highlight"><pre><span></span>query {
+  liquidityPools(first: 5000) {
+    swaps(first: 10) {
+      id
+    }
+  }
+}
+</pre></div>
+</div>
+</li>
+</ol>
+<p>To use either pagination strategy, set the <code class="docutils literal notranslate"><span class="pre">pagination_strategy</span></code> argument of toplevel querying functions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">subgrounds</span> <span class="kn">import</span> <span class="n">Subgrounds</span>
+<span class="kn">from</span> <span class="nn">subgrounds.pagination</span> <span class="kn">import</span> <span class="n">ShallowStrategy</span>
+
+<span class="n">sg</span> <span class="o">=</span> <span class="n">Subgrounds</span><span class="p">()</span>
+<span class="n">subgraph</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s2">&quot;https://api.thegraph.com/subgraphs/name/messari/compound-ethereum&quot;</span><span class="p">)</span>
+
+<span class="n">mkt_daily_snapshots</span> <span class="o">=</span> <span class="n">subgraph</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">marketDailySnapshots</span><span class="p">(</span>
+    <span class="n">orderBy</span><span class="o">=</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span>
+    <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+    <span class="n">first</span><span class="o">=</span><span class="mi">1000</span>
+<span class="p">)</span>
+
+<span class="n">field_paths</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">mkt_daily_snapshots</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+    <span class="n">mkt_daily_snapshots</span><span class="o">.</span><span class="n">market</span><span class="o">.</span><span class="n">inputToken</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+    <span class="n">mkt_daily_snapshots</span><span class="o">.</span><span class="n">rates</span><span class="o">.</span><span class="n">rate</span><span class="p">,</span>
+    <span class="n">mkt_daily_snapshots</span><span class="o">.</span><span class="n">rates</span><span class="o">.</span><span class="n">side</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">query_df</span><span class="p">(</span><span class="n">field_paths</span><span class="p">,</span> <span class="n">pagination_strategy</span><span class="o">=</span><span class="n">ShallowStrategy</span><span class="p">)</span> 
+</pre></div>
+</div>
+<p>Note that pagination can be explicitely disabled by setting <code class="docutils literal notranslate"><span class="pre">pagination_strategy</span></code> to <code class="docutils literal notranslate"><span class="pre">None</span></code>, in which case the query will be executed as-is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">query_df</span><span class="p">(</span><span class="n">field_paths</span><span class="p">,</span> <span class="n">pagination_strategy</span><span class="o">=</span><span class="n">ShallowStrategy</span><span class="p">)</span> 
+</pre></div>
+</div>
+</section>
+<section id="custom-pagination-strategy">
+<h3>Custom pagination strategy<a class="headerlink" href="#custom-pagination-strategy" title="Permalink to this headline"></a></h3>
+<p>Subgrounds allows developers to create their own pagination strategy by creating a class that implements the <code class="docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> protocol:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PaginationStrategy</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">schema</span><span class="p">:</span> <span class="n">SchemaMeta</span><span class="p">,</span>
+        <span class="n">document</span><span class="p">:</span> <span class="n">Document</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">page_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Document</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>The class's constructor should accept a <code class="docutils literal notranslate"><span class="pre">SchemaMeta</span></code> argument which represents the schema of the subgraph API that the query is directed to and a <code class="docutils literal notranslate"><span class="pre">Document</span></code> argument which represents the query to be paginated on. If no pagination is required for the given document, then the constructor should raise a <code class="docutils literal notranslate"><span class="pre">SkipPagination</span></code> exception.</p>
+<p>The class's <code class="docutils literal notranslate"><span class="pre">step</span></code> method is where the main logic of the pagination strategy is located. The method accepts a single argument, <code class="docutils literal notranslate"><span class="pre">page_data</span></code> which is a dictionary containing the response data of the previous query (i.e.: the previous page of data). The <code class="docutils literal notranslate"><span class="pre">step</span></code> method should return a tuple <code class="docutils literal notranslate"><span class="pre">(doc,</span> <span class="pre">vars)</span></code>, where <code class="docutils literal notranslate"><span class="pre">doc</span></code> is a <code class="docutils literal notranslate"><span class="pre">Document</span></code> representing the query to be made to fetch the next page of data. When pagination is over (e.g.: when all pages of data have been fetched), the <code class="docutils literal notranslate"><span class="pre">step</span></code> method should raise a <code class="docutils literal notranslate"><span class="pre">StopPagination</span></code> exception.</p>
+<p>Below is the algorithm used by Subgrounds to paginate over a query document given a pagination strategy:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">paginate</span><span class="p">(</span>
+    <span class="n">schema</span><span class="p">:</span> <span class="n">SchemaMeta</span><span class="p">,</span>
+    <span class="n">doc</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span>
+    <span class="n">pagination_strategy</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">PaginationStrategy</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Initialize the strategy</span>
+        <span class="n">strategy</span> <span class="o">=</span> <span class="n">pagination_strategy</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Compute the query document and variables to get the first page of data</span>
+        <span class="n">next_page_doc</span><span class="p">,</span> <span class="n">variables</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">page_data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Fetch a data page</span>
+                <span class="n">page_data</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+                    <span class="n">url</span><span class="o">=</span><span class="n">next_page_doc</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                    <span class="n">query_str</span><span class="o">=</span><span class="n">next_page_doc</span><span class="o">.</span><span class="n">graphql</span><span class="p">,</span>
+                    <span class="n">variables</span><span class="o">=</span><span class="n">next_page_doc</span><span class="o">.</span><span class="n">variables</span> <span class="o">|</span> <span class="n">variables</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Merge the page with the data blob</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">merge</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">page_data</span><span class="p">)</span>
+
+                <span class="c1"># Compute the query document and variables to get the next page of data</span>
+                <span class="n">next_page_doc</span><span class="p">,</span> <span class="n">variables</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">page_data</span><span class="o">=</span><span class="n">page_data</span><span class="p">)</span>
+            
+            <span class="k">except</span> <span class="n">StopPagination</span><span class="p">:</span>
+                <span class="k">break</span>
+            
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exn</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PaginationError</span><span class="p">(</span><span class="n">exn</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">strategy</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">except</span> <span class="n">SkipPagination</span><span class="p">:</span>
+        <span class="c1"># Excecute the query document as is if `SkipPagination` is raised</span>
+        <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">doc</span><span class="o">.</span><span class="n">graphql</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">doc</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../basics/" class="btn btn-neutral float-left" title="Subgrounds basics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../modules/" class="btn btn-neutral float-right" title="subgrounds" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

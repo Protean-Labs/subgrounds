@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>subgrounds.pagination.preprocess module &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="subgrounds.pagination.strategies module" href="../subgrounds.pagination.strategies/" />
+    <link rel="prev" title="subgrounds.pagination.pagination module" href="../subgrounds.pagination.pagination/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules/">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../subgrounds/">subgrounds package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../subgrounds/#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../subgrounds.pagination/">subgrounds.pagination package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.subgraph/">subgrounds.subgraph package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#module-subgrounds">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../modules/">subgrounds</a> &raquo;</li>
+          <li><a href="../subgrounds/">subgrounds package</a> &raquo;</li>
+          <li><a href="../subgrounds.pagination/">subgrounds.pagination package</a> &raquo;</li>
+      <li>subgrounds.pagination.preprocess module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/subgrounds.pagination.preprocess.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-subgrounds.pagination.preprocess">
+<span id="subgrounds-pagination-preprocess-module"></span><h1>subgrounds.pagination.preprocess module<a class="headerlink" href="#module-subgrounds.pagination.preprocess" title="Permalink to this headline"></a></h1>
+<p>Helper functions and classes used by Subgrounds' own pagination strategies.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.preprocess.</span></span><span class="sig-name descname"><span class="pre">PaginationNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class representing the pagination config for a single GraphQL list field.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode.node_idx">
+<span class="sig-name descname"><span class="pre">node_idx</span></span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode.node_idx" title="Permalink to this definition"></a></dt>
+<dd><p>Index of PaginationNode, used to label pagination arguments
+for this node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode.filter_field">
+<span class="sig-name descname"><span class="pre">filter_field</span></span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode.filter_field" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the node's filter field, e.g.: if
+<code class="docutils literal notranslate"><span class="pre">filter_name</span></code> is <code class="docutils literal notranslate"><span class="pre">timestamp_gt</span></code>, then <a class="reference internal" href="#id1" title="subgrounds.pagination.preprocess.PaginationNode.filter_field"><code class="xref py py-attr docutils literal notranslate"><span class="pre">filter_field</span></code></a>
+is <code class="docutils literal notranslate"><span class="pre">timestamp</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode.first_value">
+<span class="sig-name descname"><span class="pre">first_value</span></span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode.first_value" title="Permalink to this definition"></a></dt>
+<dd><p>Initial value of the <code class="docutils literal notranslate"><span class="pre">first</span></code> argument</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode.skip_value">
+<span class="sig-name descname"><span class="pre">skip_value</span></span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode.skip_value" title="Permalink to this definition"></a></dt>
+<dd><p>Initial value of the <code class="docutils literal notranslate"><span class="pre">skip</span></code> argument</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode.filter_value">
+<span class="sig-name descname"><span class="pre">filter_value</span></span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode.filter_value" title="Permalink to this definition"></a></dt>
+<dd><p>Initial value of the filter argument
+(i.e.: <code class="docutils literal notranslate"><span class="pre">where:</span> <span class="pre">{filter:</span> <span class="pre">FILTER_VALUE}</span></code>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode.filter_value_type">
+<span class="sig-name descname"><span class="pre">filter_value_type</span></span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode.filter_value_type" title="Permalink to this definition"></a></dt>
+<dd><p>Type of the filter value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T">TypeRef.T</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode.key_path">
+<span class="sig-name descname"><span class="pre">key_path</span></span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode.key_path" title="Permalink to this definition"></a></dt>
+<dd><p>Location in the list field to which this pagination
+node refers to in the initial query</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode.inner">
+<span class="sig-name descname"><span class="pre">inner</span></span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode.inner" title="Permalink to this definition"></a></dt>
+<dd><p>Nested pagination nodes (if any).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="#subgrounds.pagination.preprocess.PaginationNode" title="subgrounds.pagination.preprocess.PaginationNode">PaginationNode</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">node_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">filter_field</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">first_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">skip_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">filter_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">filter_value_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><span class="pre">subgrounds.schema.TypeRef.T</span></a></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">key_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">inner</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.pagination.preprocess.PaginationNode" title="subgrounds.pagination.preprocess.PaginationNode"><span class="pre">subgrounds.pagination.preprocess.PaginationNode</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.PaginationNode.get_vardefs">
+<span class="sig-name descname"><span class="pre">get_vardefs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.PaginationNode.get_vardefs" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of variable definitions corresponding to this pagination
+node's pagination arguments as well as the variable definitions related
+to any nested pagination nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.pagination.preprocess.PaginationNode" title="subgrounds.pagination.preprocess.PaginationNode"><em>PaginationNode</em></a>) -- The current PaginationNode</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="../subgrounds.query/#subgrounds.query.VariableDefinition" title="subgrounds.query.VariableDefinition">VariableDefinition</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.is_pagination_node">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.preprocess.</span></span><span class="sig-name descname"><span class="pre">is_pagination_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.is_pagination_node" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.get_orderBy_value">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.preprocess.</span></span><span class="sig-name descname"><span class="pre">get_orderBy_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.get_orderBy_value" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.get_orderDirection_value">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.preprocess.</span></span><span class="sig-name descname"><span class="pre">get_orderDirection_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.get_orderDirection_value" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.get_filtering_arg">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.preprocess.</span></span><span class="sig-name descname"><span class="pre">get_filtering_arg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.get_filtering_arg" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.get_filtering_value">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.preprocess.</span></span><span class="sig-name descname"><span class="pre">get_filtering_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.get_filtering_value" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.generate_pagination_nodes">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.preprocess.</span></span><span class="sig-name descname"><span class="pre">generate_pagination_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.generate_pagination_nodes" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.normalize">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.preprocess.</span></span><span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pagination_nodes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.normalize" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.pagination.preprocess.prune_doc">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.preprocess.</span></span><span class="sig-name descname"><span class="pre">prune_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.preprocess.prune_doc" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../subgrounds.pagination.pagination/" class="btn btn-neutral float-left" title="subgrounds.pagination.pagination module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../subgrounds.pagination.strategies/" class="btn btn-neutral float-right" title="subgrounds.pagination.strategies module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>subgrounds.pagination.strategies module &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="subgrounds.pagination.utils module" href="../subgrounds.pagination.utils/" />
+    <link rel="prev" title="subgrounds.pagination.preprocess module" href="../subgrounds.pagination.preprocess/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules/">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../subgrounds/">subgrounds package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../subgrounds/#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../subgrounds.pagination/">subgrounds.pagination package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.subgraph/">subgrounds.subgraph package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#module-subgrounds">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../modules/">subgrounds</a> &raquo;</li>
+          <li><a href="../subgrounds/">subgrounds package</a> &raquo;</li>
+          <li><a href="../subgrounds.pagination/">subgrounds.pagination package</a> &raquo;</li>
+      <li>subgrounds.pagination.strategies module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/subgrounds.pagination.strategies.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-subgrounds.pagination.strategies">
+<span id="subgrounds-pagination-strategies-module"></span><h1>subgrounds.pagination.strategies module<a class="headerlink" href="#module-subgrounds.pagination.strategies" title="Permalink to this headline"></a></h1>
+<p>Subgrounds pagination strategies</p>
+<p>This module implements functions and data structures used to implement the
+two <code class="docutils literal notranslate"><span class="pre">PaginationStrategies</span></code> that Subgrounds offers.</p>
+<p>For both strategies, pagination is done in four steps:</p>
+<ol class="arabic">
+<li><p>Generate one or many <code class="xref py py-class docutils literal notranslate"><span class="pre">PaginationNode</span></code> objects per query document.
+These are tree-like data structures that extract all information about pagination
+fields (i.e.: fields that return lists of entities) while maintaining the nestedness
+relationship between each pagination field (i.e.: which is nested in which).</p></li>
+<li><p>The query document is normalized such that every pagination field in the query has:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>An ordering (i.e.: <code class="docutils literal notranslate"><span class="pre">orderBy</span></code> and <code class="docutils literal notranslate"><span class="pre">orderDirection</span></code> are specified)</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">first</span></code> argument set to the <code class="docutils literal notranslate"><span class="pre">firstN</span></code> variable</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">skip</span></code> argument set to the <code class="docutils literal notranslate"><span class="pre">skipN</span></code> variable</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">where</span></code> filter with the filter name derived from the ordering and the
+value being a variable named <code class="docutils literal notranslate"><span class="pre">lastOrderingValueN</span></code></p></li>
+</ol>
+</div></blockquote>
+<p>In other words, the query will be transformed in a form which allows Subgrounds
+to paginate automatically by simply setting the set of pagination variables
+(i.e.: <code class="docutils literal notranslate"><span class="pre">firstN</span></code>, <code class="docutils literal notranslate"><span class="pre">skipN</span></code> and <code class="docutils literal notranslate"><span class="pre">lastOrderingValueN</span></code>) to different
+values. Each field that requires pagination (i.e.: each field that yields a list)
+will have its own set of variables, hence the <code class="docutils literal notranslate"><span class="pre">N</span></code> post-fix.</p>
+<p>Example:
+The initial query</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>query {
+  items(
+    orderBy: timestamp,
+    orderDirection: desc,
+    first: 10000
+  ) {
+    foo
+  }
+}
+</pre></div>
+</div>
+<p>will be transformed to</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>query($first0: Int, $skip0: Int, $lastOrderingValue0: BigInt) {
+  items(
+    orderBy: timestamp,
+    orderDirection: desc,
+    first: $first0,
+    skip: $skip0,
+    where: {
+      timestamp_lt: $lastOrderingValue0
+    }
+  ) {
+    foo
+  }
+}
+</pre></div>
+</div>
+</li>
+<li><p>For each data page, generate the values for the pagination variables (i.e.:
+<code class="docutils literal notranslate"><span class="pre">firstN</span></code>, <code class="docutils literal notranslate"><span class="pre">skipN</span></code> and <code class="docutils literal notranslate"><span class="pre">`lastOrderingValueN`</span></code>)</p></li>
+<li><p>If some variables are undefined (i.e.: they are present in the query document,
+but not given a value as part of step 3), then the document is pruned and all
+selections (and sub-selections) containing undefined variables are removed.</p></li>
+</ol>
+<p>Depending on the strategy, the variable values computed at step 3 will change.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.StopPagination">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.strategies.</span></span><span class="sig-name descname"><span class="pre">StopPagination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.StopPagination" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.SkipPagination">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.strategies.</span></span><span class="sig-name descname"><span class="pre">SkipPagination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.SkipPagination" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.strategies.</span></span><span class="sig-name descname"><span class="pre">LegacyStrategyArgGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pagination_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[PaginationNode]'</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="s"><span class="pre">'None'</span></span></span></span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.active_idx">
+<span class="sig-name descname"><span class="pre">active_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.active_idx" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'PaginationNode'</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="s"><span class="pre">'None'</span></span></span></span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.inner_idx">
+<span class="sig-name descname"><span class="pre">inner_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.inner_idx" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.filter_value">
+<span class="sig-name descname"><span class="pre">filter_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.filter_value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.queried_entities">
+<span class="sig-name descname"><span class="pre">queried_entities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.queried_entities" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.stop" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.page_count">
+<span class="sig-name descname"><span class="pre">page_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.page_count" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.10)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.keys" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.page_node">
+<span class="sig-name descname"><span class="pre">page_node</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.pagination.preprocess/#subgrounds.pagination.preprocess.PaginationNode" title="subgrounds.pagination.preprocess.PaginationNode"><span class="pre">subgrounds.pagination.preprocess.PaginationNode</span></a></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.page_node" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.inner">
+<span class="sig-name descname"><span class="pre">inner</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor" title="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor"><span class="pre">subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.inner" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.is_leaf">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_leaf</span></span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.is_leaf" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.update" title="Permalink to this definition"></a></dt>
+<dd><p>Moves <code class="docutils literal notranslate"><span class="pre">self</span></code> cursor forward according to previous response data <code class="docutils literal notranslate"><span class="pre">data</span></code>
+:param data: Previous response data
+:type data: dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#StopIteration" title="(in Python v3.10)"><strong>StopIteration</strong></a> -- _description_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.step" title="Permalink to this definition"></a></dt>
+<dd><p>Updates either <code class="docutils literal notranslate"><span class="pre">self</span></code> cursor or inner state machine depending on
+whether the inner state machine has reached its limit
+:param data: _description_
+:type data: dict</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.first_arg_value">
+<span class="sig-name descname"><span class="pre">first_arg_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.first_arg_value" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.args">
+<span class="sig-name descname"><span class="pre">args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.args" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the pagination arguments for the current state of the state machine
+:returns: _description_
+:rtype: dict</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Reset state machine</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.cursor">
+<span class="sig-name descname"><span class="pre">cursor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor" title="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.Cursor"><span class="pre">Cursor</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.cursor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategyArgGenerator.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator.step" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.strategies.</span></span><span class="sig-name descname"><span class="pre">LegacyStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategy" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategy.schema">
+<span class="sig-name descname"><span class="pre">schema</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.SchemaMeta" title="subgrounds.schema.SchemaMeta"><span class="pre">subgrounds.schema.SchemaMeta</span></a></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategy.schema" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategy.arg_generator">
+<span class="sig-name descname"><span class="pre">arg_generator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.pagination.strategies.LegacyStrategyArgGenerator" title="subgrounds.pagination.strategies.LegacyStrategyArgGenerator"><span class="pre">subgrounds.pagination.strategies.LegacyStrategyArgGenerator</span></a></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategy.arg_generator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategy.normalized_doc">
+<span class="sig-name descname"><span class="pre">normalized_doc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document"><span class="pre">subgrounds.query.Document</span></a></em><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategy.normalized_doc" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.LegacyStrategy.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.LegacyStrategy.step" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.strategies.</span></span><span class="sig-name descname"><span class="pre">ShallowStrategyArgGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pagination_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[PaginationNode]'</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="s"><span class="pre">'None'</span></span></span></span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queried_entities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class used to generate the pagination variables for a given tree of
+<code class="docutils literal notranslate"><span class="pre">PaginationNode</span></code> objects.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.page_node">
+<span class="sig-name descname"><span class="pre">page_node</span></span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.page_node" title="Permalink to this definition"></a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">PaginationNode</span></code> object which this cursor is iterating
+through.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.pagination.preprocess/#subgrounds.pagination.preprocess.PaginationNode" title="subgrounds.pagination.preprocess.PaginationNode">subgrounds.pagination.preprocess.PaginationNode</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.inner">
+<span class="sig-name descname"><span class="pre">inner</span></span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.inner" title="Permalink to this definition"></a></dt>
+<dd><p>The cursors for nested <code class="docutils literal notranslate"><span class="pre">PaginationNodes</span></code>, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor" title="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor">subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.inner_idx">
+<span class="sig-name descname"><span class="pre">inner_idx</span></span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.inner_idx" title="Permalink to this definition"></a></dt>
+<dd><p>The index of the inner <code class="docutils literal notranslate"><span class="pre">PaginationNode</span></code> through which this cursor
+iterating.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.filter_value">
+<span class="sig-name descname"><span class="pre">filter_value</span></span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.filter_value" title="Permalink to this definition"></a></dt>
+<dd><p>The previous page's index value used to query the next data page.
+Depends on <code class="docutils literal notranslate"><span class="pre">page_node.filter_field</span></code>, e.g.: if <code class="docutils literal notranslate"><span class="pre">page_node.filter_field</span></code>
+is <code class="docutils literal notranslate"><span class="pre">timestamp_gt</span></code>, then <code class="docutils literal notranslate"><span class="pre">filter_value</span></code> will be the highest timestamp
+the entities returned in the previous data page.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.queried_entities">
+<span class="sig-name descname"><span class="pre">queried_entities</span></span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.queried_entities" title="Permalink to this definition"></a></dt>
+<dd><p>Counter keeping track of the total number of queried entities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.stop" title="Permalink to this definition"></a></dt>
+<dd><p>Flag indicating whether or not to stop the cursor.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.page_count">
+<span class="sig-name descname"><span class="pre">page_count</span></span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.page_count" title="Permalink to this definition"></a></dt>
+<dd><p>Counter keeping track of the total number data pages queried.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.keys">
+<span class="sig-name descname"><span class="pre">keys</span></span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.keys" title="Permalink to this definition"></a></dt>
+<dd><p>Set keeping track of the keys of all queried entities to avoid duplicates.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">page_node</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.pagination.preprocess/#subgrounds.pagination.preprocess.PaginationNode" title="subgrounds.pagination.preprocess.PaginationNode"><span class="pre">subgrounds.pagination.preprocess.PaginationNode</span></a></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">inner</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor" title="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor"><span class="pre">subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">inner_idx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">filter_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">queried_entities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">page_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.from_pagination_node">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pagination_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.from_pagination_node" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.is_leaf">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_leaf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.is_leaf" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.active_cursor">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_cursor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor" title="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor"><span class="pre">subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.active_cursor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">only_active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.mapi">
+<span class="sig-name descname"><span class="pre">mapi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'self'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor.mapi" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.cursor">
+<span class="sig-name descname"><span class="pre">cursor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor" title="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.Cursor"><span class="pre">Cursor</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.cursor" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.iter_cursors">
+<span class="sig-name descname"><span class="pre">iter_cursors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.iter_cursors" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.update_cursor">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_cursor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cursor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.update_cursor" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategyArgGenerator.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator.step" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.pagination.strategies.</span></span><span class="sig-name descname"><span class="pre">ShallowStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategy" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategy.schema">
+<span class="sig-name descname"><span class="pre">schema</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.SchemaMeta" title="subgrounds.schema.SchemaMeta"><span class="pre">subgrounds.schema.SchemaMeta</span></a></em><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategy.schema" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategy.arg_generator">
+<span class="sig-name descname"><span class="pre">arg_generator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.pagination.strategies.ShallowStrategyArgGenerator" title="subgrounds.pagination.strategies.ShallowStrategyArgGenerator"><span class="pre">subgrounds.pagination.strategies.ShallowStrategyArgGenerator</span></a></em><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategy.arg_generator" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategy.normalized_doc">
+<span class="sig-name descname"><span class="pre">normalized_doc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document"><span class="pre">subgrounds.query.Document</span></a></em><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategy.normalized_doc" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.pagination.strategies.ShallowStrategy.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.pagination.strategies.ShallowStrategy.step" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../subgrounds.pagination.preprocess/" class="btn btn-neutral float-left" title="subgrounds.pagination.preprocess module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../subgrounds.pagination.utils/" class="btn btn-neutral float-right" title="subgrounds.pagination.utils module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

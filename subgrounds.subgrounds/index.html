@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>subgrounds.subgrounds module &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="subgrounds.transform module" href="../subgrounds.transform/" />
+    <link rel="prev" title="subgrounds.schema module" href="../subgrounds.schema/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules/">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../subgrounds/">subgrounds package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../subgrounds/#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.client/">subgrounds.client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dash_wrappers/">subgrounds.dash_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dataframe_utils/">subgrounds.dataframe_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.plotly_wrappers/">subgrounds.plotly_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.query/">subgrounds.query module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.schema/">subgrounds.schema module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">subgrounds.subgrounds module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.transform/">subgrounds.transform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.utils/">subgrounds.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#module-subgrounds">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../modules/">subgrounds</a> &raquo;</li>
+          <li><a href="../subgrounds/">subgrounds package</a> &raquo;</li>
+      <li>subgrounds.subgrounds module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/subgrounds.subgrounds.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-subgrounds.subgrounds">
+<span id="subgrounds-subgrounds-module"></span><h1>subgrounds.subgrounds module<a class="headerlink" href="#module-subgrounds.subgrounds" title="Permalink to this headline"></a></h1>
+<p>Toplevel Subgrounds module</p>
+<p>This module implements the toplevel API that most developers will be using when
+querying The Graph with Subgrounds.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.subgrounds.</span></span><span class="sig-name descname"><span class="pre">Subgrounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_transforms:</span> <span class="pre">list[subgrounds.transform.RequestTransform]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgraphs:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgrounds.subgraph.subgraph.Subgraph]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.global_transforms">
+<span class="sig-name descname"><span class="pre">global_transforms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../subgrounds.transform/#subgrounds.transform.RequestTransform" title="subgrounds.transform.RequestTransform"><span class="pre">subgrounds.transform.RequestTransform</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.global_transforms" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.subgraphs">
+<span class="sig-name descname"><span class="pre">subgraphs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.subgraph.subgraph/#subgrounds.subgraph.subgraph.Subgraph" title="subgrounds.subgraph.subgraph.Subgraph"><span class="pre">subgrounds.subgraph.subgraph.Subgraph</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.subgraphs" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.load_subgraph">
+<span class="sig-name descname"><span class="pre">load_subgraph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'schemas/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.load_subgraph" title="Permalink to this definition"></a></dt>
+<dd><p>Performs introspection on the provided GraphQL API <code class="docutils literal notranslate"><span class="pre">url</span></code> to get the
+schema, stores the schema if <code class="docutils literal notranslate"><span class="pre">save_schema</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and returns a
+generated class representing the subgraph with all its entities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The url of the API</p></li>
+<li><p><strong>save_schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Flag indicating whether or not the schema
+should be saved to disk. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A generated class representing the subgraph and its entities</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.subgraph.subgraph/#subgrounds.subgraph.subgraph.Subgraph" title="subgrounds.subgraph.subgraph.Subgraph">Subgraph</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.load_api">
+<span class="sig-name descname"><span class="pre">load_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'schemas/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.load_api" title="Permalink to this definition"></a></dt>
+<dd><p>Performs introspection on the provided GraphQL API <code class="docutils literal notranslate"><span class="pre">url</span></code> to get the
+schema, stores the schema if <code class="docutils literal notranslate"><span class="pre">save_schema</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and returns a
+generated class representing the GraphQL endpoint with all its entities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The url of the API</p></li>
+<li><p><strong>save_schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Flag indicating whether or not the schema
+should be saved to disk. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A generated class representing the subgraph and its entities</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.subgraph.subgraph/#subgrounds.subgraph.subgraph.Subgraph" title="subgrounds.subgraph.subgraph.Subgraph">Subgraph</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.mk_request">
+<span class="sig-name descname"><span class="pre">mk_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpaths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.mk_request" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> object by combining one or more
+<code class="xref py py-class docutils literal notranslate"><span class="pre">FieldPath</span></code> objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fpaths</strong> (<a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em>]</em>) -- One or more <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldPath</span></code>
+objects that should be included in the request</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A new <code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest">DataRequest</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pagination_strategy=&lt;class</span> <span class="pre">'subgrounds.pagination.strategies.LegacyStrategy'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Executes a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> object, sending the underlying
+query(ies) to the server and returning a data blob (list of Python
+dictionaries, one per actual query).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest"><em>DataRequest</em></a>) -- The <code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> object to be executed</p></li>
+<li><p><strong>pagination_strategy</strong> (<em>Optional</em><em>[</em><em>Type</em><em>[</em><a class="reference internal" href="../subgrounds.pagination.pagination/#subgrounds.pagination.pagination.PaginationStrategy" title="subgrounds.pagination.pagination.PaginationStrategy"><em>PaginationStrategy</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- A Class
+implementing the <code class="xref py py-class docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> <code class="docutils literal notranslate"><span class="pre">Protocol</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then
+automatic pagination is disabled. Defaults to <code class="xref py py-class docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The reponse data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.execute_iter">
+<span class="sig-name descname"><span class="pre">execute_iter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pagination_strategy=&lt;class</span> <span class="pre">'subgrounds.pagination.strategies.LegacyStrategy'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.execute_iter" title="Permalink to this definition"></a></dt>
+<dd><p>Same as <cite>execute</cite>, except that an iterator is returned which will iterate
+the data pages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest"><em>DataRequest</em></a>) -- The <code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> object to be executed</p></li>
+<li><p><strong>pagination_strategy</strong> (<em>Optional</em><em>[</em><em>Type</em><em>[</em><a class="reference internal" href="../subgrounds.pagination.pagination/#subgrounds.pagination.pagination.PaginationStrategy" title="subgrounds.pagination.pagination.PaginationStrategy"><em>PaginationStrategy</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- A Class
+implementing the <code class="xref py py-class docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> <code class="docutils literal notranslate"><span class="pre">Protocol</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then
+automatic pagination is disabled. Defaults to <code class="xref py py-class docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An iterator over the reponse data pages</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Iterator[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.query_json">
+<span class="sig-name descname"><span class="pre">query_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pagination_strategy=&lt;class</span> <span class="pre">'subgrounds.pagination.strategies.LegacyStrategy'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.query_json" title="Permalink to this definition"></a></dt>
+<dd><p>Equivalent to <code class="docutils literal notranslate"><span class="pre">Subgrounds.execute(Subgrounds.mk_request(fpaths),</span> <span class="pre">pagination_strategy)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fpaths</strong> (<a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em>]</em>) -- One or more <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldPath</span></code> objects that should be
+included in the request.</p></li>
+<li><p><strong>pagination_strategy</strong> (<em>Optional</em><em>[</em><em>Type</em><em>[</em><a class="reference internal" href="../subgrounds.pagination.pagination/#subgrounds.pagination.pagination.PaginationStrategy" title="subgrounds.pagination.pagination.PaginationStrategy"><em>PaginationStrategy</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- A Class
+implementing the <code class="xref py py-class docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> <code class="docutils literal notranslate"><span class="pre">Protocol</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then
+automatic pagination is disabled. Defaults to <code class="xref py py-class docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The reponse data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.query_json_iter">
+<span class="sig-name descname"><span class="pre">query_json_iter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pagination_strategy=&lt;class</span> <span class="pre">'subgrounds.pagination.strategies.LegacyStrategy'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.query_json_iter" title="Permalink to this definition"></a></dt>
+<dd><p>Same as <cite>query_json</cite> except an iterator over the response data pages is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fpaths</strong> (<a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em>]</em>) -- One or more <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldPath</span></code> objects
+that should be included in the request.</p></li>
+<li><p><strong>pagination_strategy</strong> (<em>Optional</em><em>[</em><em>Type</em><em>[</em><a class="reference internal" href="../subgrounds.pagination.pagination/#subgrounds.pagination.pagination.PaginationStrategy" title="subgrounds.pagination.pagination.PaginationStrategy"><em>PaginationStrategy</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- A Class
+implementing the <code class="xref py py-class docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> <code class="docutils literal notranslate"><span class="pre">Protocol</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then
+automatic pagination is disabled. Defaults to <code class="xref py py-class docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The reponse data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.query_df">
+<span class="sig-name descname"><span class="pre">query_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pagination_strategy=&lt;class</span> <span class="pre">'subgrounds.pagination.strategies.LegacyStrategy'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.query_df" title="Permalink to this definition"></a></dt>
+<dd><p>Same as <a class="reference internal" href="#subgrounds.subgrounds.Subgrounds.query" title="subgrounds.subgrounds.Subgrounds.query"><code class="xref py py-func docutils literal notranslate"><span class="pre">Subgrounds.query()</span></code></a> but formats the response data into a
+Pandas DataFrame. If the response data cannot be flattened to a single query
+(e.g.: when querying multiple list fields that return different entities),
+then multiple dataframes are returned</p>
+<p><code class="docutils literal notranslate"><span class="pre">fpaths</span></code> is a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldPath</span></code> objects that indicate which
+data must be queried.</p>
+<p><code class="docutils literal notranslate"><span class="pre">columns</span></code> is an optional argument used to rename the dataframes(s)
+columns. The length of <code class="docutils literal notranslate"><span class="pre">columns</span></code> must be the same as the number of columns
+of <em>all</em> returned dataframes.</p>
+<p><code class="docutils literal notranslate"><span class="pre">concat</span></code> indicates whether or not the resulting dataframes should be
+concatenated together. The dataframes must have the same number of columns,
+as well as the same column names and types (the names can be set using the
+<code class="docutils literal notranslate"><span class="pre">columns</span></code> argument).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fpaths</strong> (<a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em>]</em>) -- One or more <cite>FieldPath</cite> objects that
+should be included in the request.</p></li>
+<li><p><strong>columns</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- The column labels. Defaults to None.</p></li>
+<li><p><strong>merge</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Whether or not to merge resulting dataframes.</p></li>
+<li><p><strong>pagination_strategy</strong> (<em>Optional</em><em>[</em><em>Type</em><em>[</em><a class="reference internal" href="../subgrounds.pagination.pagination/#subgrounds.pagination.pagination.PaginationStrategy" title="subgrounds.pagination.pagination.PaginationStrategy"><em>PaginationStrategy</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- A Class
+implementing the <code class="xref py py-class docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> <code class="docutils literal notranslate"><span class="pre">Protocol</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then
+automatic pagination is disabled. Defaults to <code class="xref py py-class docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A DataFrame containing the reponse data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[pd.DataFrame]</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">subgrounds</span> <span class="kn">import</span> <span class="n">Subgrounds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span> <span class="o">=</span> <span class="n">Subgrounds</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">univ3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># Define price SyntheticField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">price</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">amount0</span><span class="p">)</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">amount1</span><span class="p">)</span>
+
+<span class="go"># Query last 10 swaps from the ETH/USDC pool</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eth_usdc</span> <span class="o">=</span> <span class="n">univ3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">swaps</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">orderBy</span><span class="o">=</span><span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">first</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">where</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">pool</span> <span class="o">==</span> <span class="s1">&#39;0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8&#39;</span>
+<span class="gp">... </span>    <span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query_df</span><span class="p">([</span>
+<span class="gp">... </span>    <span class="n">eth_usdc</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">eth_usdc</span><span class="o">.</span><span class="n">price</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">  swaps_timestamp  swaps_price</span>
+<span class="go">0       1643213811  2618.886394</span>
+<span class="go">1       1643213792  2618.814281</span>
+<span class="go">2       1643213792  2617.500494</span>
+<span class="go">3       1643213763  2615.458495</span>
+<span class="go">4       1643213763  2615.876574</span>
+<span class="go">5       1643213739  2615.352390</span>
+<span class="go">6       1643213678  2615.205713</span>
+<span class="go">7       1643213370  2614.115746</span>
+<span class="go">8       1643213210  2613.077301</span>
+<span class="go">9       1643213196  2610.686563</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.query_df_iter">
+<span class="sig-name descname"><span class="pre">query_df_iter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pagination_strategy=&lt;class</span> <span class="pre">'subgrounds.pagination.strategies.LegacyStrategy'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.query_df_iter" title="Permalink to this definition"></a></dt>
+<dd><p>Same as <cite>query_df</cite> except an iterator over the response data pages is returned
+:param fpaths: One or more <cite>FieldPath</cite> objects that</p>
+<blockquote>
+<div><p>should be included in the request</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>columns</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- The column labels. Defaults to None.</p></li>
+<li><p><strong>merge</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Whether or not to merge resulting dataframes.</p></li>
+<li><p><strong>pagination_strategy</strong> (<em>Optional</em><em>[</em><em>Type</em><em>[</em><a class="reference internal" href="../subgrounds.pagination.pagination/#subgrounds.pagination.pagination.PaginationStrategy" title="subgrounds.pagination.pagination.PaginationStrategy"><em>PaginationStrategy</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- A Class
+implementing the <code class="xref py py-class docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> <code class="docutils literal notranslate"><span class="pre">Protocol</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then
+automatic pagination is disabled. Defaults to <code class="xref py py-class docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An iterator over the response data pages, each as a  DataFrame</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Iterator[pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unwrap=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pagination_strategy=&lt;class</span> <span class="pre">'subgrounds.pagination.strategies.LegacyStrategy'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.query" title="Permalink to this definition"></a></dt>
+<dd><p>Executes one or multiple <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> objects immediately and return the data (as a tuple if multiple <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> objects are provided).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fpaths</strong> (<a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em>]</em>) -- One or more <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> object(s) to query.</p></li>
+<li><p><strong>unwrap</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Flag indicating whether or not, in the case where
+the returned data is a list of one element, the element itself should be
+returned instead of the list. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>pagination_strategy</strong> (<em>Optional</em><em>[</em><em>Type</em><em>[</em><a class="reference internal" href="../subgrounds.pagination.pagination/#subgrounds.pagination.pagination.PaginationStrategy" title="subgrounds.pagination.pagination.PaginationStrategy"><em>PaginationStrategy</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- A Class
+implementing the <code class="xref py py-class docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> <code class="docutils literal notranslate"><span class="pre">Protocol</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then
+automatic pagination is disabled. Defaults to <code class="xref py py-class docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> object(s) data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.10)">type</a>]</p>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">subgrounds</span> <span class="kn">import</span> <span class="n">Subgrounds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span> <span class="o">=</span> <span class="n">Subgrounds</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">univ3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># Define price SyntheticField</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">price</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">amount0</span><span class="p">)</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">amount1</span><span class="p">)</span>
+
+<span class="go"># Construct FieldPath to get price of last swap on ETH/USDC pool</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eth_usdc_last</span> <span class="o">=</span> <span class="n">univ3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">swaps</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">orderBy</span><span class="o">=</span><span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">first</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">where</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="n">univ3</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">pool</span> <span class="o">==</span> <span class="s1">&#39;0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8&#39;</span>
+<span class="gp">... </span>    <span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">price</span>
+
+<span class="go"># Query last price FieldPath</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">eth_usdc_last</span><span class="p">)</span>
+<span class="go">2628.975030015892</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.subgrounds.Subgrounds.query_iter">
+<span class="sig-name descname"><span class="pre">query_iter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unwrap=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pagination_strategy=&lt;class</span> <span class="pre">'subgrounds.pagination.strategies.LegacyStrategy'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.subgrounds.Subgrounds.query_iter" title="Permalink to this definition"></a></dt>
+<dd><p>Same as <cite>query</cite> except an iterator over the resonse data pages is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fpath</strong> (<a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em>]</em>) -- One or more <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> object(s) to query.</p></li>
+<li><p><strong>unwrap</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Flag indicating whether or not, in the case where
+the returned data is a list of one element, the element itself should be
+returned instead of the list. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>pagination_strategy</strong> (<em>Optional</em><em>[</em><em>Type</em><em>[</em><a class="reference internal" href="../subgrounds.pagination.pagination/#subgrounds.pagination.pagination.PaginationStrategy" title="subgrounds.pagination.pagination.PaginationStrategy"><em>PaginationStrategy</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- A Class
+implementing the <code class="xref py py-class docutils literal notranslate"><span class="pre">PaginationStrategy</span></code> <code class="docutils literal notranslate"><span class="pre">Protocol</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then
+automatic pagination is disabled. Defaults to <code class="xref py py-class docutils literal notranslate"><span class="pre">LegacyStrategy</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An iterator over the <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> object(s)' data pages</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Iterator[<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.10)">type</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../subgrounds.schema/" class="btn btn-neutral float-left" title="subgrounds.schema module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../subgrounds.transform/" class="btn btn-neutral float-right" title="subgrounds.transform module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

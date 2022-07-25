@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>subgrounds.query module &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="subgrounds.schema module" href="../subgrounds.schema/" />
+    <link rel="prev" title="subgrounds.plotly_wrappers module" href="../subgrounds.plotly_wrappers/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules/">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../subgrounds/">subgrounds package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../subgrounds/#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.client/">subgrounds.client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dash_wrappers/">subgrounds.dash_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dataframe_utils/">subgrounds.dataframe_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.plotly_wrappers/">subgrounds.plotly_wrappers module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">subgrounds.query module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.schema/">subgrounds.schema module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.subgrounds/">subgrounds.subgrounds module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.transform/">subgrounds.transform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.utils/">subgrounds.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#module-subgrounds">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../modules/">subgrounds</a> &raquo;</li>
+          <li><a href="../subgrounds/">subgrounds package</a> &raquo;</li>
+      <li>subgrounds.query module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/subgrounds.query.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-subgrounds.query">
+<span id="subgrounds-query-module"></span><h1>subgrounds.query module<a class="headerlink" href="#module-subgrounds.query" title="Permalink to this headline"></a></h1>
+<p>Query data structure module</p>
+<p>This module contains various data structures in the form of dataclasses that
+are used to represent GraphQL queries in Subgrounds using an AST-like approach.
+To the extent possible, these dataclasses are immutable (i.e.: <code class="xref py py-attr docutils literal notranslate"><span class="pre">frozen=True</span></code>)
+to enforce a functional programming style and reduce side-effects.</p>
+<p>A typical Subgrounds request will have the following dataclass hierarchy:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>DataRequest
+└── Document
+    └── Query
+        ├── VariableDefinition
+        │   └── InputValue
+        └── Selection
+            ├── Argument
+            │   └── InputValue
+            └── Selection
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">InputValue</span></span><a class="headerlink" href="#subgrounds.query.InputValue" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.T">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">T</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.T" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Protocol" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Protocol</span></code></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.T.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.T.graphql" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a GraphQL string representation of the input value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The GraphQL string representation of the input value</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.T.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.T.is_variable" title="Permalink to this definition"></a></dt>
+<dd><p>Returns True i.f.f. the input value is of type Variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True i.f.f. the input value is of type Variable, otherwise False</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.T.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.T.is_number" title="Permalink to this definition"></a></dt>
+<dd><p>Returns True i.f.f. the input value is of type Float or Int</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True i.f.f. the input value is of type Float or Int, otherwise False</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.T.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.T.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Null">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Null</span></span><a class="headerlink" href="#subgrounds.query.InputValue.Null" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Null.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Null.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Null.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Null.is_variable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Null.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Null.is_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Null.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Null.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Int">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Int" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Int.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Int.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Int.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Int.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Int.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Int.is_variable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Int.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Int.is_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Int.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Int.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Float">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Float" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Float.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Float.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Float.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Float.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Float.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Float.is_variable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Float.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Float.is_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Float.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Float.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.String">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">String</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.String" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.String.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.String.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.String.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.String.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.String.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.String.is_variable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.String.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.String.is_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.String.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.String.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Boolean">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Boolean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Boolean" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Boolean.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Boolean.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Boolean.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Boolean.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Boolean.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Boolean.is_variable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Boolean.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Boolean.is_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Boolean.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Boolean.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Enum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Enum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Enum" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Enum.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Enum.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Enum.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Enum.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Enum.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Enum.is_variable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Enum.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Enum.is_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Enum.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Enum.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Variable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Variable" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Variable.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Variable.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Variable.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Variable.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Variable.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Variable.is_variable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Variable.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Variable.is_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Variable.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Variable.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.List">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">List</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'list[InputValue.T]'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.List" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.List.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.InputValue.T" title="subgrounds.query.InputValue.T"><span class="pre">subgrounds.query.InputValue.T</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.InputValue.List.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.List.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.List.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.List.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.List.is_variable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.List.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.List.is_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.List.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.List.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Object">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'dict[str,</span> <span class="pre">InputValue.T]'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Object" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Object.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.query.InputValue.T" title="subgrounds.query.InputValue.T"><span class="pre">subgrounds.query.InputValue.T</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.InputValue.Object.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Object.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Object.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Object.is_variable">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_variable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Object.is_variable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Object.is_number">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_number</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.query.InputValue.Object.is_number" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.InputValue.Object.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.InputValue.Object.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.VariableDefinition">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">VariableDefinition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.VariableDefinition" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Representation of a GraphQL variable definition</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.VariableDefinition.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#subgrounds.query.VariableDefinition.name" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the argument</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.VariableDefinition.type_">
+<span class="sig-name descname"><span class="pre">type_</span></span><a class="headerlink" href="#subgrounds.query.VariableDefinition.type_" title="Permalink to this definition"></a></dt>
+<dd><p>GraphQL type of the argument</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T">TypeRef.T</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.VariableDefinition.default">
+<span class="sig-name descname"><span class="pre">default</span></span><a class="headerlink" href="#subgrounds.query.VariableDefinition.default" title="Permalink to this definition"></a></dt>
+<dd><p>Default value of the variable.
+Defaults to None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.InputValue.T" title="subgrounds.query.InputValue.T">InputValue.T</a>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">type_</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><span class="pre">subgrounds.schema.TypeRef.T</span></a></em><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.InputValue.T" title="subgrounds.query.InputValue.T"><span class="pre">subgrounds.query.InputValue.T</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.VariableDefinition.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.VariableDefinition.graphql" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the GraphQL string representation of the variable definition</p>
+<p>Example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vardef</span> <span class="o">=</span> <span class="n">VariableDefinition</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">type_</span><span class="o">=</span><span class="n">TypeRef</span><span class="o">.</span><span class="n">NonNull</span><span class="p">(</span><span class="n">TypeRef</span><span class="o">.</span><span class="n">Named</span><span class="p">(</span><span class="s1">&#39;Int&#39;</span><span class="p">)),</span>
+<span class="gp">... </span>  <span class="n">default</span><span class="o">=</span><span class="n">InputValue</span><span class="o">.</span><span class="n">Int</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">vardef</span><span class="o">.</span><span class="n">graphql</span><span class="p">)</span>
+<span class="go">$foo: Int! = 100</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The GraphQL string representation of the variable definition</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.Argument">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">Argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'InputValue.T'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.Argument.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.query.InputValue.T" title="subgrounds.query.InputValue.T"><span class="pre">subgrounds.query.InputValue.T</span></a></em><a class="headerlink" href="#subgrounds.query.Argument.value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.Argument.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument.iter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.iter_vars">
+<span class="sig-name descname"><span class="pre">iter_vars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument.iter_vars" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.for_all">
+<span class="sig-name descname"><span class="pre">for_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument.for_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.for_all_vars">
+<span class="sig-name descname"><span class="pre">for_all_vars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument.for_all_vars" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.exists">
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument.exists" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.exists_vars">
+<span class="sig-name descname"><span class="pre">exists_vars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument.exists_vars" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument.find" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.find_vars">
+<span class="sig-name descname"><span class="pre">find_vars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument.find_vars" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Argument.all_defined">
+<span class="sig-name descname"><span class="pre">all_defined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Argument.all_defined" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.Selection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">Selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmeta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alias=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents a GraphQL field selection.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.fmeta">
+<span class="sig-name descname"><span class="pre">fmeta</span></span><a class="headerlink" href="#subgrounds.query.Selection.fmeta" title="Permalink to this definition"></a></dt>
+<dd><p>The type definition of the field being selected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.FieldMeta" title="subgrounds.schema.TypeMeta.FieldMeta">TypeMeta.FieldMeta</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.alias">
+<span class="sig-name descname"><span class="pre">alias</span></span><a class="headerlink" href="#subgrounds.query.Selection.alias" title="Permalink to this definition"></a></dt>
+<dd><p>The alias of the field selection. Defaults to None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.arguments">
+<span class="sig-name descname"><span class="pre">arguments</span></span><a class="headerlink" href="#subgrounds.query.Selection.arguments" title="Permalink to this definition"></a></dt>
+<dd><p>The arguments, if any, of the field selection.
+Defaults to [].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument">Argument</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.selection">
+<span class="sig-name descname"><span class="pre">selection</span></span><a class="headerlink" href="#subgrounds.query.Selection.selection" title="Permalink to this definition"></a></dt>
+<dd><p>The inner field selections, if any.
+Defaults to [].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">fmeta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.FieldMeta" title="subgrounds.schema.TypeMeta.FieldMeta"><span class="pre">subgrounds.schema.TypeMeta.FieldMeta</span></a></em><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">alias</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><span class="pre">subgrounds.query.Argument</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">selection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><span class="pre">subgrounds.query.Selection</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.key">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#subgrounds.query.Selection.key" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.args_graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">args_graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.Selection.args_graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.graphql">
+<span class="sig-name descname"><span class="pre">graphql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.graphql" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.data_path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.Selection.data_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.data_paths">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data_paths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.Selection.data_paths" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.iter" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an iterator over all <code class="docutils literal notranslate"><span class="pre">Selections</span></code> of the current selection tree.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.iter_args">
+<span class="sig-name descname"><span class="pre">iter_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.iter_args" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an iterator over all <code class="docutils literal notranslate"><span class="pre">Arguments</span></code> of the current <code class="docutils literal notranslate"><span class="pre">Selection</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">recurse</span> <span class="pre">==</span> <span class="pre">True</span></code>, then the iterator also includes <code class="docutils literal notranslate"><span class="pre">Arguments</span></code> of
+inner <code class="docutils literal notranslate"><span class="pre">Selections</span></code>.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.filter" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">Selection</span></code> object containing all attributes of the current
+<code class="docutils literal notranslate"><span class="pre">Selection</span></code> if <code class="docutils literal notranslate"><span class="pre">predicate(self)</span> <span class="pre">==</span> <span class="pre">True</span></code> and <code class="docutils literal notranslate"><span class="pre">None</span></code> otherwise. The function
+if also applied recursively to inner <code class="docutils literal notranslate"><span class="pre">Selections</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>predicate</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>]</em>) -- _description_</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Optional[<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.filter_args">
+<span class="sig-name descname"><span class="pre">filter_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.filter_args" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">Selection</span></code> object which contains all attributes of
+the current <code class="docutils literal notranslate"><span class="pre">Selection</span></code> except for <code class="docutils literal notranslate"><span class="pre">Arguments</span></code> for which
+<code class="docutils literal notranslate"><span class="pre">predicate(arg)</span> <span class="pre">==</span> <span class="pre">True</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">recurse</span> <span class="pre">==</span> <span class="pre">True</span></code>, then the function is applied recursively to
+inner <code class="docutils literal notranslate"><span class="pre">Selections</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>predicate</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><em>Argument</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>]</em>) -- _description_</p></li>
+<li><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- _description_. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.map">
+<span class="sig-name descname"><span class="pre">map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'self'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.map" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">Selection</span></code> object containing the same selection tree
+as the current <code class="docutils literal notranslate"><span class="pre">Selection</span></code> where each <code class="docutils literal notranslate"><span class="pre">Selection</span></code> object <code class="docutils literal notranslate"><span class="pre">s</span></code> is
+<code class="docutils literal notranslate"><span class="pre">map_f(s)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>map_f</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em><em>, </em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em>) -- Mapping function to apply
+to each <code class="docutils literal notranslate"><span class="pre">Selection</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.map_args">
+<span class="sig-name descname"><span class="pre">map_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.map_args" title="Permalink to this definition"></a></dt>
+<dd><p>Replaces each <code class="docutils literal notranslate"><span class="pre">Argument</span></code> <code class="docutils literal notranslate"><span class="pre">arg</span></code> in the current <code class="docutils literal notranslate"><span class="pre">Selection</span></code> with <code class="docutils literal notranslate"><span class="pre">map_f(arg)</span></code>
+and returns a new <code class="docutils literal notranslate"><span class="pre">Selection</span></code> object containinf the modified arguments.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">recurse</span> <span class="pre">==</span> <span class="pre">True</span></code>, then the function is applied recursively to inner
+<code class="docutils literal notranslate"><span class="pre">Selections</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>map_f</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><em>Argument</em></a><em>]</em><em>, </em><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><em>Argument</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><em>Argument</em></a><em>]</em><em>]</em>) -- _description_</p></li>
+<li><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- _description_. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.filter_map">
+<span class="sig-name descname"><span class="pre">filter_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.filter_map" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.filter_map_args">
+<span class="sig-name descname"><span class="pre">filter_map_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.filter_map_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.for_all">
+<span class="sig-name descname"><span class="pre">for_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.for_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.for_all_args">
+<span class="sig-name descname"><span class="pre">for_all_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.for_all_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.exists">
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.exists" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.exists_args">
+<span class="sig-name descname"><span class="pre">exists_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.exists_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.find" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.find_args">
+<span class="sig-name descname"><span class="pre">find_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.find_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.find_all">
+<span class="sig-name descname"><span class="pre">find_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.find_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.find_all_args">
+<span class="sig-name descname"><span class="pre">find_all_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.find_all_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.T">
+<span class="sig-name descname"><span class="pre">T</span></span><a class="headerlink" href="#subgrounds.query.Selection.T" title="Permalink to this definition"></a></dt>
+<dd><p>alias of TypeVar('T')</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.fold">
+<span class="sig-name descname"><span class="pre">fold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fold_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.fold" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.contains_list">
+<span class="sig-name descname"><span class="pre">contains_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.contains_list" title="Permalink to this definition"></a></dt>
+<dd><p>Returns True i.f.f. the selection <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> selects a field of type
+list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- The selection to traverse</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if selection or nested selections selects a list field. False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.split" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of selections where each of the selections corresponds
+to a single selection path from the root to a leaf for each leaf selected
+in <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>.</p>
+<p>Example (simplified, does not show all attributes):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">select</span> <span class="o">=</span> <span class="n">Selection</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>  <span class="n">Selection</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>    <span class="n">Selection</span><span class="p">(</span><span class="s1">&#39;field0&#39;</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="p">[]),</span>
+<span class="gp">... </span>    <span class="n">Selection</span><span class="p">(</span><span class="s1">&#39;field1&#39;</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="p">[]),</span>
+<span class="gp">... </span>  <span class="p">]),</span>
+<span class="gp">... </span>  <span class="n">Selection</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="p">[])</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">split</span><span class="p">(</span><span class="n">select</span><span class="p">)</span>
+<span class="go">[</span>
+<span class="go">  Selection(&#39;foo&#39;, inner=[Selection(&#39;bar&#39;, inner=[Selection(&#39;field0&#39;, inner=[])])]),</span>
+<span class="go">  Selection(&#39;foo&#39;, inner=[Selection(&#39;bar&#39;, inner=[Selection(&#39;field1&#39;, inner=[])])]),</span>
+<span class="go">  Selection(&#39;foo&#39;, inner=[Selection(&#39;x&#39;, inner=[])]),</span>
+<span class="go">]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- The selection to split</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The split selections</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.extract_data">
+<span class="sig-name descname"><span class="pre">extract_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.extract_data" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_selections</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.add" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new selection consisting of a copy of <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> expanded
+with the selection(s) <code class="xref py py-attr docutils literal notranslate"><span class="pre">new_selections</span></code>. It is assumed that
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">new_selections</span></code> are inner selections of the root selection
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- The Selection object to be expanded</p></li>
+<li><p><strong>new_selections</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em>) -- A single or multiple
+Selection object(s) to be added to <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The resulting new selection, i.e.: <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code></dt><dd><p>expanded with <code class="xref py py-attr docutils literal notranslate"><span class="pre">new_selections</span></code></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_remove</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.remove" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new Selection object consisting of a copy of <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>
+without the selections in <code class="xref py py-attr docutils literal notranslate"><span class="pre">selections_to_remove</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>to_remove</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em>) -- The selection(s) to remove from
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The new trimmed down selection, i.e.: <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> without</dt><dd><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">selections_to_remove</span></code></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.variable_args">
+<span class="sig-name descname"><span class="pre">variable_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.variable_args" title="Permalink to this definition"></a></dt>
+<dd><p>Returns all arguments in the current selection which have been given a
+variable as value.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">recurse</span> <span class="pre">==</span> <span class="pre">True</span></code>, then the function is applied recursively to inner
+selections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- _description_. Defaults to True.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument">Argument</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.infer_variable_definitions">
+<span class="sig-name descname"><span class="pre">infer_variable_definitions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.infer_variable_definitions" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.combine">
+<span class="sig-name descname"><span class="pre">combine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.combine" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.merge">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selections</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.merge" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a list of Selection objects resulting from merging
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">selections</span></code> to the extent possible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>selections</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em>) -- The selections to be merged</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.contains">
+<span class="sig-name descname"><span class="pre">contains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.contains" title="Permalink to this definition"></a></dt>
+<dd><p>Returns True i.f.f. the Selection <code class="xref py py-attr docutils literal notranslate"><span class="pre">other</span></code> is a subtree of the
+Selection <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> and False otherwise</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- The selection</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- The subselection</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True i.f.f. <code class="xref py py-attr docutils literal notranslate"><span class="pre">other</span></code> is in <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.contains_argument">
+<span class="sig-name descname"><span class="pre">contains_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.contains_argument" title="Permalink to this definition"></a></dt>
+<dd><p>Returns True i.f.f. there is an Argument object in <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> named
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">argname</span></code>. If <code class="xref py py-attr docutils literal notranslate"><span class="pre">recurse</span></code> is True, then the method also checks the
+nested selections for an argument named <code class="xref py py-attr docutils literal notranslate"><span class="pre">argname</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- The selection</p></li>
+<li><p><strong>argname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The name of the argument</p></li>
+<li><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Flag indicating whether or not the method should
+be run recursively on nested selections. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True i.f.f. there is an argument named <code class="xref py py-attr docutils literal notranslate"><span class="pre">argname</span></code> in <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.get_argument">
+<span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.get_argument" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an Argument object corresponding to the argument in the Selection
+object <a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a> with name <code class="xref py py-attr docutils literal notranslate"><span class="pre">argname</span></code>. If <a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a> does not
+contain such an argument and <code class="xref py py-attr docutils literal notranslate"><span class="pre">recurse</span></code> is True, then the function is
+called recursively on <a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a>'s inner selections. If no such argument
+is found in <a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a> or its inner selections, then the function raises
+an exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>select</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- The selection to scan</p></li>
+<li><p><strong>argname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The name of the argument to find</p></li>
+<li><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Flag indicating whether or not the method should
+be run recursively on nested selections. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> -- If no argument named <code class="xref py py-attr docutils literal notranslate"><span class="pre">argname</span></code> exists in the selection
+    <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The argument in <a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a> with name <code class="xref py py-attr docutils literal notranslate"><span class="pre">argname</span></code> (if any).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument">Argument</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.get_argument_by_variable">
+<span class="sig-name descname"><span class="pre">get_argument_by_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">varname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.get_argument_by_variable" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an Argument object corresponding to the argument in the Selection
+object <a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a> whose value is a variable named <code class="xref py py-attr docutils literal notranslate"><span class="pre">varname</span></code>. If
+<a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a> does not contain such an argument and <code class="xref py py-attr docutils literal notranslate"><span class="pre">recurse</span></code> is True,
+then the function is called recursively on <a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a>'s inner selections.
+If no such argument is found in <a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a> or its inner selections, then
+the function raises an exception</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>select</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- The selection to scan</p></li>
+<li><p><strong>varname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The name of the variable to find</p></li>
+<li><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Flag indicating whether or not the function
+should be run recursively. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> -- If no argument with variable value named <code class="xref py py-attr docutils literal notranslate"><span class="pre">varname</span></code> exists
+    in the selection <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>The argument in <a class="reference internal" href="#subgrounds.query.Selection.select" title="subgrounds.query.Selection.select"><code class="xref py py-attr docutils literal notranslate"><span class="pre">select</span></code></a> with variable value named</dt><dd><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">varname</span></code> if it exists</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument">Argument</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.substitute_arg">
+<span class="sig-name descname"><span class="pre">substitute_arg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replacement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.substitute_arg" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new Selection object containing the same data as <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>
+with the argument named <code class="xref py py-attr docutils literal notranslate"><span class="pre">argname</span></code> replaced with <code class="xref py py-attr docutils literal notranslate"><span class="pre">replacement</span></code>.
+If <code class="xref py py-attr docutils literal notranslate"><span class="pre">recurse</span></code> is True, then the method is called recursively on
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>'s inner selections and the substitution is also applied to the
+latter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- _description_</p></li>
+<li><p><strong>argname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The name of the argument to substitute.</p></li>
+<li><p><strong>replacement</strong> (<a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><em>Argument</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><em>Argument</em></a><em>]</em>) -- The argument(s) replacement</p></li>
+<li><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Flag indicating whether or not the method
+should be run recursively. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.select">
+<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.select" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Selection.prune_undefined">
+<span class="sig-name descname"><span class="pre">prune_undefined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Selection.prune_undefined" title="Permalink to this definition"></a></dt>
+<dd><p>Return a new <code class="docutils literal notranslate"><span class="pre">Selection</span></code> containing the subtree of the current <code class="docutils literal notranslate"><span class="pre">Selection</span></code>
+where all argument <code class="docutils literal notranslate"><span class="pre">InputValues</span></code> are defined, i.e.: each argument's <code class="docutils literal notranslate"><span class="pre">InputValue</span></code>
+is either 1) not of type <code class="docutils literal notranslate"><span class="pre">InputValue.Variable</span></code>; or 2) of type <code class="docutils literal notranslate"><span class="pre">InputValue.Variable</span></code>
+and the variable name is contained in <code class="docutils literal notranslate"><span class="pre">variables</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variables</strong> (<em>Iterator</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em>) -- An iterator over defined variables</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A new pruned <code class="docutils literal notranslate"><span class="pre">Selection</span></code> object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.Query">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">Query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">'Optional[str]'</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection:</span> <span class="pre">'list[Selection]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables:</span> <span class="pre">'list[VariableDefinition]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Query.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#subgrounds.query.Query.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Query.selection">
+<span class="sig-name descname"><span class="pre">selection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><span class="pre">subgrounds.query.Selection</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.Query.selection" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Query.variables">
+<span class="sig-name descname"><span class="pre">variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.VariableDefinition" title="subgrounds.query.VariableDefinition"><span class="pre">subgrounds.query.VariableDefinition</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.Query.variables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.Query.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.Query.graphql" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a string containing a GraphQL query matching the current query</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The string containing the GraphQL query</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.iter">
+<span class="sig-name descname"><span class="pre">iter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.iter" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an iterator over all <code class="docutils literal notranslate"><span class="pre">Selections</span></code> of the selection tree of
+the current <code class="docutils literal notranslate"><span class="pre">Query</span></code>.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.iter_args">
+<span class="sig-name descname"><span class="pre">iter_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.iter_args" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an iterator over all <code class="docutils literal notranslate"><span class="pre">Arguments</span></code> of the selection tree of
+the current <code class="docutils literal notranslate"><span class="pre">Query</span></code>.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.iter_vardefs">
+<span class="sig-name descname"><span class="pre">iter_vardefs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.iter_vardefs" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an iterator over all <code class="docutils literal notranslate"><span class="pre">VariableDefinitions</span></code> of the selection tree of
+the current <code class="docutils literal notranslate"><span class="pre">Query</span></code>.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.filter" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">Query</span></code> object containing all selections <code class="docutils literal notranslate"><span class="pre">s</span></code> that satisfy
+<code class="docutils literal notranslate"><span class="pre">predicate(s)</span> <span class="pre">==</span> <span class="pre">True</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>predicate</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>]</em>) -- _description_</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query">Query</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.filter_args">
+<span class="sig-name descname"><span class="pre">filter_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.filter_args" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">Query</span></code> object containing all selections arguments <code class="docutils literal notranslate"><span class="pre">arg</span></code> that satisfy
+<code class="docutils literal notranslate"><span class="pre">predicate(arg)</span> <span class="pre">==</span> <span class="pre">True</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>predicate</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><em>Argument</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>]</em>) -- _description_</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query">Query</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.filter_vardefs">
+<span class="sig-name descname"><span class="pre">filter_vardefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.filter_vardefs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.map">
+<span class="sig-name descname"><span class="pre">map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.map" title="Permalink to this definition"></a></dt>
+<dd><p>Applies the function <code class="docutils literal notranslate"><span class="pre">map_f</span></code> to each <code class="docutils literal notranslate"><span class="pre">Selection</span></code> in the current
+<code class="docutils literal notranslate"><span class="pre">Query</span></code> and returns a new <code class="docutils literal notranslate"><span class="pre">Query</span></code> object containing the resulting <code class="docutils literal notranslate"><span class="pre">Selections</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>map_f</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em><em>, </em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em>) -- Mapping function to apply
+to each <code class="docutils literal notranslate"><span class="pre">Selection</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query">Query</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.map_args">
+<span class="sig-name descname"><span class="pre">map_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.map_args" title="Permalink to this definition"></a></dt>
+<dd><p>Applies the function <code class="docutils literal notranslate"><span class="pre">map_f</span></code> to each <code class="docutils literal notranslate"><span class="pre">Argument</span></code> in the current
+<code class="docutils literal notranslate"><span class="pre">Query</span></code> and returns a new <code class="docutils literal notranslate"><span class="pre">Query</span></code> object containing the resulting <code class="docutils literal notranslate"><span class="pre">Arguments</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>map_f</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><em>Argument</em></a><em>]</em><em>, </em><a class="reference internal" href="#subgrounds.query.Argument" title="subgrounds.query.Argument"><em>Argument</em></a><em>]</em>) -- _description_</p></li>
+<li><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- _description_. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.map_vardefs">
+<span class="sig-name descname"><span class="pre">map_vardefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.map_vardefs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.filter_map">
+<span class="sig-name descname"><span class="pre">filter_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.filter_map" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.filter_map_args">
+<span class="sig-name descname"><span class="pre">filter_map_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.filter_map_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.filter_map_vardefs">
+<span class="sig-name descname"><span class="pre">filter_map_vardefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.filter_map_vardefs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.for_all">
+<span class="sig-name descname"><span class="pre">for_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.for_all" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.for_all_args">
+<span class="sig-name descname"><span class="pre">for_all_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.for_all_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.for_all_vardefs">
+<span class="sig-name descname"><span class="pre">for_all_vardefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.for_all_vardefs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.exists">
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.exists" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.exists_args">
+<span class="sig-name descname"><span class="pre">exists_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.exists_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.exists_vardefs">
+<span class="sig-name descname"><span class="pre">exists_vardefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.exists_vardefs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.find" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.find_args">
+<span class="sig-name descname"><span class="pre">find_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.find_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.find_vardefs">
+<span class="sig-name descname"><span class="pre">find_vardefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.find_vardefs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Query.T">
+<span class="sig-name descname"><span class="pre">T</span></span><a class="headerlink" href="#subgrounds.query.Query.T" title="Permalink to this definition"></a></dt>
+<dd><p>alias of TypeVar('T')</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.fold">
+<span class="sig-name descname"><span class="pre">fold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fold_f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.fold" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.infer_variable_definitions">
+<span class="sig-name descname"><span class="pre">infer_variable_definitions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.infer_variable_definitions" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.add" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new Query containing all selections in :attr:'self' along with
+the new selections in <code class="xref py py-attr docutils literal notranslate"><span class="pre">other</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><em>Query</em></a>) -- The query to which new selection(s) or query are to be added</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><em>Query</em></a><em> | </em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em>) -- The new selection(s)</p></li>
+<li><p><strong>query</strong> (<em>or query to be added to the</em>) -- </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A new <cite>Query</cite> objects containing all selections</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query">Query</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.add_vardefs">
+<span class="sig-name descname"><span class="pre">add_vardefs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vardefs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.add_vardefs" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.remove" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new <a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a> object containing all selections in
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> minus the subquery or selection(s) specified in <code class="xref py py-attr docutils literal notranslate"><span class="pre">other</span></code>.</p>
+<p>Note: <code class="xref py py-attr docutils literal notranslate"><span class="pre">other</span></code> does not need to be a &quot;full&quot; selection (i.e.: a
+selection all the way to leaves of the GraphQL schema).</p>
+<p>Example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">og_selection</span> <span class="o">=</span> <span class="n">Selection</span><span class="p">(</span><span class="n">TypeMeta</span><span class="o">.</span><span class="n">FieldMeta</span><span class="p">(</span><span class="s1">&#39;pair&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">TypeRef</span><span class="o">.</span><span class="n">non_null_list</span><span class="p">(</span><span class="s1">&#39;Pair&#39;</span><span class="p">)),</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[</span>
+<span class="gp">... </span>  <span class="n">Selection</span><span class="p">(</span><span class="n">TypeMeta</span><span class="o">.</span><span class="n">FieldMeta</span><span class="p">(</span><span class="s1">&#39;token0&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">TypeRef</span><span class="o">.</span><span class="n">Named</span><span class="p">(</span><span class="s1">&#39;Token&#39;</span><span class="p">)),</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="n">Selection</span><span class="p">(</span><span class="n">TypeMeta</span><span class="o">.</span><span class="n">FieldMeta</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">TypeRef</span><span class="o">.</span><span class="n">Named</span><span class="p">(</span><span class="s1">&#39;String&#39;</span><span class="p">)),</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[]),</span>
+<span class="gp">... </span>    <span class="n">Selection</span><span class="p">(</span><span class="n">TypeMeta</span><span class="o">.</span><span class="n">FieldMeta</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">TypeRef</span><span class="o">.</span><span class="n">Named</span><span class="p">(</span><span class="s1">&#39;String&#39;</span><span class="p">)),</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[]),</span>
+<span class="gp">... </span>    <span class="n">Selection</span><span class="p">(</span><span class="n">TypeMeta</span><span class="o">.</span><span class="n">FieldMeta</span><span class="p">(</span><span class="s1">&#39;symbol&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">TypeRef</span><span class="o">.</span><span class="n">Named</span><span class="p">(</span><span class="s1">&#39;String&#39;</span><span class="p">)),</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[]),</span>
+<span class="gp">... </span>  <span class="p">])</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">selection_to_remove</span> <span class="o">=</span> <span class="n">Selection</span><span class="p">(</span><span class="n">TypeMeta</span><span class="o">.</span><span class="n">FieldMeta</span><span class="p">(</span><span class="s1">&#39;token0&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">TypeRef</span><span class="o">.</span><span class="n">Named</span><span class="p">(</span><span class="s1">&#39;Token&#39;</span><span class="p">)),</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">og_selection</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">selection_to_remove</span><span class="p">)</span>
+<span class="go">Selection(TypeMeta.FieldMeta(&#39;pair&#39;, &#39;&#39;, [], TypeRef.non_null_list(&#39;Pair&#39;)), None, [], [])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><em>Query</em></a>) -- The query to which a selection has to be removed</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><em>Query</em></a><em> | </em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em>) -- The subquery or
+selection(s) to remove from <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A new <cite>Query</cite> object containing the original query selections</dt><dd><p>minus <code class="xref py py-attr docutils literal notranslate"><span class="pre">other</span></code></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query">Query</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.transform">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_f=&lt;function</span> <span class="pre">identity&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_f=&lt;function</span> <span class="pre">identity&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.transform" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.contains_selection">
+<span class="sig-name descname"><span class="pre">contains_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.contains_selection" title="Permalink to this definition"></a></dt>
+<dd><p>Returns True i.f.f. the selection tree <a class="reference internal" href="#subgrounds.query.Query.selection" title="subgrounds.query.Query.selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">selection</span></code></a> is present in
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">query</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><em>Query</em></a>) -- A query object</p></li>
+<li><p><strong>selection</strong> (<a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a>) -- The selection to be found (or not) in <code class="xref py py-attr docutils literal notranslate"><span class="pre">query</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>True if the <a class="reference internal" href="#subgrounds.query.Query.selection" title="subgrounds.query.Query.selection"><code class="xref py py-attr docutils literal notranslate"><span class="pre">selection</span></code></a> is present in <code class="xref py py-attr docutils literal notranslate"><span class="pre">query</span></code>, False</dt><dd><p>otherwise.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.contains_argument">
+<span class="sig-name descname"><span class="pre">contains_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.contains_argument" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.get_argument">
+<span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.get_argument" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.substitute_arg">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">substitute_arg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replacement</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.substitute_arg" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.contains">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">contains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.contains" title="Permalink to this definition"></a></dt>
+<dd><p>Returns True i.f.f. all selections in <cite>other</cite> are contained in <cite>query</cite>. In other words,
+returns true i.f.f. <cite>other</cite> is a subset of <cite>query</cite>.</p>
+<p>Note: <cite>other</cite> does not need to include &quot;full&quot; selections (i.e.: selections all the way to
+leaves of the GraphQL schema).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><em>Query</em></a>) -- The query that is to be checked</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><em>Query</em></a>) -- The query that has to be in <cite>query</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True i.f.f. all selections in <cite>other</cite> are contained in <cite>query</cite>, otherwise False</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.select">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.select" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new Query</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><em>Query</em></a>) -- [description]</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><em>Query</em></a>) -- [description]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>[description]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query">Query</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Query.prune_undefined">
+<span class="sig-name descname"><span class="pre">prune_undefined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Query.prune_undefined" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.Fragment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">Fragment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">'str'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_:</span> <span class="pre">'TypeRef.T'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection:</span> <span class="pre">'list[Selection]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables:</span> <span class="pre">'list[VariableDefinition]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Fragment" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Fragment.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.Fragment.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Fragment.type_">
+<span class="sig-name descname"><span class="pre">type_</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><span class="pre">subgrounds.schema.TypeRef.T</span></a></em><a class="headerlink" href="#subgrounds.query.Fragment.type_" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Fragment.selection">
+<span class="sig-name descname"><span class="pre">selection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><span class="pre">subgrounds.query.Selection</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.Fragment.selection" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Fragment.variables">
+<span class="sig-name descname"><span class="pre">variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.VariableDefinition" title="subgrounds.query.VariableDefinition"><span class="pre">subgrounds.query.VariableDefinition</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.Fragment.variables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.Fragment.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><a class="headerlink" href="#subgrounds.query.Fragment.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Fragment.combine">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">combine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Fragment.combine" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Fragment.transform">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Fragment.transform" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.Document">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">Document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url:</span> <span class="pre">'str'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query:</span> <span class="pre">'Query'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragments:</span> <span class="pre">'list[Fragment]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables:</span> <span class="pre">'dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Any]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Document" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Document.url">
+<span class="sig-name descname"><span class="pre">url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.query.Document.url" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Document.query">
+<span class="sig-name descname"><span class="pre">query</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query"><span class="pre">subgrounds.query.Query</span></a></em><a class="headerlink" href="#subgrounds.query.Document.query" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Document.fragments">
+<span class="sig-name descname"><span class="pre">fragments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.Fragment" title="subgrounds.query.Fragment"><span class="pre">subgrounds.query.Fragment</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.Document.fragments" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.Document.variables">
+<span class="sig-name descname"><span class="pre">variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.Document.variables" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.Document.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><a class="headerlink" href="#subgrounds.query.Document.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Document.mk_single_query">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mk_single_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Document.mk_single_query" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Document.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Document.filter" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Document.filter_args">
+<span class="sig-name descname"><span class="pre">filter_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predicate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Document.filter_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Document.map">
+<span class="sig-name descname"><span class="pre">map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Document.map" title="Permalink to this definition"></a></dt>
+<dd><p>Applies the function <code class="docutils literal notranslate"><span class="pre">map_f</span></code> to each <code class="docutils literal notranslate"><span class="pre">Selection</span></code> in the current
+<code class="docutils literal notranslate"><span class="pre">Document</span></code> and returns a new <code class="docutils literal notranslate"><span class="pre">Document</span></code> object containing the resulting <code class="docutils literal notranslate"><span class="pre">Selections</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>map_f</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em><em>, </em><a class="reference internal" href="#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em>) -- Mapping function to apply
+to each <code class="docutils literal notranslate"><span class="pre">Selection</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Query" title="subgrounds.query.Query">Query</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Document.filter_map">
+<span class="sig-name descname"><span class="pre">filter_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">map_f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Document.filter_map" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Document.combine">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">combine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Document.combine" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Document.transform">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query_f=&lt;function</span> <span class="pre">identity&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragment_f=&lt;function</span> <span class="pre">identity&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Document.transform" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.Document.prune_undefined">
+<span class="sig-name descname"><span class="pre">prune_undefined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variables</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.Document.prune_undefined" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">Document</span></code> object that contains the subset of the current
+<code class="docutils literal notranslate"><span class="pre">Document</span></code>'s query containing only the <code class="docutils literal notranslate"><span class="pre">Selections</span></code> for which all its
+arguments are defined (i.e.: either constants or variables in <code class="docutils literal notranslate"><span class="pre">variables</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) -- _description_</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.query.Document" title="subgrounds.query.Document">Document</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.query.DataRequest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">DataRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">documents:</span> <span class="pre">'list[Document]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.DataRequest" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.query.DataRequest.documents">
+<span class="sig-name descname"><span class="pre">documents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.query.Document" title="subgrounds.query.Document"><span class="pre">subgrounds.query.Document</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.query.DataRequest.documents" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.query.DataRequest.graphql">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><a class="headerlink" href="#subgrounds.query.DataRequest.graphql" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.DataRequest.combine">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">combine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.DataRequest.combine" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.DataRequest.transform">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.DataRequest.transform" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.DataRequest.single_query">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">single_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.DataRequest.single_query" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.DataRequest.single_document">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">single_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.DataRequest.single_document" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.query.DataRequest.add_documents">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_documents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.DataRequest.add_documents" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.query.selections_of_object">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">selections_of_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.selections_of_object" title="Permalink to this definition"></a></dt>
+<dd><p>Returns generator of Selection objects that selects all non-list fields of
+GraphQL Object of Interface <code class="xref py py-attr docutils literal notranslate"><span class="pre">object_</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>schema</strong> (<a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.SchemaMeta" title="subgrounds.schema.SchemaMeta"><em>SchemaMeta</em></a>) -- _description_</p></li>
+<li><p><strong>object</strong> (<a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.ObjectMeta" title="subgrounds.schema.TypeMeta.ObjectMeta"><em>TypeMeta.ObjectMeta</em></a><em> | </em><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.InterfaceMeta" title="subgrounds.schema.TypeMeta.InterfaceMeta"><em>TypeMeta.InterfaceMeta</em></a>) -- _description_</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><em>_type_</em> -- _description_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.query.input_value_of_argument">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">input_value_of_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argmeta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.input_value_of_argument" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.query.arguments_of_field_args">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.query.</span></span><span class="sig-name descname"><span class="pre">arguments_of_field_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.query.arguments_of_field_args" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../subgrounds.plotly_wrappers/" class="btn btn-neutral float-left" title="subgrounds.plotly_wrappers module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../subgrounds.schema/" class="btn btn-neutral float-right" title="subgrounds.schema module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

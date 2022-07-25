@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>subgrounds.schema module &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="subgrounds.subgrounds module" href="../subgrounds.subgrounds/" />
+    <link rel="prev" title="subgrounds.query module" href="../subgrounds.query/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules/">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../subgrounds/">subgrounds package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../subgrounds/#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.client/">subgrounds.client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dash_wrappers/">subgrounds.dash_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dataframe_utils/">subgrounds.dataframe_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.plotly_wrappers/">subgrounds.plotly_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.query/">subgrounds.query module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">subgrounds.schema module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.subgrounds/">subgrounds.subgrounds module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.transform/">subgrounds.transform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.utils/">subgrounds.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#module-subgrounds">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../modules/">subgrounds</a> &raquo;</li>
+          <li><a href="../subgrounds/">subgrounds package</a> &raquo;</li>
+      <li>subgrounds.schema module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/subgrounds.schema.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-subgrounds.schema">
+<span id="subgrounds-schema-module"></span><h1>subgrounds.schema module<a class="headerlink" href="#module-subgrounds.schema" title="Permalink to this headline"></a></h1>
+<p>Schema data structure module</p>
+<p>This module contains various data structures in the form of dataclasses that
+are used to represent GraphQL schemas in Subgrounds using an AST-like approach.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.schema.</span></span><span class="sig-name descname"><span class="pre">TypeRef</span></span><a class="headerlink" href="#subgrounds.schema.TypeRef" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class used as namespace for all types and functions related to
+GraphQL schema type references.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.T">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">T</span></span><a class="headerlink" href="#subgrounds.schema.TypeRef.T" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Base class of all types of type references.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.T.name">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.T.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.T.is_list">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.T.is_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.T.is_non_null">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_non_null</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.T.is_non_null" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.Named">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Named</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeRef.Named" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeRef.T</span></code></a></p>
+<p>Class used to represent a simple type reference.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.Named.name_">
+<span class="sig-name descname"><span class="pre">name_</span></span><a class="headerlink" href="#subgrounds.schema.TypeRef.Named.name_" title="Permalink to this definition"></a></dt>
+<dd><p>Name of the type being referenced.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">name_</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.Named.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.Named.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.Named.is_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.Named.is_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.Named.is_non_null">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_non_null</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.Named.is_non_null" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.NonNull">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NonNull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inner</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeRef.NonNull" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeRef.T</span></code></a></p>
+<p>Class used to represent a non-nullable type reference.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.NonNull.inner">
+<span class="sig-name descname"><span class="pre">inner</span></span><a class="headerlink" href="#subgrounds.schema.TypeRef.NonNull.inner" title="Permalink to this definition"></a></dt>
+<dd><p>Non-nullable type being referenced.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T">TypeRef.T</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">inner</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><span class="pre">subgrounds.schema.TypeRef.T</span></a></em><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.NonNull.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.NonNull.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.NonNull.is_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.NonNull.is_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.NonNull.is_non_null">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_non_null</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.NonNull.is_non_null" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.List">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">List</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inner</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeRef.List" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeRef.T</span></code></a></p>
+<p>Class used to represent a list type reference.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.List.inner">
+<span class="sig-name descname"><span class="pre">inner</span></span><a class="headerlink" href="#subgrounds.schema.TypeRef.List.inner" title="Permalink to this definition"></a></dt>
+<dd><p>List type being referenced.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T">TypeRef.T</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">inner</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><span class="pre">subgrounds.schema.TypeRef.T</span></a></em><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.List.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.List.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.List.is_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.List.is_list" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.List.is_non_null">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_non_null</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeRef.List.is_non_null" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.non_null">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">non_null</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeRef.non_null" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.non_null_list">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">non_null_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeRef.non_null_list" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.root_type_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">root_type_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeRef.root_type_name" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.is_non_null">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_non_null</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeRef.is_non_null" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.is_list">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeRef.is_list" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeRef.graphql">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">graphql</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeRef.graphql" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.schema.</span></span><span class="sig-name descname"><span class="pre">TypeMeta</span></span><a class="headerlink" href="#subgrounds.schema.TypeMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class used as namespace for all types and functions related to
+GraphQL schema types.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.T">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">T</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.T" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Base class of all GraphQL schema types.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.T.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.T.name" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.T.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.T.description" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.T.is_object">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.T.is_object" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ArgumentMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ArgumentMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.ArgumentMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeMeta.T</span></code></a></p>
+<p>Class representing a field argument definition.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ArgumentMeta.type_">
+<span class="sig-name descname"><span class="pre">type_</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><span class="pre">subgrounds.schema.TypeRef.T</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.ArgumentMeta.type_" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ArgumentMeta.default_value">
+<span class="sig-name descname"><span class="pre">default_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.ArgumentMeta.default_value" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.FieldMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FieldMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.FieldMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeMeta.T</span></code></a></p>
+<p>Class representing an object field definition.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.FieldMeta.arguments">
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.schema.TypeMeta.ArgumentMeta" title="subgrounds.schema.TypeMeta.ArgumentMeta"><span class="pre">subgrounds.schema.TypeMeta.ArgumentMeta</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.FieldMeta.arguments" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.FieldMeta.type_">
+<span class="sig-name descname"><span class="pre">type_</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><span class="pre">subgrounds.schema.TypeRef.T</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.FieldMeta.type_" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.FieldMeta.has_arg">
+<span class="sig-name descname"><span class="pre">has_arg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.FieldMeta.has_arg" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.FieldMeta.type_of_arg">
+<span class="sig-name descname"><span class="pre">type_of_arg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.FieldMeta.type_of_arg" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ScalarMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ScalarMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.ScalarMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeMeta.T</span></code></a></p>
+<p>Class representing an scalar definition.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ObjectMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interfaces=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.ObjectMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeMeta.T</span></code></a></p>
+<p>Class representing an object definition.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ObjectMeta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.schema.TypeMeta.FieldMeta" title="subgrounds.schema.TypeMeta.FieldMeta"><span class="pre">subgrounds.schema.TypeMeta.FieldMeta</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.ObjectMeta.fields" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ObjectMeta.interfaces">
+<span class="sig-name descname"><span class="pre">interfaces</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.ObjectMeta.interfaces" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ObjectMeta.is_object">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.ObjectMeta.is_object" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ObjectMeta.field">
+<span class="sig-name descname"><span class="pre">field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.ObjectMeta.field" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the field definition of object <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> with name <code class="xref py py-attr docutils literal notranslate"><span class="pre">fname</span></code>, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.schema.TypeMeta.ObjectMeta" title="subgrounds.schema.TypeMeta.ObjectMeta"><em>TypeMeta.ObjectMeta</em></a>) -- The object type</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The name of the desired field definition</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> -- If no field named <code class="xref py py-attr docutils literal notranslate"><span class="pre">fname</span></code> is defined for object <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The field definition</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#subgrounds.schema.TypeMeta.FieldMeta" title="subgrounds.schema.TypeMeta.FieldMeta">TypeMeta.FieldMeta</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.ObjectMeta.type_of_field">
+<span class="sig-name descname"><span class="pre">type_of_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.ObjectMeta.type_of_field" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the type reference of the field of object <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> with name <code class="xref py py-attr docutils literal notranslate"><span class="pre">fname</span></code>, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.schema.TypeMeta.ObjectMeta" title="subgrounds.schema.TypeMeta.ObjectMeta"><em>TypeMeta.ObjectMeta</em></a>) -- The object type</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The name of the desired field type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> -- If no field named <code class="xref py py-attr docutils literal notranslate"><span class="pre">fname</span></code> is defined for object <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The field type reference</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T">TypeRef.T</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.EnumValueMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EnumValueMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.EnumValueMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeMeta.T</span></code></a></p>
+<p>Class representing an enum value definition.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.EnumMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EnumMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.EnumMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeMeta.T</span></code></a></p>
+<p>Class representing an enum definition.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.EnumMeta.values">
+<span class="sig-name descname"><span class="pre">values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.schema.TypeMeta.EnumValueMeta" title="subgrounds.schema.TypeMeta.EnumValueMeta"><span class="pre">subgrounds.schema.TypeMeta.EnumValueMeta</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.EnumMeta.values" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.InterfaceMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InterfaceMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.InterfaceMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeMeta.T</span></code></a></p>
+<p>Class representing an interface definition.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.InterfaceMeta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.schema.TypeMeta.FieldMeta" title="subgrounds.schema.TypeMeta.FieldMeta"><span class="pre">subgrounds.schema.TypeMeta.FieldMeta</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.InterfaceMeta.fields" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.InterfaceMeta.is_object">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.InterfaceMeta.is_object" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.InterfaceMeta.field">
+<span class="sig-name descname"><span class="pre">field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.InterfaceMeta.field" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the field definition of interface <cite>self</cite> with name <cite>fname</cite>, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.schema.TypeMeta.InterfaceMeta" title="subgrounds.schema.TypeMeta.InterfaceMeta"><em>TypeMeta.InterfaceMeta</em></a>) -- The interface type</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The name of the desired field definition</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> -- If no field named <code class="xref py py-attr docutils literal notranslate"><span class="pre">fname</span></code> is defined for interface <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The field definition</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#subgrounds.schema.TypeMeta.FieldMeta" title="subgrounds.schema.TypeMeta.FieldMeta">TypeMeta.FieldMeta</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.InterfaceMeta.type_of_field">
+<span class="sig-name descname"><span class="pre">type_of_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.InterfaceMeta.type_of_field" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the type reference of the field of interface <cite>self</cite> with name <cite>fname</cite>, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.schema.TypeMeta.InterfaceMeta" title="subgrounds.schema.TypeMeta.InterfaceMeta"><em>TypeMeta.InterfaceMeta</em></a>) -- The interface type</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The name of the desired field type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> -- If no field named <cite>fname</cite> is defined for interface <cite>self</cite>.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The field type reference</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T">TypeRef.T</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.UnionMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UnionMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.UnionMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeMeta.T</span></code></a></p>
+<p>Class representing an union definition.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.UnionMeta.types">
+<span class="sig-name descname"><span class="pre">types</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.UnionMeta.types" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.InputObjectMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InputObjectMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_fields</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.InputObjectMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.schema.TypeMeta.T</span></code></a></p>
+<p>Class representing an input object definition.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.InputObjectMeta.input_fields">
+<span class="sig-name descname"><span class="pre">input_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.schema.TypeMeta.ArgumentMeta" title="subgrounds.schema.TypeMeta.ArgumentMeta"><span class="pre">subgrounds.schema.TypeMeta.ArgumentMeta</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.schema.TypeMeta.InputObjectMeta.input_fields" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.TypeMeta.InputObjectMeta.type_of_input_field">
+<span class="sig-name descname"><span class="pre">type_of_input_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.TypeMeta.InputObjectMeta.type_of_input_field" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the type reference of the input field named <cite>fname</cite> in the
+input object <cite>self</cite>, if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.schema.TypeMeta.InputObjectMeta" title="subgrounds.schema.TypeMeta.InputObjectMeta"><em>TypeMeta.InputObjectMeta</em></a>) -- The input object</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) -- The name of the input field</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> -- If <cite>fname</cite> is not an input field of input object <cite>self</cite></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The type reference for input field <cite>fname</cite></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T">TypeRef.T</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.schema.SchemaMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.schema.</span></span><span class="sig-name descname"><span class="pre">SchemaMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscription_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.SchemaMeta" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class representing a GrpahQL schema.</p>
+<p>Contains all type definitions.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.SchemaMeta.query_type">
+<span class="sig-name descname"><span class="pre">query_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.schema.SchemaMeta.query_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.SchemaMeta.type_map">
+<span class="sig-name descname"><span class="pre">type_map</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T"><span class="pre">subgrounds.schema.TypeMeta.T</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.schema.SchemaMeta.type_map" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.SchemaMeta.mutation_type">
+<span class="sig-name descname"><span class="pre">mutation_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#subgrounds.schema.SchemaMeta.mutation_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.schema.SchemaMeta.subscription_type">
+<span class="sig-name descname"><span class="pre">subscription_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#subgrounds.schema.SchemaMeta.subscription_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.SchemaMeta.type_of_typeref">
+<span class="sig-name descname"><span class="pre">type_of_typeref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typeref</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.SchemaMeta.type_of_typeref" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the type information of the type reference <cite>typeref</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<a class="reference internal" href="#subgrounds.schema.SchemaMeta" title="subgrounds.schema.SchemaMeta"><em>SchemaMeta</em></a>) -- The schema.</p></li>
+<li><p><strong>typeref</strong> (<a class="reference internal" href="#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><em>TypeRef.T</em></a>) -- The type reference pointing to the type of interest.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.10)"><strong>KeyError</strong></a> -- If the type reference refers to a non-existant type</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>_description_</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#subgrounds.schema.TypeMeta.T" title="subgrounds.schema.TypeMeta.T">TypeMeta.T</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.schema.SchemaMeta.type_of">
+<span class="sig-name descname"><span class="pre">type_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmeta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.SchemaMeta.type_of" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the argument or field definition's underlying type.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="subgrounds.schema.ParsingError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.schema.</span></span><span class="sig-name descname"><span class="pre">ParsingError</span></span><a class="headerlink" href="#subgrounds.schema.ParsingError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.schema.mk_schema">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.schema.</span></span><span class="sig-name descname"><span class="pre">mk_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.schema.mk_schema" title="Permalink to this definition"></a></dt>
+<dd><p>Builds the schema data structure from a dictionary containing a
+JSON GraphQL schema definition (the result of the introspection query
+on a GraphQL API endpoint).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>json</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) -- JSON GraphQL schema definition</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A schema data structure</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.schema.SchemaMeta" title="subgrounds.schema.SchemaMeta">SchemaMeta</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../subgrounds.query/" class="btn btn-neutral float-left" title="subgrounds.query module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../subgrounds.subgrounds/" class="btn btn-neutral float-right" title="subgrounds.subgrounds module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

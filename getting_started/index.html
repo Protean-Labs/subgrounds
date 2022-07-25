@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting started &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="Subgrounds basics" href="../basics/" />
+    <link rel="prev" title="subgrounds" href="../" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simple-example">Simple example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+      <li>Getting started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/getting_started.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<p>Subgrounds can be installed via <code class="docutils literal notranslate"><span class="pre">pip</span></code> with the following command:
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">subgrounds</span></code></p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Subgrounds requires <code class="docutils literal notranslate"><span class="pre">python&gt;=3.10</span></code></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you run into problems during installation, see <a class="reference internal" href="../troubleshooting/#isolated-environment-setup"><span class="std std-ref">Set up an isolated environment</span></a>.</p>
+</div>
+</section>
+<section id="simple-example">
+<h2>Simple example<a class="headerlink" href="#simple-example" title="Permalink to this headline"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">subgrounds</span> <span class="kn">import</span> <span class="n">Subgrounds</span>
+
+<span class="go"># Initialize Subgrounds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span> <span class="o">=</span> <span class="n">Subgrounds</span><span class="p">()</span>
+
+<span class="go"># Load a subgraph</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aaveV2</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/aave/protocol-v2&#39;</span><span class="p">)</span>
+
+<span class="go"># Create a SyntheticField on the Borrow entity type using Python arithmetic operators</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aaveV2</span><span class="o">.</span><span class="n">Borrow</span><span class="o">.</span><span class="n">adjusted_amount</span> <span class="o">=</span> <span class="n">aaveV2</span><span class="o">.</span><span class="n">Borrow</span><span class="o">.</span><span class="n">amount</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">**</span> <span class="n">aaveV2</span><span class="o">.</span><span class="n">Borrow</span><span class="o">.</span><span class="n">reserve</span><span class="o">.</span><span class="n">decimals</span>
+
+<span class="go"># Create a partial FieldPath representing a selection on the borrows field with arguments</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">last10_borrows</span> <span class="o">=</span> <span class="n">aaveV2</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">borrows</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">aaveV2</span><span class="o">.</span><span class="n">Borrow</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># Query FieldPaths and format the result into a Pandas DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query_df</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">last10_borrows</span><span class="o">.</span><span class="n">reserve</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> 
+<span class="gp">... </span>  <span class="n">last10_borrows</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">last10_borrows</span><span class="o">.</span><span class="n">adjusted_amount</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">  borrows_reserve_symbol  borrows_timestamp  borrows_adjusted_amount</span>
+<span class="go">0                   USDT         1643300294            500000.000000</span>
+<span class="go">1                    DAI         1643299575              6000.000000</span>
+<span class="go">2                   USDT         1643298921            900000.000000</span>
+<span class="go">3                   USDT         1643297685            500000.000000</span>
+<span class="go">4                   USDC         1643296256             50000.000000</span>
+<span class="go">5                    PAX         1643295342              4150.000000</span>
+<span class="go">6                   USDT         1643294783              9000.000000</span>
+<span class="go">7                    DAI         1643293451             45585.919063</span>
+<span class="go">8                    UNI         1643289600             50000.000000</span>
+<span class="go">9                   USDT         1643289117             14000.000000</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../" class="btn btn-neutral float-left" title="subgrounds" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../basics/" class="btn btn-neutral float-right" title="Subgrounds basics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

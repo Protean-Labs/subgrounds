@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subgrounds basics &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="Advanced topics" href="../advanced/" />
+    <link rel="prev" title="Getting started" href="../getting_started/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Subgrounds basics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subgrounds">Subgrounds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fieldpaths">FieldPaths</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fieldpath-arguments">FieldPath arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#querying-data">Querying data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subgrounds-query"><code class="docutils literal notranslate"><span class="pre">Subgrounds.query</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#subgrounds-query-df"><code class="docutils literal notranslate"><span class="pre">Subgrounds.query_df</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-with-single-dataframe-returned">Example with single DataFrame returned</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#example-with-multiple-dataframes-returned">Example with multiple DataFrames returned</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#subgrounds-query-json"><code class="docutils literal notranslate"><span class="pre">Subgrounds.query_json</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#combining-fieldpaths">Combining FieldPaths</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#syntheticfields">SyntheticFields</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+      <li>Subgrounds basics</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/basics.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="subgrounds-basics">
+<h1>Subgrounds basics<a class="headerlink" href="#subgrounds-basics" title="Permalink to this headline"></a></h1>
+<p>This page was written to provide an overview of the main concepts in Subgrounds and to serve as a quick reference for those concepts.</p>
+<section id="subgrounds">
+<h2>Subgrounds<a class="headerlink" href="#subgrounds" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Subgrounds</span></code> class provides the toplevel Subgrounds API and most Subgrounds users will be using this class exclusively. This class is used to load (i.e.: introspect) GraphQL APIs (subgraph APIs or vanilla GraphQL APIs) as well as execute querying operations. Moreover, this class is meant to be used as a singleton, i.e.: initialized once and reused throughout a project.</p>
+<p>The code cell below demonstrates how to initialize your <code class="docutils literal notranslate"><span class="pre">Subgrounds</span></code> object and load a GraphQL API.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">subgrounds</span> <span class="kn">import</span> <span class="n">Subgrounds</span>
+
+<span class="go"># Initialize Subgrounds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span> <span class="o">=</span> <span class="n">Subgrounds</span><span class="p">()</span>
+
+<span class="go"># Load a subgraph using its API URL</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aaveV2</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/aave/protocol-v2&#39;</span><span class="p">)</span>
+
+<span class="go"># Load a vanilla GraphQL API using its API URL</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">snapshot</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_api</span><span class="p">(</span><span class="s1">&#39;https://hub.snapshot.org/graphql&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="fieldpaths">
+<h2>FieldPaths<a class="headerlink" href="#fieldpaths" title="Permalink to this headline"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> are the main building blocks used to construct Subgrounds queries. A <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> represents a selection path through a GraphQL schema starting from the root <code class="docutils literal notranslate"><span class="pre">Query</span></code> entity (see <a class="reference external" href="https://graphql.org/learn/schema/#the-query-and-mutation-types">The Query and Mutation types</a>) all the way down to a scalar leaf.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> are created by simply selecting attributes starting from the subgraph object returned by the <code class="docutils literal notranslate"><span class="pre">Subgrounds.load_subgraph</span></code> or <code class="docutils literal notranslate"><span class="pre">Subgrounds.load_api</span></code> methods:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniswapV3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># Create a FieldPath</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pools_tvl</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">pools</span><span class="o">.</span><span class="n">totalValueLockedUSD</span>
+</pre></div>
+</div>
+<p>In the example above, the <code class="docutils literal notranslate"><span class="pre">pools_tvl</span></code> variable is a <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> object representing the following GraphQL query:</p>
+<div class="highlight-graphql notranslate"><div class="highlight"><pre><span></span>query {
+  pools {
+    totalValueLockedUSD
+  }
+}
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> don't have to be selected from root to leaf each time and partial <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> can be reused:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniswapV3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># Create a FieldPath</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pools_tvl</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">pools</span><span class="o">.</span><span class="n">totalValueLockedUSD</span>
+
+<span class="go"># Create a partial FieldPath</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pools</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">pools</span>
+
+<span class="go"># This FieldPath is equivalent to the `pools_tvl` FieldPath</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pools_tvl2</span> <span class="o">=</span> <span class="n">pools</span><span class="o">.</span><span class="n">totalValueLockedUSD</span>
+</pre></div>
+</div>
+<section id="fieldpath-arguments">
+<h3>FieldPath arguments<a class="headerlink" href="#fieldpath-arguments" title="Permalink to this headline"></a></h3>
+<p>Field arguments can be specified via <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> by &quot;calling&quot; the field in question:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniswapV3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># Create a partial FieldPath of `pools` created after block 14720000 </span>
+<span class="go"># ordered by their TVL in descending order</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_pools</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">pools</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">uniswapV3</span><span class="o">.</span><span class="n">Pool</span><span class="o">.</span><span class="n">totalValueLockedUSD</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">where</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>    <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Pool</span><span class="o">.</span><span class="n">createdAtBlockNumber</span> <span class="o">&gt;</span> <span class="mi">14720000</span>
+<span class="gp">... </span>  <span class="p">]</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># Select the `totalValueLockedUSD` of the</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pools_tvl</span> <span class="o">=</span> <span class="n">new_pools</span><span class="o">.</span><span class="n">totalValueLockedUSD</span>
+</pre></div>
+</div>
+<p>In the example above, the <code class="docutils literal notranslate"><span class="pre">pools_tvl</span></code> <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> represents the following GraphQL query:</p>
+<div class="highlight-graphql notranslate"><div class="highlight"><pre><span></span>query {
+  pools(
+    orderBy: totalValueLockedUSD,
+    orderDirection: desc,
+    where: {
+      createdAtBlockNumber_gt: 14720000
+    }
+  ) {
+    totalValueLockedUSD
+  }
+}
+</pre></div>
+</div>
+<p>Notice that the values for the <code class="docutils literal notranslate"><span class="pre">orderBy</span></code> and <code class="docutils literal notranslate"><span class="pre">where</span></code> arguments are <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> themselves. This allows users to construct complex queries in pure Python by using the <code class="docutils literal notranslate"><span class="pre">Subgraph</span></code> object returned when loading an API. Note however that the <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> used as argument values are <em>relative</em> <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code>, i.e.: they do not start from the root <code class="docutils literal notranslate"><span class="pre">Query</span></code> entity, but rather start from a user defined entity type (in this case the <code class="docutils literal notranslate"><span class="pre">Pool</span></code> entity). It is important to make sure that the relative <code class="docutils literal notranslate"><span class="pre">FieldPath</span></code> used as values for the <code class="docutils literal notranslate"><span class="pre">orderBy</span></code> and <code class="docutils literal notranslate"><span class="pre">where</span></code> arguments match the entity type of the field on which the arguments are applied (in our example, the <code class="docutils literal notranslate"><span class="pre">pools</span></code> field is of type <code class="docutils literal notranslate"><span class="pre">Pool</span></code>). If this is not respected, a type error exception will be thrown.</p>
+<p>Argument values can also be supplied in their &quot;raw&quot; form, without the use of relative <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniswapV3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># This partial FieldPath is equivalant to the `new_pools` FieldPath</span>
+<span class="go"># in the previous example</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_pools2</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">pools</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="s1">&#39;totalValueLockedUSD&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">where</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>    <span class="s1">&#39;createdAtBlockNumber_gt&#39;</span><span class="p">:</span> <span class="mi">14720000</span>
+<span class="gp">... </span>  <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="querying-data">
+<h2>Querying data<a class="headerlink" href="#querying-data" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Subgrounds</span></code> class provides three methods for querying data:</p>
+<ol class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">query</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query_df</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query_json</span></code></p></li>
+</ol>
+<p>All three methods take the same arguments (ignoring optional arguments), namely a list of <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> and differ only in the way the returned data is formatted. This section will go over each method individually.</p>
+<section id="subgrounds-query">
+<h3><code class="docutils literal notranslate"><span class="pre">Subgrounds.query</span></code><a class="headerlink" href="#subgrounds-query" title="Permalink to this headline"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">query</span></code> method returns the data in its simplest form which, depending on the <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> given as argument, will be either: 1) a single value; 2) a list of values; or 3) a tuple containing single values or lists of values. It is important to consider the shape of the queried data (e.g.: single entities, list of entities...) as the shape of the returned data will depend on it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniswapV3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># 1) Single value: Query the quantity of WETH locked on Uniswap V3 </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">totalValueLocked</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">505722.3421353012</span>
+
+<span class="go"># Partial FieldPath of top 10 most traded tokens </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">most_traded_tokens</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">uniswapV3</span><span class="o">.</span><span class="n">Token</span><span class="o">.</span><span class="n">volumeUSD</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># 2) List of values: Query symbol of top 10 most traded tokens</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">most_traded_tokens</span><span class="o">.</span><span class="n">symbol</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">[&#39;WETH&#39;, &#39;USDC&#39;, &#39;USDT&#39;, &#39;DAI&#39;, &#39;WBTC&#39;, &#39;FEI&#39;, &#39;UST&#39;, &#39;APE&#39;, &#39;LOOKS&#39;, &#39;HEX&#39;]</span>
+
+<span class="go"># 3) Tuple of values: Query symbol and TVL of top 10 most traded tokens</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">most_traded_tokens</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">most_traded_tokens</span><span class="o">.</span><span class="n">totalValueLocked</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">([&#39;WETH&#39;, &#39;USDC&#39;, &#39;USDT&#39;, &#39;DAI&#39;, &#39;WBTC&#39;, &#39;FEI&#39;, &#39;UST&#39;, &#39;APE&#39;, &#39;LOOKS&#39;, &#39;HEX&#39;],</span>
+<span class="go"> [506128.5352471704,</span>
+<span class="go">  774159914.44222,</span>
+<span class="go">  353261712.912211,</span>
+<span class="go">  384420834.9304443,</span>
+<span class="go">  11069.25245941,</span>
+<span class="go">  42232365.752994545,</span>
+<span class="go">  8030872.929855888,</span>
+<span class="go">  2604424.599749661,</span>
+<span class="go">  11610722.749456603,</span>
+<span class="go">  131046877.18519919])</span>
+</pre></div>
+</div>
+</section>
+<section id="subgrounds-query-df">
+<h3><code class="docutils literal notranslate"><span class="pre">Subgrounds.query_df</span></code><a class="headerlink" href="#subgrounds-query-df" title="Permalink to this headline"></a></h3>
+<p>Subgrounds provides a simple way to query subgraph data directly into a pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> via the <code class="docutils literal notranslate"><span class="pre">query_df</span></code> method. Just like the <code class="docutils literal notranslate"><span class="pre">query</span></code> method, <code class="docutils literal notranslate"><span class="pre">query_df</span></code> takes as argument a list of <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> and returns one or more <code class="docutils literal notranslate"><span class="pre">DataFrames</span></code> depending on the shape of the queried data. <code class="docutils literal notranslate"><span class="pre">query_df</span></code> will attempt to flatten all the data to a single <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> (effectively mimicking the SQL <code class="docutils literal notranslate"><span class="pre">JOIN</span></code> operation) but when that is not possible, two or more <code class="docutils literal notranslate"><span class="pre">DataFrames</span></code> will be returned.</p>
+<section id="example-with-single-dataframe-returned">
+<h4>Example with single DataFrame returned<a class="headerlink" href="#example-with-single-dataframe-returned" title="Permalink to this headline"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniswapV3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># Select top 10 pools by cummulative volume </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_10_pools</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">pools</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">uniswapV3</span><span class="o">.</span><span class="n">Pool</span><span class="o">.</span><span class="n">volumeUSD</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># Query data flattened to a single DataFrame</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query_df</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">top_10_pools</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">top_10_pools</span><span class="o">.</span><span class="n">token0</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">top_10_pools</span><span class="o">.</span><span class="n">token1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">                                     pools_id pools_token0_symbol pools_token1_symbol</span>
+<span class="go">0  0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640                USDC                WETH</span>
+<span class="go">1  0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8                USDC                WETH</span>
+<span class="go">2  0x11b815efb8f581194ae79006d24e0d814b7697f6                WETH                USDT</span>
+<span class="go">3  0x4e68ccd3e89f51c3074ca5072bbac773960dfa36                WETH                USDT</span>
+<span class="go">4  0x60594a405d53811d3bc4766596efd80fd545a270                 DAI                WETH</span>
+<span class="go">5  0x4585fe77225b41b697c938b018e2ac67ac5a20c0                WBTC                WETH</span>
+<span class="go">6  0x3416cf6c708da44db2624d63ea0aaef7113527c6                USDC                USDT</span>
+<span class="go">7  0xcbcdf9626bc03e24f779434178a73a0b4bad62ed                WBTC                WETH</span>
+<span class="go">8  0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8                 DAI                WETH</span>
+<span class="go">9  0x7858e59e0c01ea06df3af3d20ac7b0003275d4bf                USDC                USDT</span>
+</pre></div>
+</div>
+</section>
+<section id="example-with-multiple-dataframes-returned">
+<h4>Example with multiple DataFrames returned<a class="headerlink" href="#example-with-multiple-dataframes-returned" title="Permalink to this headline"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniswapV3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># Select WETH-USDC pool</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weth_usdc</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">pool</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640&#39;</span><span class="p">)</span>
+
+<span class="go"># Define FieldPaths for last 10 mints and burns</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weth_usdc_last10_mints</span> <span class="o">=</span> <span class="n">weth_usdc</span><span class="o">.</span><span class="n">mints</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">uniswapV3</span><span class="o">.</span><span class="n">Mint</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weth_usdc_last10_burns</span> <span class="o">=</span> <span class="n">weth_usdc</span><span class="o">.</span><span class="n">burns</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">uniswapV3</span><span class="o">.</span><span class="n">Burn</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># Query flattened data. Since we are selecting two unnested list fields (i.e.: one is not nested inside the other) we will get back two DataFrames</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">mints</span><span class="p">,</span> <span class="n">burns</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">query_df</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">weth_usdc_last10_mints</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">weth_usdc_last10_mints</span><span class="o">.</span><span class="n">amount0</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">weth_usdc_last10_mints</span><span class="o">.</span><span class="n">amount1</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">weth_usdc_last10_burns</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">weth_usdc_last10_burns</span><span class="o">.</span><span class="n">amount0</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">weth_usdc_last10_burns</span><span class="o">.</span><span class="n">amount1</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mints</span>
+<span class="go">   pool_mints_timestamp  pool_mints_amount0  pool_mints_amount1</span>
+<span class="go">0            1652114746        3.179282e+05          548.114506</span>
+<span class="go">1            1652113488        1.194870e+06          400.000000</span>
+<span class="go">2            1652113014        1.249154e+06          760.212396</span>
+<span class="go">3            1652112429        2.112058e+06         1891.033562</span>
+<span class="go">4            1652111846        3.646868e+05          140.593137</span>
+<span class="go">5            1652110962        5.740381e+04           23.700000</span>
+<span class="go">6            1652110962        3.522151e+05          548.186728</span>
+<span class="go">7            1652109116        5.223502e+04           20.894748</span>
+<span class="go">8            1652106977        1.204390e+04           10.525402</span>
+<span class="go">9            1652106531        7.187740e+02            0.993683</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">burns</span>
+<span class="go">   pool_burns_timestamp  pool_burns_amount0  pool_burns_amount1</span>
+<span class="go">0            1652115279       278038.482233           57.092565</span>
+<span class="go">1            1652114890         1754.280892            6.006157</span>
+<span class="go">2            1652114731            0.000000          697.289317</span>
+<span class="go">3            1652114233            0.000000           19.743883</span>
+<span class="go">4            1652113956            0.000000            0.017788</span>
+<span class="go">5            1652112925         4743.955507            0.780928</span>
+<span class="go">6            1652112719            0.000000          587.274826</span>
+<span class="go">7            1652112509            0.000000           23.297411</span>
+<span class="go">8            1652112509            0.000000          760.767874</span>
+<span class="go">9            1652112459            0.000000          631.697170</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="subgrounds-query-json">
+<h3><code class="docutils literal notranslate"><span class="pre">Subgrounds.query_json</span></code><a class="headerlink" href="#subgrounds-query-json" title="Permalink to this headline"></a></h3>
+<p>Subgrounds allows users to query data in its raw JSON format using the <code class="docutils literal notranslate"><span class="pre">query_json</span></code> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniswapV3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">top_2_traded_tokens</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">uniswapV3</span><span class="o">.</span><span class="n">Token</span><span class="o">.</span><span class="n">volumeUSD</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">2</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query_json</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">top_2_traded_tokens</span><span class="o">.</span><span class="n">symbol</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">[{&#39;x6e2162a85075a2b3&#39;: [{&#39;symbol&#39;: &#39;WETH&#39;,</span>
+<span class="go">    &#39;id&#39;: &#39;0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&#39;,</span>
+<span class="go">    &#39;volumeUSD&#39;: &#39;456255840800.0050364446410698045662&#39;},</span>
+<span class="go">   {&#39;symbol&#39;: &#39;USDC&#39;,</span>
+<span class="go">    &#39;id&#39;: &#39;0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48&#39;,</span>
+<span class="go">    &#39;volumeUSD&#39;: &#39;324987692399.2943551375705643641231&#39;}]}]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Subgrounds uses GraphQL aliases to differentiate queries selecting the same fields but with different arguments, which is why the JSON response data contains the key <code class="docutils literal notranslate"><span class="pre">x6e2162a85075a2b3</span></code> instead of the &quot;expected&quot; <code class="docutils literal notranslate"><span class="pre">tokens</span></code> key (see Subgrounds query aliases for more information). Subgrounds also selects additional fields automatically due to how automatic pagination is implemented. In the previous example, the <code class="docutils literal notranslate"><span class="pre">id</span></code> and <code class="docutils literal notranslate"><span class="pre">volumeUSD</span></code> fields were automatically added to the query by Subgrounds. However, these particularities are only apparent when using <code class="docutils literal notranslate"><span class="pre">query_json</span></code>, hence why using this method is not recommended unless it is absolutely necessary to get the raw JSON data.</p>
+</div>
+</section>
+<section id="combining-fieldpaths">
+<h3>Combining FieldPaths<a class="headerlink" href="#combining-fieldpaths" title="Permalink to this headline"></a></h3>
+<p>When passing a list of <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> as argument to one of the aforementioned functions, the <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> are merged together in a single query <strong>if the <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> originate from the same subgraph</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uniswapV3</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3&#39;</span><span class="p">)</span>
+
+<span class="go"># Partial FieldPath selecting the top 4 most traded tokens on Uniswap V3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">most_traded_tokens</span> <span class="o">=</span> <span class="n">uniswapV3</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">tokens</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">uniswapV3</span><span class="o">.</span><span class="n">Token</span><span class="o">.</span><span class="n">volumeUSD</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">4</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># Partial FieldPath selecting the top 2 pools by TVL of the top 4 most traded tokens</span>
+<span class="go"># (notice the FieldPath starts from most_traded_tokens) </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">most_liquid_pairs</span> <span class="o">=</span> <span class="n">most_traded_tokens</span><span class="o">.</span><span class="n">whitelistPools</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">uniswapV3</span><span class="o">.</span><span class="n">Pool</span><span class="o">.</span><span class="n">totalValueLockedUSD</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">2</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># Querying the symbol of the top 4 most traded tokens, their 2 most liquid </span>
+<span class="go"># pools&#39; token symbols and their 2 most liquid pool&#39;s TVL in USD</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query_df</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">most_traded_tokens</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">most_liquid_pairs</span><span class="o">.</span><span class="n">token0</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">most_liquid_pairs</span><span class="o">.</span><span class="n">token1</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">most_liquid_pairs</span><span class="o">.</span><span class="n">totalValueLockedUSD</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">  tokens_symbol tokens_whitelistPools_token0_symbol tokens_whitelistPools_token1_symbol  tokens_whitelistPools_totalValueLockedUSD</span>
+<span class="go">0          WETH                                USDC                                WETH                               4.068723e+08</span>
+<span class="go">1          WETH                                WBTC                                WETH                               3.311227e+08</span>
+<span class="go">2          USDC                                 DAI                                USDC                               3.284779e+08</span>
+<span class="go">3          USDC                                USDC                                WETH                               4.068723e+08</span>
+<span class="go">4          USDT                                WETH                                USDT                               2.055448e+08</span>
+<span class="go">5          USDT                                USDC                                USDT                               1.980053e+08</span>
+<span class="go">6           DAI                                 DAI                                USDC                               3.284779e+08</span>
+<span class="go">7           DAI                                 DAI                                WETH                               9.759597e+07</span>
+</pre></div>
+</div>
+<p>Under the hood, when executing the previous code, Subgrounds will combine the queried <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> into the following GraphQL query:</p>
+<div class="highlight-graphql notranslate"><div class="highlight"><pre><span></span>query {
+  tokens(first: 4, orderBy: volumeUSD, orderDirection: desc) {
+    symbol
+    whitelistPools(first: 2, orderBy: totalValueLockedUSD, orderDirection: desc) {
+      token0 {
+        symbol
+      }
+      token1 {
+        symbol
+      }
+      totalValueLockedUSD
+    }
+  }
+}
+</pre></div>
+</div>
+<!-- In the cases where the `FieldPaths` originate from different subgraphs, then multiple queries will be executed concurrently: -->
+</section>
+</section>
+<section id="syntheticfields">
+<h2>SyntheticFields<a class="headerlink" href="#syntheticfields" title="Permalink to this headline"></a></h2>
+<p>One of Subgrounds' unique features is the ability to define schema-based (i.e.: pre-querying) transformations using <code class="docutils literal notranslate"><span class="pre">SyntheticFields</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">SyntheticFields</span></code> can be created using Python arithmetic operators on relative <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> (i.e.: <code class="docutils literal notranslate"><span class="pre">FieldPaths</span></code> starting from an entity and not the root <code class="docutils literal notranslate"><span class="pre">Query</span></code> object) and must be added to the entity which they enhance. Once added to an entity, <code class="docutils literal notranslate"><span class="pre">SyntheticFields</span></code> can be queried just like regular GraphQL fields. The example below demonstrates how to create a simple <code class="docutils literal notranslate"><span class="pre">SyntheticField</span></code> to calculate the swap price of <code class="docutils literal notranslate"><span class="pre">Swap</span></code> events stored on the Sushiswap subgraph:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sushiswap</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/sushiswap/exchange&#39;</span><span class="p">)</span>
+
+<span class="go"># Define a synthetic field named price1 (the swap price of token1,</span>
+<span class="go"># in terms of token0) on Swap entities</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sushiswap</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">price1</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">sushiswap</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">amount0Out</span> <span class="o">-</span> <span class="n">sushiswap</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">amount0In</span><span class="p">)</span> <span class="o">/</span> <span class="nb">abs</span><span class="p">(</span><span class="n">sushiswap</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">amount1Out</span> <span class="o">-</span> <span class="n">sushiswap</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">amount1In</span><span class="p">)</span>
+
+<span class="go"># Build query to get the last 10 swaps of the WETH-USDC pair on Sushiswap </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weth_usdc</span> <span class="o">=</span> <span class="n">sushiswap</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">pair</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;0x397ff1542f962076d0bfe58ea045ffa2d347aca0&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">last_10_swaps</span> <span class="o">=</span> <span class="n">weth_usdc</span><span class="o">.</span><span class="n">swaps</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">sushiswap</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># Query swap prices using the SyntheticField price1 just like they were regular fields</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query_df</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">last_10_swaps</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">last_10_swaps</span><span class="o">.</span><span class="n">price1</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">   pair_swaps_timestamp  pair_swaps_price1</span>
+<span class="go">0            1654267855        1762.526840</span>
+<span class="go">1            1654267855        1760.132097</span>
+<span class="go">2            1654267766        1747.485689</span>
+<span class="go">3            1654267562        1758.131683</span>
+<span class="go">4            1654267528        1758.081544</span>
+<span class="go">5            1654267493        1742.260312</span>
+<span class="go">6            1654267493        1749.891244</span>
+<span class="go">7            1654267493        1755.254957</span>
+<span class="go">8            1654267364        1748.934985</span>
+<span class="go">9            1654267356        1750.284126</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">SyntheticFields</span></code> can also be created using the constructor, allowing for much more complex transformations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">subgrounds.subgraph</span> <span class="kn">import</span> <span class="n">SyntheticField</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sushiswap</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">load_subgraph</span><span class="p">(</span><span class="s1">&#39;https://api.thegraph.com/subgraphs/name/sushiswap/exchange&#39;</span><span class="p">)</span>
+
+<span class="go"># Create a SyntheticField on the Swap entity called `datetime`, which will format </span>
+<span class="go"># the timestamp field into something more human readable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sushiswap</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">datetime</span> <span class="o">=</span> <span class="n">SyntheticField</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="k">lambda</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)),</span>
+<span class="gp">... </span>  <span class="n">SyntheticField</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">sushiswap</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">timestamp</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">last_10_swaps</span> <span class="o">=</span> <span class="n">sushiswap</span><span class="o">.</span><span class="n">Query</span><span class="o">.</span><span class="n">swaps</span><span class="p">(</span>
+<span class="gp">... </span>  <span class="n">orderBy</span><span class="o">=</span><span class="n">sushiswap</span><span class="o">.</span><span class="n">Swap</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">orderDirection</span><span class="o">=</span><span class="s1">&#39;desc&#39;</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">first</span><span class="o">=</span><span class="mi">10</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sg</span><span class="o">.</span><span class="n">query_df</span><span class="p">([</span>
+<span class="gp">... </span>  <span class="n">last_10_swaps</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">last_10_swaps</span><span class="o">.</span><span class="n">to</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">last_10_swaps</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">token0</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+<span class="gp">... </span>  <span class="n">last_10_swaps</span><span class="o">.</span><span class="n">pair</span><span class="o">.</span><span class="n">token1</span><span class="o">.</span><span class="n">symbol</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="go">        swaps_datetime                                    swaps_to swaps_pair_token0_symbol swaps_pair_token1_symbol</span>
+<span class="go">0  2022-06-03 11:04:25  0x98c3d3183c4b8a650614ad179a1a98be0a8d6b8e                     OOKI                     WETH</span>
+<span class="go">1  2022-06-03 11:03:29  0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f                    CHIMP                     WETH</span>
+<span class="go">2  2022-06-03 11:03:29  0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f                     WETH                     USDT</span>
+<span class="go">3  2022-06-03 11:02:59  0x0eae044f00b0af300500f090ea00027097d03000                     ICHI                     WETH</span>
+<span class="go">4  2022-06-03 11:02:59  0xfb3bd022d5dacf95ee28a6b07825d4ff9c5b3814                     USDC                     WETH</span>
+<span class="go">5  2022-06-03 11:02:59  0x11111112542d85b3ef69ae05771c2dccff4faa26                     WETH                     USDT</span>
+<span class="go">6  2022-06-03 11:02:21  0xd7c09e006a2891880331b0f6224071c1e890a98a                     WETH                     ROOK</span>
+<span class="go">7  2022-06-03 11:02:21  0x60c809705e045572ffe3c44badd4d680165960fa                      OHM                      DAI</span>
+<span class="go">8  2022-06-03 11:01:00  0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f                      BIT                     WETH</span>
+<span class="go">9  2022-06-03 11:00:54  0xdef171fe48cf0115b1d80b88dc8eab59176fee57                     NEWO                     USDC</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../getting_started/" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../advanced/" class="btn btn-neutral float-right" title="Advanced topics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

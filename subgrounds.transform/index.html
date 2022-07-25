@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>subgrounds.transform module &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="subgrounds.utils module" href="../subgrounds.utils/" />
+    <link rel="prev" title="subgrounds.subgrounds module" href="../subgrounds.subgrounds/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules/">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../subgrounds/">subgrounds package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../subgrounds/#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.client/">subgrounds.client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dash_wrappers/">subgrounds.dash_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dataframe_utils/">subgrounds.dataframe_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.plotly_wrappers/">subgrounds.plotly_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.query/">subgrounds.query module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.schema/">subgrounds.schema module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.subgrounds/">subgrounds.subgrounds module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">subgrounds.transform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.utils/">subgrounds.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#module-subgrounds">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../modules/">subgrounds</a> &raquo;</li>
+          <li><a href="../subgrounds/">subgrounds package</a> &raquo;</li>
+      <li>subgrounds.transform module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/subgrounds.transform.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-subgrounds.transform">
+<span id="subgrounds-transform-module"></span><h1>subgrounds.transform module<a class="headerlink" href="#module-subgrounds.transform" title="Permalink to this headline"></a></h1>
+<p>Subgrounds request/response transformation layers module</p>
+<p>This module defines interfaces (abstract classes) for transformation layers.
+Transformation layers, or transforms, can be applied to entire
+requests (see <a class="reference internal" href="#subgrounds.transform.RequestTransform" title="subgrounds.transform.RequestTransform"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestTransform</span></code></a>) or on a per-document basis (see
+<a class="reference internal" href="#subgrounds.transform.DocumentTransform" title="subgrounds.transform.DocumentTransform"><code class="xref py py-class docutils literal notranslate"><span class="pre">DocumentTransform</span></code></a>). Classes that implement either type of transforms
+can be used to perform modifications to queries and their response data.</p>
+<p>For example, the <a class="reference internal" href="#subgrounds.transform.TypeTransform" title="subgrounds.transform.TypeTransform"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeTransform</span></code></a> class is used to tranform the response
+data of <code class="docutils literal notranslate"><span class="pre">BigInt</span></code> and <code class="docutils literal notranslate"><span class="pre">BigDecimal</span></code> fields (which are represented as
+strings in the response JSON data) to python <code class="docutils literal notranslate"><span class="pre">int</span></code> and <code class="docutils literal notranslate"><span class="pre">float</span></code>
+respectively (see the actual transforms in <code class="docutils literal notranslate"><span class="pre">DEFAULT_SUBGRAPH_TRANSFORMS</span></code>).</p>
+<p>Transforms are also used to apply <code class="xref py py-class docutils literal notranslate"><span class="pre">SyntheticField</span></code> to queries and the
+response data (see <a class="reference internal" href="#subgrounds.transform.LocalSyntheticField" title="subgrounds.transform.LocalSyntheticField"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalSyntheticField</span></code></a> transform class). Each
+<code class="xref py py-class docutils literal notranslate"><span class="pre">SyntheticField</span></code> defined on a subgraph creates a new transformation layer
+by instantiating a new <a class="reference internal" href="#subgrounds.transform.LocalSyntheticField" title="subgrounds.transform.LocalSyntheticField"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocalSyntheticField</span></code></a> object.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.transform.select_data">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.transform.</span></span><span class="sig-name descname"><span class="pre">select_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">select</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.select_data" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.transform.RequestTransform">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.transform.</span></span><span class="sig-name descname"><span class="pre">RequestTransform</span></span><a class="headerlink" href="#subgrounds.transform.RequestTransform" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Abstract class representing a transformation layer to be applied to entire
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> objects.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.RequestTransform.transform_request">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.RequestTransform.transform_request" title="Permalink to this definition"></a></dt>
+<dd><p>Method that will be applied to all <code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> objects that
+pass through the transformation layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>req</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest"><em>DataRequest</em></a>) -- The initial request object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed request object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest">DataRequest</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.RequestTransform.transform_response">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.RequestTransform.transform_response" title="Permalink to this definition"></a></dt>
+<dd><p>Method to be applied to all response data <code class="docutils literal notranslate"><span class="pre">data</span></code> of requests that pass
+through the transformation layer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">req</span></code> is the initial <code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> object that yielded the
+resulting JSON data <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest"><em>DataRequest</em></a>) -- Initial data request object</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) -- JSON data blob resulting from the execution
+of the transformed data request.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed response data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.transform.DocumentTransform">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.transform.</span></span><span class="sig-name descname"><span class="pre">DocumentTransform</span></span><a class="headerlink" href="#subgrounds.transform.DocumentTransform" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Abstract class representing a transformation layer to be applied to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Document</span></code> objects.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.DocumentTransform.transform_document">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.DocumentTransform.transform_document" title="Permalink to this definition"></a></dt>
+<dd><p>Method that will be applied to all <code class="xref py py-class docutils literal notranslate"><span class="pre">Document</span></code> objects that pass
+through the transformation layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>doc</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document"><em>Document</em></a>) -- The initial document</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed document</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document">Document</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.DocumentTransform.transform_response">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transform_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.DocumentTransform.transform_response" title="Permalink to this definition"></a></dt>
+<dd><p>Method to be applied to all response data <code class="docutils literal notranslate"><span class="pre">data</span></code> of requests that pass
+through the transformation layer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">doc</span></code> is the initial <code class="xref py py-class docutils literal notranslate"><span class="pre">Document</span></code> object that yielded the
+resulting JSON data <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>doc</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document"><em>Document</em></a>) -- Initial document</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) -- JSON data blob resulting from the execution of the
+transformed document.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed response data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.transform.TypeTransform">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.transform.</span></span><span class="sig-name descname"><span class="pre">TypeTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.TypeTransform" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.transform.DocumentTransform" title="subgrounds.transform.DocumentTransform"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.transform.DocumentTransform</span></code></a></p>
+<p>Transform to be applied to scalar fields on a per-type basis.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.transform.TypeTransform.type_">
+<span class="sig-name descname"><span class="pre">type_</span></span><a class="headerlink" href="#subgrounds.transform.TypeTransform.type_" title="Permalink to this definition"></a></dt>
+<dd><p>Type indicating which scalar values (i.e.: values of that
+type) should be transformed using the function <code class="docutils literal notranslate"><span class="pre">f</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T">TypeRef.T</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.transform.TypeTransform.f">
+<span class="sig-name descname"><span class="pre">f</span></span><a class="headerlink" href="#subgrounds.transform.TypeTransform.f" title="Permalink to this definition"></a></dt>
+<dd><p>Function to be applied to scalar values of type
+<code class="docutils literal notranslate"><span class="pre">type_</span></code> in the response data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable[[Any], Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">type_</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeRef.T" title="subgrounds.schema.TypeRef.T"><span class="pre">subgrounds.schema.TypeRef.T</span></a></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">f</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.TypeTransform.transform_document">
+<span class="sig-name descname"><span class="pre">transform_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.TypeTransform.transform_document" title="Permalink to this definition"></a></dt>
+<dd><p>Method that will be applied to all <code class="xref py py-class docutils literal notranslate"><span class="pre">Document</span></code> objects that pass
+through the transformation layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>doc</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document"><em>Document</em></a>) -- The initial document</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed document</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document">Document</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.TypeTransform.transform_response">
+<span class="sig-name descname"><span class="pre">transform_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.TypeTransform.transform_response" title="Permalink to this definition"></a></dt>
+<dd><p>Method to be applied to all response data <code class="docutils literal notranslate"><span class="pre">data</span></code> of requests that pass
+through the transformation layer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">doc</span></code> is the initial <code class="xref py py-class docutils literal notranslate"><span class="pre">Document</span></code> object that yielded the
+resulting JSON data <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>doc</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document"><em>Document</em></a>) -- Initial document</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) -- JSON data blob resulting from the execution of the
+transformed document.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed response data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.transform.LocalSyntheticField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.transform.</span></span><span class="sig-name descname"><span class="pre">LocalSyntheticField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subgraph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmeta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.LocalSyntheticField" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.transform.DocumentTransform" title="subgrounds.transform.DocumentTransform"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.transform.DocumentTransform</span></code></a></p>
+<p>Transform used to implement synthetic fields on GraphQL objects that only
+depend on values accessible from that object.</p>
+<p><a class="reference internal" href="#subgrounds.transform.LocalSyntheticField.transform_document" title="subgrounds.transform.LocalSyntheticField.transform_document"><code class="xref py py-meth docutils literal notranslate"><span class="pre">transform_document()</span></code></a> replaces the field <a class="reference internal" href="#id3" title="subgrounds.transform.LocalSyntheticField.fmeta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fmeta</span></code></a> by the argument
+fields selections <a class="reference internal" href="#id7" title="subgrounds.transform.LocalSyntheticField.args"><code class="xref py py-attr docutils literal notranslate"><span class="pre">args</span></code></a> if the synthetic field <a class="reference internal" href="#id3" title="subgrounds.transform.LocalSyntheticField.fmeta"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fmeta</span></code></a> is present
+in the document.</p>
+<p><a class="reference internal" href="#subgrounds.transform.LocalSyntheticField.transform_response" title="subgrounds.transform.LocalSyntheticField.transform_response"><code class="xref py py-meth docutils literal notranslate"><span class="pre">transform_response()</span></code></a> applied <a class="reference internal" href="#id5" title="subgrounds.transform.LocalSyntheticField.f"><code class="xref py py-attr docutils literal notranslate"><span class="pre">f</span></code></a> to the fields corresponding to
+the argument selections <a class="reference internal" href="#id7" title="subgrounds.transform.LocalSyntheticField.args"><code class="xref py py-attr docutils literal notranslate"><span class="pre">args</span></code></a> and places the result in the response.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.transform.LocalSyntheticField.subgraph">
+<span class="sig-name descname"><span class="pre">subgraph</span></span><a class="headerlink" href="#subgrounds.transform.LocalSyntheticField.subgraph" title="Permalink to this definition"></a></dt>
+<dd><p>The subgraph to which the synthetic field's object
+belongs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.subgraph.subgraph/#subgrounds.subgraph.subgraph.Subgraph" title="subgrounds.subgraph.subgraph.Subgraph">Subgraph</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.transform.LocalSyntheticField.fmeta">
+<span class="sig-name descname"><span class="pre">fmeta</span></span><a class="headerlink" href="#subgrounds.transform.LocalSyntheticField.fmeta" title="Permalink to this definition"></a></dt>
+<dd><p>The synthetic field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.FieldMeta" title="subgrounds.schema.TypeMeta.FieldMeta">TypeMeta.FieldMeta</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.transform.LocalSyntheticField.type_">
+<span class="sig-name descname"><span class="pre">type_</span></span><a class="headerlink" href="#subgrounds.transform.LocalSyntheticField.type_" title="Permalink to this definition"></a></dt>
+<dd><p>The object for which
+the synthetic field is defined</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.ObjectMeta" title="subgrounds.schema.TypeMeta.ObjectMeta">TypeMeta.ObjectMeta</a> | <a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.InterfaceMeta" title="subgrounds.schema.TypeMeta.InterfaceMeta">TypeMeta.InterfaceMeta</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.transform.LocalSyntheticField.f">
+<span class="sig-name descname"><span class="pre">f</span></span><a class="headerlink" href="#subgrounds.transform.LocalSyntheticField.f" title="Permalink to this definition"></a></dt>
+<dd><p>The function to be applied to the argument fields</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.transform.LocalSyntheticField.default">
+<span class="sig-name descname"><span class="pre">default</span></span><a class="headerlink" href="#subgrounds.transform.LocalSyntheticField.default" title="Permalink to this definition"></a></dt>
+<dd><p>The default value of the synthetic field used in case of
+exceptions (e.g.: division by zero)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.transform.LocalSyntheticField.args">
+<span class="sig-name descname"><span class="pre">args</span></span><a class="headerlink" href="#subgrounds.transform.LocalSyntheticField.args" title="Permalink to this definition"></a></dt>
+<dd><p>The selections of the fields used as arguments to
+compute the synthetic field</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="../subgrounds.query/#subgrounds.query.Selection" title="subgrounds.query.Selection">Selection</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">subgraph</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.subgraph.subgraph/#subgrounds.subgraph.subgraph.Subgraph" title="subgrounds.subgraph.subgraph.Subgraph"><span class="pre">Subgraph</span></a></em><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">fmeta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.FieldMeta" title="subgrounds.schema.TypeMeta.FieldMeta"><span class="pre">TypeMeta.FieldMeta</span></a></em><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">type_</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.ObjectMeta" title="subgrounds.schema.TypeMeta.ObjectMeta"><span class="pre">TypeMeta.ObjectMeta</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.schema/#subgrounds.schema.TypeMeta.InterfaceMeta" title="subgrounds.schema.TypeMeta.InterfaceMeta"><span class="pre">TypeMeta.InterfaceMeta</span></a></em><a class="headerlink" href="#id4" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">f</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span></em><a class="headerlink" href="#id5" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#id6" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../subgrounds.query/#subgrounds.query.Selection" title="subgrounds.query.Selection"><span class="pre">Selection</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id7" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.LocalSyntheticField.transform_document">
+<span class="sig-name descname"><span class="pre">transform_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.LocalSyntheticField.transform_document" title="Permalink to this definition"></a></dt>
+<dd><p>Method that will be applied to all <code class="xref py py-class docutils literal notranslate"><span class="pre">Document</span></code> objects that pass
+through the transformation layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>doc</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document"><em>Document</em></a>) -- The initial document</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed document</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document">Document</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.LocalSyntheticField.transform_response">
+<span class="sig-name descname"><span class="pre">transform_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.LocalSyntheticField.transform_response" title="Permalink to this definition"></a></dt>
+<dd><p>Method to be applied to all response data <code class="docutils literal notranslate"><span class="pre">data</span></code> of requests that pass
+through the transformation layer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">doc</span></code> is the initial <code class="xref py py-class docutils literal notranslate"><span class="pre">Document</span></code> object that yielded the
+resulting JSON data <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>doc</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.Document" title="subgrounds.query.Document"><em>Document</em></a>) -- Initial document</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) -- JSON data blob resulting from the execution of the
+transformed document.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed response data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.transform.SplitTransform">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.transform.</span></span><span class="sig-name descname"><span class="pre">SplitTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.SplitTransform" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.transform.RequestTransform" title="subgrounds.transform.RequestTransform"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.transform.RequestTransform</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.SplitTransform.transform_request">
+<span class="sig-name descname"><span class="pre">transform_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.SplitTransform.transform_request" title="Permalink to this definition"></a></dt>
+<dd><p>Method that will be applied to all <code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> objects that
+pass through the transformation layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>req</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest"><em>DataRequest</em></a>) -- The initial request object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed request object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest">DataRequest</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.transform.SplitTransform.transform_response">
+<span class="sig-name descname"><span class="pre">transform_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.transform.SplitTransform.transform_response" title="Permalink to this definition"></a></dt>
+<dd><p>Method to be applied to all response data <code class="docutils literal notranslate"><span class="pre">data</span></code> of requests that pass
+through the transformation layer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">req</span></code> is the initial <code class="xref py py-class docutils literal notranslate"><span class="pre">DataRequest</span></code> object that yielded the
+resulting JSON data <code class="docutils literal notranslate"><span class="pre">data</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>req</strong> (<a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest"><em>DataRequest</em></a>) -- Initial data request object</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) -- JSON data blob resulting from the execution
+of the transformed data request.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The transformed response data</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../subgrounds.subgrounds/" class="btn btn-neutral float-left" title="subgrounds.subgrounds module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../subgrounds.utils/" class="btn btn-neutral float-right" title="subgrounds.utils module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>subgrounds.plotly_wrappers module &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="subgrounds.query module" href="../subgrounds.query/" />
+    <link rel="prev" title="subgrounds.dataframe_utils module" href="../subgrounds.dataframe_utils/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules/">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../subgrounds/">subgrounds package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../subgrounds/#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.client/">subgrounds.client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dash_wrappers/">subgrounds.dash_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dataframe_utils/">subgrounds.dataframe_utils module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">subgrounds.plotly_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.query/">subgrounds.query module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.schema/">subgrounds.schema module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.subgrounds/">subgrounds.subgrounds module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.transform/">subgrounds.transform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.utils/">subgrounds.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#module-subgrounds">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../modules/">subgrounds</a> &raquo;</li>
+          <li><a href="../subgrounds/">subgrounds package</a> &raquo;</li>
+      <li>subgrounds.plotly_wrappers module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/subgrounds.plotly_wrappers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-subgrounds.plotly_wrappers">
+<span id="subgrounds-plotly-wrappers-module"></span><h1>subgrounds.plotly_wrappers module<a class="headerlink" href="#module-subgrounds.plotly_wrappers" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.TraceWrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">TraceWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.TraceWrapper" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.TraceWrapper.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">plotly.basedatatypes.BaseTraceType</span></em><a class="headerlink" href="#subgrounds.plotly_wrappers.TraceWrapper.graph_object" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.TraceWrapper.fpaths">
+<span class="sig-name descname"><span class="pre">fpaths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><span class="pre">subgrounds.subgraph.fieldpath.FieldPath</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.plotly_wrappers.TraceWrapper.fpaths" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.TraceWrapper.args">
+<span class="sig-name descname"><span class="pre">args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.plotly_wrappers.TraceWrapper.args" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.TraceWrapper.mk_trace">
+<span class="sig-name descname"><span class="pre">mk_trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.TraceWrapper.mk_trace" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.TraceWrapper.field_paths">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">field_paths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><span class="pre">subgrounds.subgraph.fieldpath.FieldPath</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.plotly_wrappers.TraceWrapper.field_paths" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scatter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/line-and-scatter/">https://plotly.com/python/line-and-scatter/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scatter.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scatter.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._scatter.Scatter</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Pie">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Pie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Pie" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/pie-charts/">https://plotly.com/python/pie-charts/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Pie.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Pie.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._pie.Pie</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Bar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Bar" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/bar-charts/">https://plotly.com/python/bar-charts/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Bar.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Bar.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._bar.Bar</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Heatmap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Heatmap" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/heatmaps/">https://plotly.com/python/heatmaps/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Heatmap.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Heatmap.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._heatmap.Heatmap</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Contour">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Contour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Contour" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/contour-plots/">https://plotly.com/python/contour-plots/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Contour.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Contour.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._contour.Contour</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Table">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Table" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/contour-plots/">https://plotly.com/python/contour-plots/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Table.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Table.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._table.Table</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Box">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Box" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/box-plots/">https://plotly.com/python/box-plots/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Box.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Box.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._box.Box</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Violin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Violin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Violin" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/violin/">https://plotly.com/python/violin/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Violin.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Violin.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._violin.Violin</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Histogram">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Histogram" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/histograms/">https://plotly.com/python/histograms/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Histogram.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Histogram.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._histogram.Histogram</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Histogram2d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Histogram2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Histogram2d" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/2D-Histogram/">https://plotly.com/python/2D-Histogram/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Histogram2d.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Histogram2d.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._histogram2d.Histogram2d</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Histogram2dContour">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Histogram2dContour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Histogram2dContour" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/2d-histogram-contour/">https://plotly.com/python/2d-histogram-contour/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Histogram2dContour.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Histogram2dContour.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._histogram2dcontour.Histogram2dContour</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Ohlc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Ohlc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Ohlc" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/ohlc-charts/">https://plotly.com/python/ohlc-charts/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Ohlc.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Ohlc.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._ohlc.Ohlc</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Candlestick">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Candlestick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Candlestick" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/candlestick-charts/">https://plotly.com/python/candlestick-charts/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Candlestick.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Candlestick.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._candlestick.Candlestick</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Waterfall">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Waterfall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Waterfall" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/waterfall-charts/">https://plotly.com/python/waterfall-charts/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Waterfall.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Waterfall.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._waterfall.Waterfall</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Funnel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Funnel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Funnel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/funnel-charts/">https://plotly.com/python/funnel-charts/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Funnel.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Funnel.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._funnel.Funnel</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Indicator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Indicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Indicator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/indicator/">https://plotly.com/python/indicator/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Indicator.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Indicator.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._indicator.Indicator</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scatter3d">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Scatter3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scatter3d" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/3d-scatter-plots/">https://plotly.com/python/3d-scatter-plots/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scatter3d.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scatter3d.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._scatter3d.Scatter3d</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Surface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Surface" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/3d-surface-plots/">https://plotly.com/python/3d-surface-plots/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Surface.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Surface.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._surface.Surface</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scattergeo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Scattergeo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scattergeo" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/scatter-plots-on-maps/">https://plotly.com/python/scatter-plots-on-maps/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scattergeo.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scattergeo.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._scattergeo.Scattergeo</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Choropleth">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Choropleth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Choropleth" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/choropleth-maps/">https://plotly.com/python/choropleth-maps/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Choropleth.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Choropleth.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._choropleth.Choropleth</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scattermapbox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Scattermapbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scattermapbox" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/scattermapbox/">https://plotly.com/python/scattermapbox/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scattermapbox.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scattermapbox.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._scattermapbox.Scattermapbox</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Choroplethmapbox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Choroplethmapbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Choroplethmapbox" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/mapbox-county-choropleth/">https://plotly.com/python/mapbox-county-choropleth/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Choroplethmapbox.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Choroplethmapbox.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._choroplethmapbox.Choroplethmapbox</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Densitymapbox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Densitymapbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Densitymapbox" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/mapbox-density-heatmaps/">https://plotly.com/python/mapbox-density-heatmaps/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Densitymapbox.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Densitymapbox.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._densitymapbox.Densitymapbox</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scatterpolar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Scatterpolar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scatterpolar" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/polar-chart/">https://plotly.com/python/polar-chart/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scatterpolar.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scatterpolar.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._scatterpolar.Scatterpolar</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Barpolar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Barpolar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Barpolar" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/wind-rose-charts/">https://plotly.com/python/wind-rose-charts/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Barpolar.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Barpolar.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._barpolar.Barpolar</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Sunburst">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Sunburst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Sunburst" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/sunburst-charts/">https://plotly.com/python/sunburst-charts/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Sunburst.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Sunburst.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._sunburst.Sunburst</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Treemap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Treemap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Treemap" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/treemaps/">https://plotly.com/python/treemaps/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Treemap.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Treemap.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._treemap.Treemap</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Icicle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Icicle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Icicle" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/icicle-charts/">https://plotly.com/python/icicle-charts/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Icicle.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Icicle.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._icicle.Icicle</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Sankey">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Sankey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Sankey" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/sankey-diagram/">https://plotly.com/python/sankey-diagram/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Sankey.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Sankey.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._sankey.Sankey</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Parcoords">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Parcoords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Parcoords" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/parallel-coordinates-plot/">https://plotly.com/python/parallel-coordinates-plot/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Parcoords.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Parcoords.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._parcoords.Parcoords</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Parcats">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Parcats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Parcats" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/parallel-categories-diagram/">https://plotly.com/python/parallel-categories-diagram/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Parcats.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Parcats.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._parcats.Parcats</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Carpet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Carpet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Carpet" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/carpet-plot/">https://plotly.com/python/carpet-plot/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Carpet.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Carpet.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._carpet.Carpet</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scattercarpet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Scattercarpet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scattercarpet" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/carpet-scatter/">https://plotly.com/python/carpet-scatter/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Scattercarpet.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Scattercarpet.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._scattercarpet.Scattercarpet</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Contourcarpet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Contourcarpet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Contourcarpet" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></code></a></p>
+<p>See <a class="reference external" href="https://plotly.com/python/carpet-contour/">https://plotly.com/python/carpet-contour/</a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Contourcarpet.graph_object">
+<span class="sig-name descname"><span class="pre">graph_object</span></span><a class="headerlink" href="#subgrounds.plotly_wrappers.Contourcarpet.graph_object" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">plotly.graph_objs._contourcarpet.Contourcarpet</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Figure">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.plotly_wrappers.</span></span><span class="sig-name descname"><span class="pre">Figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subgrounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traces</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Figure" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Figure.figure">
+<span class="sig-name descname"><span class="pre">figure</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">plotly.graph_objs._figure.Figure</span></em><a class="headerlink" href="#subgrounds.plotly_wrappers.Figure.figure" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Figure.subgrounds">
+<span class="sig-name descname"><span class="pre">subgrounds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.subgrounds/#subgrounds.subgrounds.Subgrounds" title="subgrounds.subgrounds.Subgrounds"><span class="pre">subgrounds.subgrounds.Subgrounds</span></a></em><a class="headerlink" href="#subgrounds.plotly_wrappers.Figure.subgrounds" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Figure.traces">
+<span class="sig-name descname"><span class="pre">traces</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#subgrounds.plotly_wrappers.TraceWrapper" title="subgrounds.plotly_wrappers.TraceWrapper"><span class="pre">subgrounds.plotly_wrappers.TraceWrapper</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.plotly_wrappers.Figure.traces" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Figure.req">
+<span class="sig-name descname"><span class="pre">req</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="../subgrounds.query/#subgrounds.query.DataRequest" title="subgrounds.query.DataRequest"><span class="pre">subgrounds.query.DataRequest</span></a></em><a class="headerlink" href="#subgrounds.plotly_wrappers.Figure.req" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Figure.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.plotly_wrappers.Figure.data" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Figure.args">
+<span class="sig-name descname"><span class="pre">args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.plotly_wrappers.Figure.args" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.plotly_wrappers.Figure.refresh">
+<span class="sig-name descname"><span class="pre">refresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.plotly_wrappers.Figure.refresh" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../subgrounds.dataframe_utils/" class="btn btn-neutral float-left" title="subgrounds.dataframe_utils module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../subgrounds.query/" class="btn btn-neutral float-right" title="subgrounds.query module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

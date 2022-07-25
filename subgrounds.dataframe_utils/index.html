@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>subgrounds.dataframe_utils module &mdash; subgrounds 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="subgrounds.plotly_wrappers module" href="../subgrounds.plotly_wrappers/" />
+    <link rel="prev" title="subgrounds.dash_wrappers module" href="../subgrounds.dash_wrappers/" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../" class="icon icon-home"> subgrounds
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started/">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/">Subgrounds basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/">Advanced topics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../modules/">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../subgrounds/">subgrounds package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../subgrounds/#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.client/">subgrounds.client module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.dash_wrappers/">subgrounds.dash_wrappers module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">subgrounds.dataframe_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.plotly_wrappers/">subgrounds.plotly_wrappers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.query/">subgrounds.query module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.schema/">subgrounds.schema module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.subgrounds/">subgrounds.subgrounds module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.transform/">subgrounds.transform module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../subgrounds.utils/">subgrounds.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../subgrounds/#module-subgrounds">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">subgrounds</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../modules/">subgrounds</a> &raquo;</li>
+          <li><a href="../subgrounds/">subgrounds package</a> &raquo;</li>
+      <li>subgrounds.dataframe_utils module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/subgrounds.dataframe_utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-subgrounds.dataframe_utils">
+<span id="subgrounds-dataframe-utils-module"></span><h1>subgrounds.dataframe_utils module<a class="headerlink" href="#module-subgrounds.dataframe_utils" title="Permalink to this headline"></a></h1>
+<p>Pandas DataFrame utility module containing functions related to the
+formatting of GraphQL JSON data into DataFrames.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.dataframe_utils.gen_columns">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.dataframe_utils.</span></span><span class="sig-name descname"><span class="pre">gen_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.dataframe_utils.gen_columns" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.dataframe_utils.fmt_cols">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.dataframe_utils.</span></span><span class="sig-name descname"><span class="pre">fmt_cols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.dataframe_utils.fmt_cols" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="subgrounds.dataframe_utils.DataFrameColumns">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">subgrounds.dataframe_utils.</span></span><span class="sig-name descname"><span class="pre">DataFrameColumns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpaths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.dataframe_utils.DataFrameColumns" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Helper class that holds data related to the shape of a DataFrame</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.dataframe_utils.DataFrameColumns.key">
+<span class="sig-name descname"><span class="pre">key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></em><a class="headerlink" href="#subgrounds.dataframe_utils.DataFrameColumns.key" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="subgrounds.dataframe_utils.DataFrameColumns.fpaths">
+<span class="sig-name descname"><span class="pre">fpaths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#subgrounds.dataframe_utils.DataFrameColumns.fpaths" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.dataframe_utils.DataFrameColumns.combine">
+<span class="sig-name descname"><span class="pre">combine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.dataframe_utils.DataFrameColumns.combine" title="Permalink to this definition"></a></dt>
+<dd><p>Returns new DataFrameColumns containing the union of <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">other</span></code>'s columns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#subgrounds.dataframe_utils.DataFrameColumns" title="subgrounds.dataframe_utils.DataFrameColumns"><em>DataFrameColumns</em></a>) -- Columns to be combined to <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>New <a class="reference internal" href="#subgrounds.dataframe_utils.DataFrameColumns" title="subgrounds.dataframe_utils.DataFrameColumns"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrameColumns</span></code></a> containing the union of</dt><dd><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">other</span></code></p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#subgrounds.dataframe_utils.DataFrameColumns" title="subgrounds.dataframe_utils.DataFrameColumns">DataFrameColumns</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="subgrounds.dataframe_utils.DataFrameColumns.mk_df">
+<span class="sig-name descname"><span class="pre">mk_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.dataframe_utils.DataFrameColumns.mk_df" title="Permalink to this definition"></a></dt>
+<dd><p>Formats the JSON data <code class="xref py py-attr docutils literal notranslate"><span class="pre">data</span></code> into a DataFrame containing the columns
+defined in <code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) -- The JSON data to be formatted into a dataframe</p></li>
+<li><p><strong>path_map</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em>]</em>) -- A dictionary of <code class="xref py py-attr docutils literal notranslate"><span class="pre">(key-FieldPath)</span></code> pairs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The JSON data formatted into a DataFrame</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.dataframe_utils.columns_of_selections">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.dataframe_utils.</span></span><span class="sig-name descname"><span class="pre">columns_of_selections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selections</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.dataframe_utils.columns_of_selections" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a list of DataFrame columns specifications based on a list of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Selection</span></code> trees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>selections</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="../subgrounds.query/#subgrounds.query.Selection" title="subgrounds.query.Selection"><em>Selection</em></a><em>]</em>) -- The selection trees</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The list of DataFrame columns specifications</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference internal" href="#subgrounds.dataframe_utils.DataFrameColumns" title="subgrounds.dataframe_utils.DataFrameColumns">DataFrameColumns</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="subgrounds.dataframe_utils.df_of_json">
+<span class="sig-prename descclassname"><span class="pre">subgrounds.dataframe_utils.</span></span><span class="sig-name descname"><span class="pre">df_of_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#subgrounds.dataframe_utils.df_of_json" title="Permalink to this definition"></a></dt>
+<dd><p>Formats the JSON data <code class="xref py py-attr docutils literal notranslate"><span class="pre">json_data</span></code> into Pandas DataFrames,
+flattening the data in the process.</p>
+<p>Depending on the request's fieldpaths, either one or multiple dataframes will
+be returned based on how flattenable the response data is.</p>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">fpaths</span></code> is a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldPath</span></code> objects corresponding to the
+set of fieldpaths that were used to get the response data <code class="xref py py-attr docutils literal notranslate"><span class="pre">json_data</span></code>.</p>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">columns</span></code> is an optional argument used to rename the dataframes(s)
+columns. The length of <code class="xref py py-attr docutils literal notranslate"><span class="pre">columns</span></code> must be the same as the number of columns
+of all returned dataframes.</p>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">concat</span></code> indicates whether or not the resulting dataframes should be
+concatenated together. The dataframes must have the same number of columns,
+as well as the same column names (which can be set using the <code class="xref py py-attr docutils literal notranslate"><span class="pre">columns</span></code>
+argument).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>json_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) -- Response data</p></li>
+<li><p><strong>fpaths</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference internal" href="../subgrounds.subgraph.fieldpath/#subgrounds.subgraph.fieldpath.FieldPath" title="subgrounds.subgraph.fieldpath.FieldPath"><em>FieldPath</em></a><em>]</em>) -- Fieldpaths that yielded the response data</p></li>
+<li><p><strong>columns</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>optional</em>) -- Column names. Defaults to None.</p></li>
+<li><p><strong>concat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) -- Flag indicating whether or not to concatenate the
+resulting dataframes, if there are more than one. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The resulting dataframe(s)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../subgrounds.dash_wrappers/" class="btn btn-neutral float-left" title="subgrounds.dash_wrappers module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../subgrounds.plotly_wrappers/" class="btn btn-neutral float-right" title="subgrounds.plotly_wrappers module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
