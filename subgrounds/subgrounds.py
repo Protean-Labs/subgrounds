@@ -7,7 +7,7 @@ querying The Graph with Subgrounds.
 from dataclasses import dataclass, field
 from functools import reduce
 import functools
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator, Optional, Type
 from pipe import map, groupby, traverse, where
 import os
 import json
@@ -16,13 +16,15 @@ import logging
 import warnings
 
 from subgrounds.dataframe_utils import df_of_json
+from subgrounds.pagination.pagination import PaginationStrategy
+from subgrounds.pagination.strategies import ShallowStrategy, LegacyStrategy
 from subgrounds.query import DataRequest, Document, Query
 from subgrounds.schema import mk_schema
 from subgrounds.subgraph.fieldpath import FieldPath
 from subgrounds.subgraph.subgraph import Subgraph
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, DEFAULT_SUBGRAPH_TRANSFORMS, DocumentTransform, RequestTransform
 import subgrounds.client as client
-import subgrounds.pagination as pagination
+from subgrounds.pagination import paginate, paginate_iter
 
 logger = logging.getLogger('subgrounds')
 warnings.simplefilter('default')
@@ -118,28 +120,31 @@ class Subgrounds:
       ))
     ))
 
-  def execute(self, req: DataRequest, auto_paginate: bool = True) -> list[dict]:
+  def execute(
+    self,
+    req: DataRequest,
+    pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
+  ) -> list[dict]:
     """ Executes a :class:`DataRequest` object, sending the underlying
     query(ies) to the server and returning a data blob (list of Python
     dictionaries, one per actual query).
 
     Args:
-      req (DataRequest): The :class:`DataRequest` object to be executed
-      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
-        should automatically paginate the query. Useful for querying non-subgraph
-        APIs since automatic pagination is only supported for subgraph APIs.
-        Defaults to True.
+        req (DataRequest): The :class:`DataRequest` object to be executed
+        pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
+          implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
+          automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
 
     Returns:
-      list[dict]: The reponse data
+        list[dict]: The reponse data
     """
     def execute_document(doc: Document) -> dict:
       subgraph: Subgraph = next(
         self.subgraphs.values()
         | where(lambda sg: sg._url == doc.url)
       )
-      if auto_paginate and subgraph._is_subgraph:
-        return pagination.paginate(subgraph._schema, doc)
+      if pagination_strategy is not None and subgraph._is_subgraph:
+        return paginate(subgraph._schema, doc, pagination_strategy=pagination_strategy)
       else:
         return client.query(doc.url, doc.graphql, variables=doc.variables)
 
@@ -168,16 +173,19 @@ class Subgrounds:
 
     return transform_req(self.global_transforms, req)
 
-  def execute_iter(self, req: DataRequest, auto_paginate: bool = True) -> Iterator[dict[str, Any]]:
+  def execute_iter(
+    self,
+    req: DataRequest,
+    pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
+  ) -> Iterator[dict[str, Any]]:
     """ Same as `execute`, except that an iterator is returned which will iterate
     the data pages.
 
     Args:
       req (DataRequest): The :class:`DataRequest` object to be executed
-      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
-        should automatically paginate the query. Useful for querying non-subgraph
-        APIs since automatic pagination is only supported for subgraph APIs.
-        Defaults to True.
+      pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
+        implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
+        automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
 
     Returns:
       Iterator[dict]: An iterator over the reponse data pages
@@ -187,8 +195,8 @@ class Subgrounds:
         self.subgraphs.values()
         | where(lambda sg: sg._url == doc.url)
       )
-      if auto_paginate and subgraph._is_subgraph:
-        yield from pagination.paginate_iter(subgraph._schema, doc)
+      if pagination_strategy is not None and subgraph._is_subgraph:
+        yield from paginate_iter(subgraph._schema, doc, pagination_strategy=pagination_strategy)
       else:
         yield client.query(doc.url, doc.graphql, variables=doc.variables)
 
@@ -217,17 +225,16 @@ class Subgrounds:
   def query_json(
     self,
     fpaths: FieldPath | list[FieldPath],
-    auto_paginate: bool = True
+    pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> list[dict[str, Any]]:
-    """Combines ``Subgrounds.mk_request`` and ``Subgrounds.execute`` into one function.
+    """Equivalent to ``Subgrounds.execute(Subgrounds.mk_request(fpaths), pagination_strategy)``.
 
     Args:
       fpaths (FieldPath | list[FieldPath]): One or more :class:`FieldPath` objects that should be
-        included in the request
-      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
-        should automatically paginate the query. Useful for querying non-subgraph
-        APIs since automatic pagination is only supported for subgraph APIs.
-        Defaults to True.
+        included in the request.
+      pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
+        implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
+        automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
 
     Returns:
       list[dict[str, Any]]: The reponse data
@@ -239,22 +246,21 @@ class Subgrounds:
       | traverse
     )
     req = self.mk_request(fpaths)
-    return self.execute(req, auto_paginate=auto_paginate)
+    return self.execute(req, pagination_strategy=pagination_strategy)
 
   def query_json_iter(
     self,
     fpaths: FieldPath | list[FieldPath],
-    auto_paginate: bool = True
+    pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> Iterator[dict[str, Any]]:
     """Same as `query_json` except an iterator over the response data pages is returned.
 
     Args:
       fpaths (FieldPath | list[FieldPath]): One or more :class:`FieldPath` objects
-        that should be included in the request
-      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
-        should automatically paginate the query. Useful for querying non-subgraph
-        APIs since automatic pagination is only supported for subgraph APIs.
-        Defaults to True.
+        that should be included in the request.
+      pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
+        implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
+        automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
 
     Returns:
       list[dict[str, Any]]: The reponse data
@@ -266,14 +272,14 @@ class Subgrounds:
       | traverse
     )
     req = self.mk_request(fpaths)
-    yield from self.execute_iter(req, auto_paginate=auto_paginate)
+    yield from self.execute_iter(req, pagination_strategy=pagination_strategy)
 
   def query_df(
     self,
     fpaths: FieldPath | list[FieldPath],
     columns: Optional[list[str]] = None,
     concat: bool = False,
-    auto_paginate: bool = True
+    pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> pd.DataFrame | list[pd.DataFrame]:
     """Same as :func:`Subgrounds.query` but formats the response data into a
     Pandas DataFrame. If the response data cannot be flattened to a single query
@@ -297,10 +303,9 @@ class Subgrounds:
         should be included in the request.
       columns (Optional[list[str]], optional): The column labels. Defaults to None.
       merge (bool, optional): Whether or not to merge resulting dataframes.
-      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
-        should automatically paginate the query. Useful for querying non-subgraph
-        APIs since automatic pagination is only supported for subgraph APIs.
-        Defaults to True.
+      pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
+        implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
+        automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
 
     Returns:
       pd.DataFrame | list[pd.DataFrame]: A DataFrame containing the reponse data
@@ -318,16 +323,16 @@ class Subgrounds:
 
         # Query last 10 swaps from the ETH/USDC pool
         >>> eth_usdc = univ3.Query.swaps(
-        ...   orderBy=univ3.Swap.timestamp,
-        ...   orderDirection='desc',
-        ...   first=10,
-        ...   where=[
-        ...     univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
-        ...   ]
+        ...     orderBy=univ3.Swap.timestamp,
+        ...     orderDirection='desc',
+        ...     first=10,
+        ...     where=[
+        ...         univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
+        ...     ]
         ... )
         >>> sg.query_df([
-        ...   eth_usdc.timestamp,
-        ...   eth_usdc.price
+        ...     eth_usdc.timestamp,
+        ...     eth_usdc.price
         ... ])
           swaps_timestamp  swaps_price
         0       1643213811  2618.886394
@@ -347,13 +352,13 @@ class Subgrounds:
       | map(FieldPath._auto_select)
       | traverse
     )
-    json_data = self.query_json(fpaths, auto_paginate=auto_paginate)
+    json_data = self.query_json(fpaths, pagination_strategy=pagination_strategy)
     return df_of_json(json_data, fpaths, columns, concat)
 
   def query_df_iter(
     self,
     fpaths: FieldPath | list[FieldPath],
-    auto_paginate: bool = True
+    pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> Iterator[pd.DataFrame]:
     """Same as `query_df` except an iterator over the response data pages is returned
     Args:
@@ -361,10 +366,9 @@ class Subgrounds:
         should be included in the request
       columns (Optional[list[str]], optional): The column labels. Defaults to None.
       merge (bool, optional): Whether or not to merge resulting dataframes.
-      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
-        should automatically paginate the query. Useful for querying non-subgraph
-        APIs since automatic pagination is only supported for subgraph APIs.
-        Defaults to True.
+      pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
+        implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
+        automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
 
     Returns:
       Iterator[pd.DataFrame]: An iterator over the response data pages, each as a  DataFrame
@@ -375,14 +379,14 @@ class Subgrounds:
       | map(FieldPath._auto_select)
       | traverse
     )
-    for page in self.query_json_iter(fpaths, auto_paginate=auto_paginate):
+    for page in self.query_json_iter(fpaths, pagination_strategy=pagination_strategy):
       yield df_of_json(page, fpaths, None, False)
 
   def query(
     self,
     fpaths: FieldPath | list[FieldPath],
     unwrap: bool = True,
-    auto_paginate: bool = True
+    pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> str | int | float | bool | list | tuple | None:
     """Executes one or multiple ``FieldPath`` objects immediately and return the data (as a tuple if multiple ``FieldPath`` objects are provided).
 
@@ -391,10 +395,10 @@ class Subgrounds:
       unwrap (bool, optional): Flag indicating whether or not, in the case where
         the returned data is a list of one element, the element itself should be
         returned instead of the list. Defaults to ``True``.
-      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
-        should automatically paginate the query. Useful for querying non-subgraph
-        APIs since automatic pagination is only supported for subgraph APIs.
-        Defaults to ``True``.
+      pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
+        implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
+        automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
+
     Returns:
       [type]: The ``FieldPath`` object(s) data
 
@@ -411,12 +415,12 @@ class Subgrounds:
 
       # Construct FieldPath to get price of last swap on ETH/USDC pool
       >>> eth_usdc_last = univ3.Query.swaps(
-      ...   orderBy=univ3.Swap.timestamp,
-      ...   orderDirection='desc',
-      ...   first=1,
-      ...   where=[
-      ...     univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
-      ...   ]
+      ...     orderBy=univ3.Swap.timestamp,
+      ...     orderDirection='desc',
+      ...     first=1,
+      ...     where=[
+      ...         univ3.Swap.pool == '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
+      ...     ]
       ... ).price
 
       # Query last price FieldPath
@@ -430,7 +434,7 @@ class Subgrounds:
       | map(FieldPath._auto_select)
       | traverse
     )
-    blob = self.query_json(fpaths, auto_paginate=auto_paginate)
+    blob = self.query_json(fpaths, pagination_strategy=pagination_strategy)
 
     def f(fpath: FieldPath) -> dict[str, Any]:
       data = fpath._extract_data(blob)
@@ -450,7 +454,7 @@ class Subgrounds:
     self,
     fpaths: FieldPath | list[FieldPath],
     unwrap: bool = True,
-    auto_paginate: bool = True
+    pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> str | int | float | bool | list | tuple | None:
     """Same as `query` except an iterator over the resonse data pages is returned.
 
@@ -459,10 +463,10 @@ class Subgrounds:
       unwrap (bool, optional): Flag indicating whether or not, in the case where
         the returned data is a list of one element, the element itself should be
         returned instead of the list. Defaults to ``True``.
-      auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
-        should automatically paginate the query. Useful for querying non-subgraph
-        APIs since automatic pagination is only supported for subgraph APIs.
-        Defaults to ``True``.
+      pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
+        implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
+        automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
+
     Returns:
       Iterator[type]: An iterator over the ``FieldPath`` object(s)' data pages
     """
@@ -479,7 +483,7 @@ class Subgrounds:
       | map(FieldPath._auto_select)
       | traverse
     )
-    for page in self.query_json_iter(fpaths, auto_paginate=auto_paginate):
+    for page in self.query_json_iter(fpaths, pagination_strategy=pagination_strategy):
       data = tuple(fpaths | map(functools.partial(f, blob=page)))
 
       if len(data) == 1:
