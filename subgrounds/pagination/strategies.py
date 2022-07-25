@@ -7,8 +7,10 @@ from pprint import pprint
 from pipe import traverse, map
 from typing import Any, Callable, Iterator, Literal, Optional
 
-from subgrounds.pagination.preprocess import PaginationNode
+from subgrounds.pagination.preprocess import PaginationNode, generate_pagination_nodes, normalize, prune_doc
 from subgrounds.pagination.utils import PAGE_SIZE
+from subgrounds.query import Document
+from subgrounds.schema import SchemaMeta
 from subgrounds.utils import extract_data
 
 
@@ -17,8 +19,13 @@ class StopPagination(Exception):
     super().__init__(*args)
 
 
+class SkipPagination(Exception):
+  def __init__(self, *args: object) -> None:
+    super().__init__(*args)
+
+
 @dataclass
-class LegacyStrategy:
+class LegacyStrategyArgGenerator:
   cursor: list[Cursor]
   active_idx: int = 0
 
@@ -26,7 +33,7 @@ class LegacyStrategy:
   class Cursor:
     page_node: PaginationNode
 
-    inner: list[LegacyStrategy.Cursor]
+    inner: list[LegacyStrategyArgGenerator.Cursor]
     inner_idx: int = 0
 
     filter_value: Any = None
@@ -37,7 +44,7 @@ class LegacyStrategy:
 
     def __init__(self, page_node: PaginationNode) -> None:
       self.page_node = page_node
-      self.inner = list(page_node.inner | map(LegacyStrategy.Cursor))
+      self.inner = list(page_node.inner | map(LegacyStrategyArgGenerator.Cursor))
       self.reset()
 
     @property
@@ -134,7 +141,7 @@ class LegacyStrategy:
       self.keys = set()
 
   def __init__(self, pagination_nodes: list[PaginationNode]) -> None:
-    self.cursor = self.cursor = list(pagination_nodes | map(LegacyStrategy.Cursor))
+    self.cursor = list(pagination_nodes | map(LegacyStrategyArgGenerator.Cursor))
 
   def step(self, page_data: Optional[dict[str, Any]] = None) -> dict[str, Any]:
     try:
@@ -150,8 +157,38 @@ class LegacyStrategy:
         raise StopPagination
 
 
+class LegacyStrategy:
+  schema: SchemaMeta
+  arg_generator: LegacyStrategyArgGenerator
+  normalized_doc: Document
+
+  def __init__(self, schema: SchemaMeta, document: Document) -> None:
+    self.schema = schema
+    
+    pagination_nodes = generate_pagination_nodes(schema, document)
+
+    if len(pagination_nodes) == 0:
+      raise SkipPagination
+
+    self.arg_generator = LegacyStrategyArgGenerator(pagination_nodes)
+    self.normalized_doc = normalize(
+      schema,
+      document,
+      pagination_nodes
+    )
+
+  def step(
+    self,
+    page_data: Optional[dict[str, Any]] = None
+  ) ->  Tuple[Document, dict[str, Any]]:
+    args = self.arg_generator.step(page_data)
+    trimmed_doc = prune_doc(self.normalized_doc, args)
+    return (trimmed_doc, args)
+
+
+
 @dataclass
-class GreedyStrategy:
+class ShallowStrategyArgGenerator:
   @dataclass
   class Cursor:
     # TODO: Add GreedyStrategy doc
@@ -175,7 +212,7 @@ class GreedyStrategy:
     """
     page_node: PaginationNode
 
-    inner: list[GreedyStrategy.Cursor]
+    inner: list[ShallowStrategyArgGenerator.Cursor]
     inner_idx: int = 0
 
     filter_value: Any = None
@@ -183,13 +220,13 @@ class GreedyStrategy:
     page_count: int = 0
 
     @staticmethod
-    def from_pagination_node(page_node: PaginationNode) -> GreedyStrategy.Cursor:
-      return GreedyStrategy.Cursor(
+    def from_pagination_node(page_node: PaginationNode) -> ShallowStrategyArgGenerator.Cursor:
+      return ShallowStrategyArgGenerator.Cursor(
         page_node=page_node,
         filter_value=page_node.filter_value,
         inner=list(
           page_node.inner
-          | map(GreedyStrategy.Cursor.from_pagination_node)
+          | map(ShallowStrategyArgGenerator.Cursor.from_pagination_node)
         )
       )
 
@@ -198,13 +235,13 @@ class GreedyStrategy:
       return len(self.inner) == 0
 
     @property
-    def active_cursor(self) -> Optional[GreedyStrategy.Cursor]:
+    def active_cursor(self) -> Optional[ShallowStrategyArgGenerator.Cursor]:
       if len(self.inner) > 0:
         return self.inner[self.inner_idx]
       else:
         return None
 
-    def iter(self, only_active: bool = False) -> Iterator[GreedyStrategy.Cursor]:
+    def iter(self, only_active: bool = False) -> Iterator[ShallowStrategyArgGenerator.Cursor]:
       yield self
       if only_active and len(self.inner) > 0:
         yield from self.inner[self.inner_idx].iter(only_active=True)
@@ -214,10 +251,10 @@ class GreedyStrategy:
 
     def mapi(
       self,
-      map_f: Callable[[int, GreedyStrategy.Cursor], GreedyStrategy.Cursor],
+      map_f: Callable[[int, ShallowStrategyArgGenerator.Cursor], ShallowStrategyArgGenerator.Cursor],
       priority: Literal['self'] | Literal['children'] = 'self',
       counter: Optional(count[int]) = None
-    ) -> GreedyStrategy.Cursor:
+    ) -> ShallowStrategyArgGenerator.Cursor:
       if counter is None:
         counter = count()
 
@@ -225,9 +262,9 @@ class GreedyStrategy:
         case 'self':
           new_cursor = map_f(next(counter), self)
 
-          return GreedyStrategy.Cursor(
+          return ShallowStrategyArgGenerator.Cursor(
             page_node=new_cursor.page_node,
-            inner=list(new_cursor.inner | map(partial(GreedyStrategy.Cursor.mapi, map_f=map_f, counter=counter))),
+            inner=list(new_cursor.inner | map(partial(ShallowStrategyArgGenerator.Cursor.mapi, map_f=map_f, counter=counter))),
             inner_idx=new_cursor.inner_idx,
             filter_value=new_cursor.filter_value,
             queried_entities=new_cursor.queried_entities,
@@ -237,9 +274,9 @@ class GreedyStrategy:
         case 'children':
           i = next(counter)
 
-          new_cursor = GreedyStrategy.Cursor(
+          new_cursor = ShallowStrategyArgGenerator.Cursor(
             page_node=self.page_node,
-            inner=list(self.inner | map(partial(GreedyStrategy.Cursor.mapi, map_f=map_f, counter=counter))),
+            inner=list(self.inner | map(partial(ShallowStrategyArgGenerator.Cursor.mapi, map_f=map_f, counter=counter))),
             inner_idx=self.inner_idx,
             filter_value=self.filter_value,
             queried_entities=self.queried_entities,
@@ -254,7 +291,7 @@ class GreedyStrategy:
   cursor: list[Cursor]
 
   def __init__(self, pagination_nodes: list[PaginationNode]) -> None:
-    self.cursor = list(pagination_nodes | map(GreedyStrategy.Cursor.from_pagination_node))
+    self.cursor = list(pagination_nodes | map(ShallowStrategyArgGenerator.Cursor.from_pagination_node))
 
   def iter_cursors(self) -> Iterator[Cursor]:
     for cur in self.cursor:
@@ -266,7 +303,7 @@ class GreedyStrategy:
     num_entities = len(index_field_data)
     filter_value = index_field_data[-1] if len(index_field_data) > 0 else None
 
-    new_cursor = GreedyStrategy.Cursor(
+    new_cursor = ShallowStrategyArgGenerator.Cursor(
       page_node=cursor.page_node,
       inner=cursor.inner,
       inner_idx=0,
@@ -287,8 +324,8 @@ class GreedyStrategy:
     if page_data is not None:
       self.cursor = list(
         self.cursor
-        | map(partial(GreedyStrategy.Cursor.mapi, map_f=lambda i, cursor: (
-          GreedyStrategy.update_cursor(cursor, page_data)
+        | map(partial(ShallowStrategyArgGenerator.Cursor.mapi, map_f=lambda i, cursor: (
+          ShallowStrategyArgGenerator.update_cursor(cursor, page_data)
           if i == 0 
           else cursor
         )))
@@ -308,3 +345,32 @@ class GreedyStrategy:
         args[f'lastOrderingValue{cur.page_node.node_idx}'] = cur.filter_value
 
     return args
+
+
+class ShallowStrategy:
+  schema: SchemaMeta
+  arg_generator: ShallowStrategyArgGenerator
+  normalized_doc: Document
+
+  def __init__(self, schema: SchemaMeta, document: Document) -> None:
+    self.schema = schema
+    
+    pagination_nodes = generate_pagination_nodes(schema, document)
+
+    if len(pagination_nodes) == 0:
+      raise SkipPagination
+    
+    self.arg_generator = ShallowStrategyArgGenerator(pagination_nodes)
+    self.normalized_doc = normalize(
+      schema,
+      document,
+      pagination_nodes
+    )
+
+  def step(
+    self,
+    page_data: Optional[dict[str, Any]] = None
+  ) ->  Tuple[Document, dict[str, Any]]:
+    args = self.arg_generator.step(page_data)
+    trimmed_doc = prune_doc(self.normalized_doc, args)
+    return (trimmed_doc, args)

@@ -77,12 +77,10 @@ See :class:`Cursor`, :func:`trim_document` and :func:`paginate`.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Iterator, Protocol, Tuple, Type
-
-from pyparsing import Optional
+from typing import Any, Callable, Iterator, Protocol, Tuple, Type, Optional
 
 from subgrounds.pagination.preprocess import PaginationNode, generate_pagination_nodes, normalize, prune_doc
-from subgrounds.pagination.strategies import StopPagination
+from subgrounds.pagination.strategies import SkipPagination, StopPagination
 from subgrounds.pagination.utils import merge
 # from subgrounds.pagination.strategies import Cursor
 
@@ -99,9 +97,9 @@ class PaginationError(RuntimeError):
 
 
 class PaginationStrategy(Protocol):
-  def __init__(self, pagination_nodes: list[PaginationNode]) -> None: ...
+  def __init__(self, schema: SchemaMeta, document: Document) -> None: ...
 
-  def step(self, page_data: Optional[dict[str, Any]] = None) -> dict[str, Any]: ...
+  def step(self, page_data: Optional[dict[str, Any]] = None) -> Tuple[Document, dict[str, Any]]: ...
 
 
 def paginate(
@@ -119,31 +117,29 @@ def paginate(
   Returns:
     dict[str, Any]: The response data as a JSON dictionary
   """
-  pagination_nodes = generate_pagination_nodes(schema, doc)
 
-  if len(pagination_nodes) == 0:
-    return client.query(doc.url, doc.graphql, variables=doc.variables)
-  else:
-    normalized_doc = normalize(schema, doc, pagination_nodes)
+  try:
+    strategy = pagination_strategy(schema, doc)
+
     data: dict[str, Any] = {}
-
-    strategy = pagination_strategy(pagination_nodes)
-    args = strategy.step()
+    doc, args = strategy.step()
 
     while True:
       try:
-        trimmed_doc = prune_doc(normalized_doc, args)
         page_data = client.query(
-          url=trimmed_doc.url,
-          query_str=trimmed_doc.graphql,
-          variables=trimmed_doc.variables | args
+          url=doc.url,
+          query_str=doc.graphql,
+          variables=doc.variables | args
         )
         data = merge(data, page_data)
-        args = strategy.step(data)
+        doc, args = strategy.step(page_data)
       except StopPagination:
         break
 
     return data
+
+  except SkipPagination:
+    return client.query(doc.url, doc.graphql, variables=doc.variables)
 
 
 def paginate_iter(
@@ -161,22 +157,25 @@ def paginate_iter(
   Returns:
     dict[str, Any]: The response data as a JSON dictionary
   """
-  pagination_nodes = generate_pagination_nodes(schema, doc)
 
-  if len(pagination_nodes) == 0:
-    yield client.query(doc.url, doc.graphql, variables=doc.variables)
-  else:
-    normalized_doc = normalize(schema, doc, pagination_nodes)
-    strategy = pagination_strategy(pagination_nodes)
-    args = strategy.step()
+  try:
+    strategy = pagination_strategy(schema, doc)
+
+    doc, args = strategy.step()
 
     while True:
       try:
-        trimmed_doc = prune_doc(normalized_doc, args)
-        page_data = client.query(trimmed_doc.url, trimmed_doc.graphql, variables=trimmed_doc.variables | args)
+        page_data = client.query(
+          url=doc.url,
+          query_str=doc.graphql,
+          variables=doc.variables | args
+        )
         yield page_data
-        args = strategy.step(page_data)
-      except StopIteration:
+        doc, args = strategy.step(page_data)
+      except StopPagination:
         break
       except Exception as exn:
         raise PaginationError(exn.args[0], strategy)
+
+  except SkipPagination:
+    return client.query(doc.url, doc.graphql, variables=doc.variables)

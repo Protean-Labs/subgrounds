@@ -5,7 +5,7 @@ import pytest
 
 from subgrounds.pagination.pagination import PaginationStrategy
 from subgrounds.pagination.preprocess import PaginationNode
-from subgrounds.pagination.strategies import GreedyStrategy, LegacyStrategy, StopPagination
+from subgrounds.pagination.strategies import ShallowStrategyArgGenerator, LegacyStrategyArgGenerator, StopPagination
 from subgrounds.schema import TypeRef
 
 
@@ -242,7 +242,7 @@ def test_legacy_strategy(
   data_and_exception: list[Tuple[dict[str, Any], Optional[Exception]]],
   expected: list[dict[str, Any]]
 ):
-  strategy = LegacyStrategy(page_nodes)
+  strategy = LegacyStrategyArgGenerator(page_nodes)
   __test_args(strategy, expected, data_and_exception)
 
 
@@ -430,5 +430,5 @@ def test_greedy_strategy(
   data_and_exception: list[Tuple[dict[str, Any], Optional[Exception]]],
   expected: list[dict[str, Any]]
 ):
-  strategy = GreedyStrategy(page_nodes)
+  strategy = ShallowStrategyArgGenerator(page_nodes)
   __test_args(strategy, expected, data_and_exception)
