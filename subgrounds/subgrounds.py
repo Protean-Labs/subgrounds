@@ -91,18 +91,23 @@ class Subgrounds:
     self.subgraphs[url] = sg
     return sg
 
-  def mk_request(self, fpaths: list[FieldPath]) -> DataRequest:
-    """Creates a :class:`DataRequest` object by combining multiple
+  def mk_request(self, fpaths: FieldPath | list[FieldPath]) -> DataRequest:
+    """Creates a :class:`DataRequest` object by combining one or more
     :class:`FieldPath` objects.
 
     Args:
-      fpaths (list[FieldPath]): The :class:`FieldPath` objects that should be
-        included in the request
+      fpaths (FieldPath | list[FieldPath]): One or more :class:`FieldPath`
+        objects that should be included in the request
 
     Returns:
       DataRequest: A new :class:`DataRequest` object
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
 
     return DataRequest(documents=list(
       fpaths
@@ -211,13 +216,14 @@ class Subgrounds:
 
   def query_json(
     self,
-    fpaths: list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     auto_paginate: bool = True
   ) -> list[dict[str, Any]]:
     """Combines ``Subgrounds.mk_request`` and ``Subgrounds.execute`` into one function.
 
     Args:
-      fpaths (list[FieldPath]): The :class:`FieldPath` objects that should be included in the request
+      fpaths (FieldPath | list[FieldPath]): One or more :class:`FieldPath` objects that should be
+        included in the request
       auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
         should automatically paginate the query. Useful for querying non-subgraph
         APIs since automatic pagination is only supported for subgraph APIs.
@@ -226,19 +232,25 @@ class Subgrounds:
     Returns:
       list[dict[str, Any]]: The reponse data
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     req = self.mk_request(fpaths)
     return self.execute(req, auto_paginate=auto_paginate)
 
   def query_json_iter(
     self,
-    fpaths: list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     auto_paginate: bool = True
   ) -> Iterator[dict[str, Any]]:
     """Same as `query_json` except an iterator over the response data pages is returned.
 
     Args:
-      fpaths (list[FieldPath]): The :class:`FieldPath` objects that should be included in the request
+      fpaths (FieldPath | list[FieldPath]): One or more :class:`FieldPath` objects
+        that should be included in the request
       auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
         should automatically paginate the query. Useful for querying non-subgraph
         APIs since automatic pagination is only supported for subgraph APIs.
@@ -247,13 +259,18 @@ class Subgrounds:
     Returns:
       list[dict[str, Any]]: The reponse data
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     req = self.mk_request(fpaths)
     yield from self.execute_iter(req, auto_paginate=auto_paginate)
 
   def query_df(
     self,
-    fpaths: list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     columns: Optional[list[str]] = None,
     concat: bool = False,
     auto_paginate: bool = True
@@ -276,8 +293,8 @@ class Subgrounds:
     ``columns`` argument).
 
     Args:
-      fpaths (list[FieldPath]): The `FieldPath` objects that should be included
-        in the request
+      fpaths (FieldPath | list[FieldPath]): One or more `FieldPath` objects that
+        should be included in the request.
       columns (Optional[list[str]], optional): The column labels. Defaults to None.
       merge (bool, optional): Whether or not to merge resulting dataframes.
       auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
@@ -324,19 +341,24 @@ class Subgrounds:
         8       1643213210  2613.077301
         9       1643213196  2610.686563
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     json_data = self.query_json(fpaths, auto_paginate=auto_paginate)
     return df_of_json(json_data, fpaths, columns, concat)
 
   def query_df_iter(
     self,
-    fpaths: list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     auto_paginate: bool = True
   ) -> Iterator[pd.DataFrame]:
     """Same as `query_df` except an iterator over the response data pages is returned
     Args:
-      fpaths (list[FieldPath]): The `FieldPath` objects that should be included
-        in the request
+      fpaths (FieldPath | list[FieldPath]): One or more `FieldPath` objects that
+        should be included in the request
       columns (Optional[list[str]], optional): The column labels. Defaults to None.
       merge (bool, optional): Whether or not to merge resulting dataframes.
       auto_paginate (bool, optional): Flag indicating whether or not Subgrounds
@@ -347,20 +369,25 @@ class Subgrounds:
     Returns:
       Iterator[pd.DataFrame]: An iterator over the response data pages, each as a  DataFrame
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     for page in self.query_json_iter(fpaths, auto_paginate=auto_paginate):
       yield df_of_json(page, fpaths, None, False)
 
   def query(
     self,
-    fpath: FieldPath | list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     unwrap: bool = True,
     auto_paginate: bool = True
   ) -> str | int | float | bool | list | tuple | None:
     """Executes one or multiple ``FieldPath`` objects immediately and return the data (as a tuple if multiple ``FieldPath`` objects are provided).
 
     Args:
-      fpath (FieldPath): The ``FieldPath`` object(s) to query.
+      fpaths (FieldPath | list[FieldPath]): One or more ``FieldPath`` object(s) to query.
       unwrap (bool, optional): Flag indicating whether or not, in the case where
         the returned data is a list of one element, the element itself should be
         returned instead of the list. Defaults to ``True``.
@@ -397,7 +424,12 @@ class Subgrounds:
       2628.975030015892
 
     """
-    fpaths = list(fpath | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     blob = self.query_json(fpaths, auto_paginate=auto_paginate)
 
     def f(fpath: FieldPath) -> dict[str, Any]:
@@ -416,14 +448,14 @@ class Subgrounds:
 
   def query_iter(
     self,
-    fpath: FieldPath | list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     unwrap: bool = True,
     auto_paginate: bool = True
   ) -> str | int | float | bool | list | tuple | None:
     """Same as `query` except an iterator over the resonse data pages is returned.
 
     Args:
-      fpath (FieldPath): The ``FieldPath`` object(s) to query.
+      fpath (FieldPath | list[FieldPath]): One or more ``FieldPath`` object(s) to query.
       unwrap (bool, optional): Flag indicating whether or not, in the case where
         the returned data is a list of one element, the element itself should be
         returned instead of the list. Defaults to ``True``.
@@ -441,7 +473,12 @@ class Subgrounds:
       else:
         return data
 
-    fpaths = list(fpath | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     for page in self.query_json_iter(fpaths, auto_paginate=auto_paginate):
       data = tuple(fpaths | map(functools.partial(f, blob=page)))
 
