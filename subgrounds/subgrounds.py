@@ -93,18 +93,23 @@ class Subgrounds:
     self.subgraphs[url] = sg
     return sg
 
-  def mk_request(self, fpaths: list[FieldPath]) -> DataRequest:
-    """Creates a :class:`DataRequest` object by combining multiple
+  def mk_request(self, fpaths: FieldPath | list[FieldPath]) -> DataRequest:
+    """Creates a :class:`DataRequest` object by combining one or more
     :class:`FieldPath` objects.
 
     Args:
-      fpaths (list[FieldPath]): The :class:`FieldPath` objects that should be
-        included in the request
+      fpaths (FieldPath | list[FieldPath]): One or more :class:`FieldPath`
+        objects that should be included in the request
 
     Returns:
       DataRequest: A new :class:`DataRequest` object
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
 
     return DataRequest(documents=list(
       fpaths
@@ -219,13 +224,14 @@ class Subgrounds:
 
   def query_json(
     self,
-    fpaths: list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> list[dict[str, Any]]:
     """Equivalent to ``Subgrounds.execute(Subgrounds.mk_request(fpaths), pagination_strategy)``.
 
     Args:
-      fpaths (list[FieldPath]): The :class:`FieldPath` objects that should be included in the request
+      fpaths (FieldPath | list[FieldPath]): One or more :class:`FieldPath` objects that should be
+        included in the request.
       pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
         implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
         automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
@@ -233,19 +239,25 @@ class Subgrounds:
     Returns:
       list[dict[str, Any]]: The reponse data
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     req = self.mk_request(fpaths)
     return self.execute(req, pagination_strategy=pagination_strategy)
 
   def query_json_iter(
     self,
-    fpaths: list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> Iterator[dict[str, Any]]:
     """Same as `query_json` except an iterator over the response data pages is returned.
 
     Args:
-      fpaths (list[FieldPath]): The :class:`FieldPath` objects that should be included in the request
+      fpaths (FieldPath | list[FieldPath]): One or more :class:`FieldPath` objects
+        that should be included in the request.
       pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
         implementing the :class:`PaginationStrategy` ``Protocol``. If ``None``, then
         automatic pagination is disabled. Defaults to :class:`LegacyStrategy`.
@@ -253,13 +265,18 @@ class Subgrounds:
     Returns:
       list[dict[str, Any]]: The reponse data
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     req = self.mk_request(fpaths)
     yield from self.execute_iter(req, pagination_strategy=pagination_strategy)
 
   def query_df(
     self,
-    fpaths: list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     columns: Optional[list[str]] = None,
     concat: bool = False,
     pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
@@ -282,8 +299,8 @@ class Subgrounds:
     ``columns`` argument).
 
     Args:
-      fpaths (list[FieldPath]): The `FieldPath` objects that should be included
-        in the request
+      fpaths (FieldPath | list[FieldPath]): One or more `FieldPath` objects that
+        should be included in the request.
       columns (Optional[list[str]], optional): The column labels. Defaults to None.
       merge (bool, optional): Whether or not to merge resulting dataframes.
       pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
@@ -329,19 +346,24 @@ class Subgrounds:
         8       1643213210  2613.077301
         9       1643213196  2610.686563
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     json_data = self.query_json(fpaths, pagination_strategy=pagination_strategy)
     return df_of_json(json_data, fpaths, columns, concat)
 
   def query_df_iter(
     self,
-    fpaths: list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> Iterator[pd.DataFrame]:
     """Same as `query_df` except an iterator over the response data pages is returned
     Args:
-      fpaths (list[FieldPath]): The `FieldPath` objects that should be included
-        in the request
+      fpaths (FieldPath | list[FieldPath]): One or more `FieldPath` objects that
+        should be included in the request
       columns (Optional[list[str]], optional): The column labels. Defaults to None.
       merge (bool, optional): Whether or not to merge resulting dataframes.
       pagination_strategy (Optional[Type[PaginationStrategy]], optional): A Class
@@ -351,20 +373,25 @@ class Subgrounds:
     Returns:
       Iterator[pd.DataFrame]: An iterator over the response data pages, each as a  DataFrame
     """
-    fpaths = list(fpaths | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     for page in self.query_json_iter(fpaths, pagination_strategy=pagination_strategy):
       yield df_of_json(page, fpaths, None, False)
 
   def query(
     self,
-    fpath: FieldPath | list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     unwrap: bool = True,
     pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> str | int | float | bool | list | tuple | None:
     """Executes one or multiple ``FieldPath`` objects immediately and return the data (as a tuple if multiple ``FieldPath`` objects are provided).
 
     Args:
-      fpath (FieldPath): The ``FieldPath`` object(s) to query.
+      fpaths (FieldPath | list[FieldPath]): One or more ``FieldPath`` object(s) to query.
       unwrap (bool, optional): Flag indicating whether or not, in the case where
         the returned data is a list of one element, the element itself should be
         returned instead of the list. Defaults to ``True``.
@@ -401,7 +428,12 @@ class Subgrounds:
       2628.975030015892
 
     """
-    fpaths = list(fpath | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     blob = self.query_json(fpaths, pagination_strategy=pagination_strategy)
 
     def f(fpath: FieldPath) -> dict[str, Any]:
@@ -420,14 +452,14 @@ class Subgrounds:
 
   def query_iter(
     self,
-    fpath: FieldPath | list[FieldPath],
+    fpaths: FieldPath | list[FieldPath],
     unwrap: bool = True,
     pagination_strategy: Optional[Type[PaginationStrategy]] = LegacyStrategy
   ) -> str | int | float | bool | list | tuple | None:
     """Same as `query` except an iterator over the resonse data pages is returned.
 
     Args:
-      fpath (FieldPath): The ``FieldPath`` object(s) to query.
+      fpath (FieldPath | list[FieldPath]): One or more ``FieldPath`` object(s) to query.
       unwrap (bool, optional): Flag indicating whether or not, in the case where
         the returned data is a list of one element, the element itself should be
         returned instead of the list. Defaults to ``True``.
@@ -445,7 +477,12 @@ class Subgrounds:
       else:
         return data
 
-    fpaths = list(fpath | map(FieldPath._auto_select) | traverse)
+    fpaths = list(
+      [fpaths]
+      | traverse
+      | map(FieldPath._auto_select)
+      | traverse
+    )
     for page in self.query_json_iter(fpaths, pagination_strategy=pagination_strategy):
       data = tuple(fpaths | map(functools.partial(f, blob=page)))
 
