@@ -20,7 +20,7 @@ Subgrounds provides two pagination strategies out of the box:
     }
     ```
 
-2. `ShallowStrategy`: A new pagination strategy that is fatster than the `LegacyStrategy`, but does not paginate on nested list fields. In other words, this strategy is best when nested list fields select fewer than 1000 entities. Below is an example of a query for which you should use this strategy:
+2. `ShallowStrategy`: A new pagination strategy that is faster than the `LegacyStrategy`, but does not paginate on nested list fields. In other words, this strategy is best when nested list fields select fewer than 1000 entities. Below is an example of a query for which you should use this strategy:
     ```graphql
     query {
       liquidityPools(first: 5000) {
