@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   subgrounds.pagination
    subgrounds.subgraph
 
 Submodules
@@ -18,7 +19,6 @@ Submodules
    subgrounds.client
    subgrounds.dash_wrappers
    subgrounds.dataframe_utils
-   subgrounds.pagination
    subgrounds.plotly_wrappers
    subgrounds.query
    subgrounds.schema

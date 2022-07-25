@@ -7,6 +7,7 @@ subgrounds
 
   getting_started
   basics
+  advanced
   API reference <modules>
   troubleshooting
   examples

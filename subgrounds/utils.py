@@ -2,9 +2,9 @@
 """
 
 from itertools import filterfalse
-from typing import Any, Callable, Optional, Tuple, TypeVar
+from typing import Any, Callable, Iterator, Optional, Tuple, TypeVar
 
-from pipe import map
+from pipe import map, Pipe
 
 
 def flatten(t):
@@ -77,6 +77,12 @@ def union(
 def filter_none(items: list[Optional[T]]) -> list[T]:
   return list(filter(None, items))
 
+@Pipe
+def filter_map(items: Iterator[T], mapping: Callable[[T], Optional[T]]) -> Iterator[T]:
+  for item in items:
+    new_item = mapping(item)
+    if new_item is not None:
+      yield new_item
 
 def loop_generator(items: list):
   while True:
