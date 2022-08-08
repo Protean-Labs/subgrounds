@@ -14,6 +14,7 @@ import json
 import pandas as pd
 import logging
 import warnings
+from pathlib import Path
 
 from subgrounds.dataframe_utils import df_of_json
 from subgrounds.pagination.pagination import PaginationStrategy
@@ -30,12 +31,60 @@ logger = logging.getLogger('subgrounds')
 warnings.simplefilter('default')
 
 
+def store_schema(schema: dict[str, Any], path: Path):
+  with path.open("w") as f:
+    json.dump(schema, f)
+
+
+def load_schema(path: Path) -> dict[str, Any]:
+  with path.open() as f:
+    return json.load(f)
+
+
+def subgraph_slug(url: str) -> str:
+  author = url.split('/')[-2]
+  name = url.split('/')[-1]
+  return f"{author}_{name}"
+
+
 @dataclass
 class Subgrounds:
   global_transforms: list[RequestTransform] = field(default_factory=lambda: DEFAULT_GLOBAL_TRANSFORMS)
   subgraphs: dict[str, Subgraph] = field(default_factory=dict)
 
-  def load_subgraph(self, url: str, save_schema: bool = False, cache_dir: str = 'schemas/') -> Subgraph:
+  def load(
+    self,
+    url: str,
+    save_schema: bool = False,
+    cache_dir: str = 'schemas/',
+    is_subgraph: bool = True
+  ):
+    if save_schema:
+      cache_path = Path(cache_dir)
+      if not cache_path.exists():
+        cache_path.mkdir(parents=True)
+
+      schema_path = cache_path / (subgraph_slug(url) + ".json")
+
+      if schema_path.exists():
+        schema = load_schema(schema_path)
+      else:
+        schema = client.get_schema(url)
+        store_schema(schema, schema_path)
+
+    else:
+      schema = client.get_schema(url)
+
+    subgraph = Subgraph(url, mk_schema(schema), DEFAULT_SUBGRAPH_TRANSFORMS, is_subgraph)
+    self.subgraphs[url] = subgraph
+    return subgraph
+
+  def load_subgraph(
+    self,
+    url: str,
+    save_schema: bool = False,
+    cache_dir: str = 'schemas/'
+  ) -> Subgraph:
     """Performs introspection on the provided GraphQL API ``url`` to get the
     schema, stores the schema if ``save_schema`` is ``True`` and returns a
     generated class representing the subgraph with all its entities.
@@ -43,26 +92,15 @@ class Subgrounds:
     Args:
       url (str): The url of the API
       save_schema (bool, optional): Flag indicating whether or not the schema
-        should be saved to disk. Defaults to False.
+        should be cached to disk. Defaults to False.
+      cache_dir (str, optional): If ``save_schema == True``, then subgraph schemas
+        will be stored under ``cache_dir``. Defaults to ``schemas/``
 
     Returns:
       Subgraph: A generated class representing the subgraph and its entities
     """
-    filename = cache_dir + url.split("/")[-1] + ".json"
-    if os.path.isfile(filename):
-      with open(filename) as f:
-        schema = json.load(f)
-    else:
-      schema = client.get_schema(url)
-      if save_schema:
-        if cache_dir != '.' and not os.path.exists(cache_dir):
-          os.makedirs(cache_dir)
-        with open(filename, mode="w") as f:
-          json.dump(schema, f)
 
-    sg = Subgraph(url, mk_schema(schema), DEFAULT_SUBGRAPH_TRANSFORMS)
-    self.subgraphs[url] = sg
-    return sg
+    return self.load(url, save_schema, cache_dir, True)
 
   def load_api(self, url: str, save_schema: bool = False, cache_dir: str = 'schemas/') -> Subgraph:
     """Performs introspection on the provided GraphQL API ``url`` to get the
@@ -77,21 +115,9 @@ class Subgrounds:
     Returns:
       Subgraph: A generated class representing the subgraph and its entities
     """
-    filename = cache_dir + url.split("/")[-1] + ".json"
-    if os.path.isfile(filename):
-      with open(filename) as f:
-        schema = json.load(f)
-    else:
-      schema = client.get_schema(url)
-      if save_schema:
-        if cache_dir != '.' and not os.path.exists(cache_dir):
-          os.makedirs(cache_dir)
-        with open(filename, mode="w") as f:
-          json.dump(schema, f)
 
-    sg = Subgraph(url, mk_schema(schema), DEFAULT_SUBGRAPH_TRANSFORMS, False)
-    self.subgraphs[url] = sg
-    return sg
+    return self.load(url, save_schema, cache_dir, False)
+
 
   def mk_request(self, fpaths: FieldPath | list[FieldPath]) -> DataRequest:
     """Creates a :class:`DataRequest` object by combining one or more
