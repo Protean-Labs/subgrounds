@@ -264,11 +264,30 @@ def normalize(
   )
 
 
-def prune_doc(document: Document, args: dict[str, Any]):
-  return document.filter_args(
-    lambda arg: (
-      arg.find_vars(lambda var: 'lastOrderingValue' in var.name).name in args
-      if arg.exists_vars(lambda var: 'lastOrderingValue' in var.name)
-      else True
+def prune_doc(document: Document, args: dict[str, Any]) -> Document:
+  def prune_where_arg(where_arg: Argument) -> Argument:
+    input_val: InputValue.Object = where_arg.value
+    return Argument(
+      name=where_arg.name,
+      value=InputValue.Object({
+        name: val for name, val in input_val.value.items()
+        if not val.is_variable or (
+          val.is_variable and val.name in args
+        )
+      })
     )
-  ).prune_undefined(args)
+
+  return (
+    document
+      .map_args(
+        lambda arg: prune_where_arg(arg) if arg.name == 'where' else arg
+      )
+      .filter_args(
+        lambda arg: (
+          arg.find_var(lambda var: 'lastOrderingValue' in var.name).name in args
+          if arg.exists_vars(lambda var: 'lastOrderingValue' in var.name)
+          else True
+        )
+      )
+      .prune_undefined(args)
+  )
