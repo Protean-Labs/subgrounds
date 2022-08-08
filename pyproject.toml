@@ -11,6 +11,7 @@ requests = "^2.27.1"
 pandas = "^1.4.2"
 pipe = "^2.0"
 dash = { version = "^2.3.1", optional = true }
+pathlib = "^1.0.1"
 
 [tool.poetry.extras]
 dash = ["dash"]

@@ -14,6 +14,7 @@ import json
 import pandas as pd
 import logging
 import warnings
+from pathlib import Path
 
 from subgrounds.dataframe_utils import df_of_json
 from subgrounds.pagination.pagination import PaginationStrategy
@@ -44,6 +45,8 @@ class Subgrounds:
       url (str): The url of the API
       save_schema (bool, optional): Flag indicating whether or not the schema
         should be saved to disk. Defaults to False.
+      cache_dir (str, optional): If ``save_schema == True``, then subgraph schemas
+        will be stored under ``cache_dir``. Defaults to ``schemas/``
 
     Returns:
       Subgraph: A generated class representing the subgraph and its entities
