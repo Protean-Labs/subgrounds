@@ -340,7 +340,7 @@ class Argument:
     except StopIteration:
       return None
 
-  def find_vars(self, predicate: Callable[[InputValue.Variable], bool]) -> Optional[InputValue.T]:
+  def find_var(self, predicate: Callable[[InputValue.Variable], bool]) -> Optional[InputValue.T]:
     try:
       return next(self.iter_vars() | where(predicate))
     except StopIteration:
@@ -1028,11 +1028,15 @@ class Selection:
     Returns:
         Selection: A new pruned ``Selection`` object
     """
-    return self.filter(
-      lambda select: select.for_all_args(
-        lambda arg: arg.all_defined(variables),
-        recurse=False
-      )
+
+    return (
+      self
+        .filter(
+          lambda select: select.for_all_args(
+            lambda arg: arg.all_defined(variables),
+            recurse=False
+          )
+        )
     )
 
 
@@ -1167,7 +1171,6 @@ class Query:
 
     Args:
         map_f (Callable[[Argument], Argument]): _description_
-        recurse (bool, optional): _description_. Defaults to True.
 
     Returns:
         Selection: _description_
@@ -1486,10 +1489,14 @@ class Query:
     )
 
   def prune_undefined(self, variables: Iterator[str]) -> Query:
-    return self.filter_map(
-      partial(Selection.prune_undefined, variables=variables)
-    ).filter_vardefs(
-      lambda vardef: vardef.name in variables
+    return (
+      self
+        .filter_map(
+          partial(Selection.prune_undefined, variables=variables)
+        )
+        .filter_vardefs(
+          lambda vardef: vardef.name in variables
+        )
     )
 
 @dataclass(frozen=True)
@@ -1572,6 +1579,24 @@ class Document:
     return Document(
       url=self.url,
       query=self.query.map(map_f),
+      fragments=self.fragments,     # TODO: Add mapping to fragments
+      variables=self.variables
+    )
+
+  def map_args(self, map_f: Callable[[Argument], Argument]) -> Document:
+    """ Applies the function ``map_f`` to each ``Argument`` in the current 
+    ``Document`` and returns a new ``Document`` object containing the resulting
+    ``Arguments``.
+
+    Args:
+        map_f (Callable[[Argument], Argument]): _description_
+
+    Returns:
+        Selection: _description_
+    """
+    return Document(
+      url=self.url,
+      query=self.query.map_args(map_f),
       fragments=self.fragments,     # TODO: Add mapping to fragments
       variables=self.variables
     )

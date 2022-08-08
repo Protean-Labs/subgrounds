@@ -367,3 +367,113 @@ def doc10():
       ]
     )]
   ))
+
+
+def doc11():
+  """
+  query {
+    pairs(
+      where: {
+        createdAtTimestamp_gt: 10000
+      }
+    ) {
+      id
+    }
+  }
+  """
+  return Document(url='www.abc.xyz/graphql', query=Query(
+    name=None,
+    selection=[Selection(
+      fmeta=TypeMeta.FieldMeta('pairs', '', [
+        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+      ], TypeRef.non_null_list('Pair')),
+      arguments=[
+        Argument('where', InputValue.Object({
+          'createdAtTimestamp_gt': InputValue.Int(10000)
+        })),
+      ],
+      selection=[
+        Selection(
+          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+        )
+      ]
+    )]
+  ))
+
+
+def doc12():
+  """
+  query {
+    pairs(
+      orderBy: createdAtTimestamp,
+      orderDirection: desc,
+      where: {
+        createdAtTimestamp_gt: 10000
+      }
+    ) {
+      id
+    }
+  }
+  """
+  return Document(url='www.abc.xyz/graphql', query=Query(
+    name=None,
+    selection=[Selection(
+      fmeta=TypeMeta.FieldMeta('pairs', '', [
+        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+      ], TypeRef.non_null_list('Pair')),
+      arguments=[
+        Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
+        Argument('orderDirection', InputValue.Enum('desc')),
+        Argument('where', InputValue.Object({
+          'createdAtTimestamp_gt': InputValue.Int(10000)
+        })),
+      ],
+      selection=[
+        Selection(
+          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+        )
+      ]
+    )]
+  ))
+
+
+def doc13():
+  """
+  query {
+    pairs(
+      orderBy: createdAtTimestamp,
+      orderDirection: asc,
+      where: {
+        createdAtTimestamp_gt: 10000
+      }
+    ) {
+      id
+    }
+  }
+  """
+  return Document(url='www.abc.xyz/graphql', query=Query(
+    name=None,
+    selection=[Selection(
+      fmeta=TypeMeta.FieldMeta('pairs', '', [
+        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
+        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
+      ], TypeRef.non_null_list('Pair')),
+      arguments=[
+        Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
+        Argument('orderDirection', InputValue.Enum('asc')),
+        Argument('where', InputValue.Object({
+          'createdAtTimestamp_gt': InputValue.Int(10000)
+        })),
+      ],
+      selection=[
+        Selection(
+          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+        )
+      ]
+    )]
+  ))
