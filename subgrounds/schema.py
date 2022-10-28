@@ -54,6 +54,10 @@ class TypeRef:
             return self.inner.name
 
         @property
+        def is_list(self) -> bool:
+            return self.inner.is_list
+
+        @property
         def is_non_null(self) -> bool:
             return True
 
@@ -68,6 +72,10 @@ class TypeRef:
         @property
         def is_list(self) -> bool:
             return True
+
+        @property
+        def is_non_null(self) -> bool:
+            return self.inner.is_non_null
 
     @staticmethod
     def non_null(name: str, kind: str = "SCALAR") -> TypeRef_T:
@@ -98,11 +106,11 @@ class TypeRef:
     @staticmethod
     def graphql(type_: TypeRef.T) -> str:
         match type_:
-            case TypeRef.Named(name):
+            case TypeRef.Named(name=name):
                 return name
-            case TypeRef.NonNull(t):
+            case TypeRef.NonNull(inner=t):
                 return f'{TypeRef.graphql(t)}!'
-            case TypeRef.List(t):
+            case TypeRef.List(inner=t):
                 return f'[{TypeRef.graphql(t)}]'
 
         assert False

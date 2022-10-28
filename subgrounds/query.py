@@ -275,7 +275,7 @@ class VariableDefinition:
 
     >>> vardef = VariableDefinition(
     ...   name='foo',
-    ...   type_=TypeRef.NonNull(TypeRef.Named('Int')),
+    ...   type_=TypeRef.NonNull(TypeRef.Named(name="Int", kind="SCALAR")),
     ...   default=InputValue.Int(100)
     ... )
     >>> print(vardef.graphql)
@@ -1349,16 +1349,16 @@ class Query:
 
     Example:
 
-    >>> og_selection = Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [
-    ...   Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [
-    ...     Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')), None, [], []),
-    ...     Selection(TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')), None, [], []),
-    ...     Selection(TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')), None, [], []),
+    >>> og_selection = Selection(TypeMeta.FieldMeta('pair', description="", args=[], type=TypeRef.non_null_list('Pair')), None, [], [
+    ...   Selection(TypeMeta.FieldMeta('token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")), None, [], [
+    ...     Selection(TypeMeta.FieldMeta('id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")), None, [], []),
+    ...     Selection(TypeMeta.FieldMeta('name', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")), None, [], []),
+    ...     Selection(TypeMeta.FieldMeta('symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")), None, [], []),
     ...   ])
     ... ])
-    >>> selection_to_remove = Selection(TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')), None, [], [])
+    >>> selection_to_remove = Selection(TypeMeta.FieldMeta('token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")), None, [], [])
     >>> og_selection.remove(selection_to_remove)
-    Selection(TypeMeta.FieldMeta('pair', '', [], TypeRef.non_null_list('Pair')), None, [], [])
+    Selection(TypeMeta.FieldMeta('pair', description="", args=[], type=TypeRef.non_null_list('Pair')), None, [], [])
 
     Args:
       query (Query): The query to which a selection has to be removed

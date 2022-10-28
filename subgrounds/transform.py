@@ -36,10 +36,10 @@ logger = logging.getLogger('subgrounds')
 
 def select_data(select: Selection, data: dict) -> list[Any]:
   match (select, data):
-    case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name in data:
+    case (Selection(TypeMeta.FieldMeta(name=name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name in data:
       return [data[name]]
 
-    case (Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data) if name in data:
+    case (Selection(TypeMeta.FieldMeta(name=name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data) if name in data:
       return list(inner_select | map(partial(select_data, data=data[name])) | traverse)
 
     case (select, data):
@@ -153,7 +153,7 @@ class TypeTransform(DocumentTransform):
       match (select, data):
         # Type matches
         case (
-          Selection(TypeMeta.FieldMeta(name, _, _, ftype), None, _, [] | None) | Selection(TypeMeta.FieldMeta(_, _, _, ftype), str() as name, _, [] | None),
+          Selection(TypeMeta.FieldMeta(name=name, type_=ftype), None, _, [] | None) | Selection(TypeMeta.FieldMeta(type_=ftype), str() as name, _, [] | None),
           dict() as data
         ) if TypeRef.root_type_name(self.type_) == TypeRef.root_type_name(ftype):
           match data[name]:
@@ -168,7 +168,7 @@ class TypeTransform(DocumentTransform):
           pass
 
         case (
-          Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), str() as name, _, inner_select),
+          Selection(TypeMeta.FieldMeta(name=name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), str() as name, _, inner_select),
           dict() as data
         ):
           match data[name]:
@@ -243,11 +243,11 @@ class LocalSyntheticField(DocumentTransform):
     def transform(select: Selection) -> Selection | list[Selection]:
       match select:
         # case Selection(TypeMeta.FieldMeta(name) as fmeta, _, _, [] | None) if name == self.fmeta.name and fmeta.type_.name == self.type_.name:
-        case Selection(TypeMeta.FieldMeta(name), _, _, [] | None) if name == self.fmeta.name:
+        case Selection(TypeMeta.FieldMeta(name=name), _, _, [] | None) if name == self.fmeta.name:
           return Selection.merge(self.args)
         case Selection(_, _, _, [] | None):
           return [select]
-        case Selection(TypeMeta.FieldMeta(name) as select_fmeta, alias, args, inner_select):
+        case Selection(TypeMeta.FieldMeta(name=name) as select_fmeta, alias, args, inner_select):
           new_inner_select = list(inner_select | map(transform) | traverse)
           return Selection(select_fmeta, alias, args, new_inner_select)
         case _:
@@ -257,7 +257,7 @@ class LocalSyntheticField(DocumentTransform):
 
     def transform_on_type(select: Selection) -> Selection:
       match select:
-        case Selection(TypeMeta.FieldMeta(_, _, _, type_) as select_fmeta, alias, args, inner_select) if type_.name == self.type_.name:
+        case Selection(TypeMeta.FieldMeta(type_=type_) as select_fmeta, alias, args, inner_select) if type_.name == self.type_.name:
           new_inner_select = Selection.merge(list(inner_select | map(transform) | traverse))
           return Selection(select_fmeta, alias, args, new_inner_select)
 
@@ -274,7 +274,7 @@ class LocalSyntheticField(DocumentTransform):
   def transform_response(self, doc: Document, data: dict[str, Any]) -> dict[str, Any]:
     def transform(select: Selection, data: dict) -> None:
       match (select, data):
-        case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
+        case (Selection(TypeMeta.FieldMeta(name=name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
           arg_values = flatten(list(self.args | map(partial(select_data, data=data))))
 
           try:
@@ -282,9 +282,9 @@ class LocalSyntheticField(DocumentTransform):
           except ZeroDivisionError:
             data[name] = self.default
 
-        case (Selection(TypeMeta.FieldMeta(name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data):
+        case (Selection(TypeMeta.FieldMeta(name=name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data):
           pass
-        case (Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data) if name in data:
+        case (Selection(TypeMeta.FieldMeta(name=name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data) if name in data:
           match data[name]:
             case list() as elts:
               for elt in elts:
@@ -301,7 +301,7 @@ class LocalSyntheticField(DocumentTransform):
 
     def transform_on_type(select: Selection, data: dict) -> None:
       match select:
-        case Selection(TypeMeta.FieldMeta(_, _, _, type_), None, _, _) | Selection(TypeMeta.FieldMeta(_, _, _, type_), _, _, _) if type_.name == self.type_.name:
+        case Selection(TypeMeta.FieldMeta(type_=type_), None, _, _) | Selection(TypeMeta.FieldMeta(type_=type_), _, _, _) if type_.name == self.type_.name:
           # for select in inner_select:
           #   transform(select, data[name])
           match data:
@@ -311,7 +311,7 @@ class LocalSyntheticField(DocumentTransform):
             case dict():
               transform(select, data)
 
-        case (Selection(TypeMeta.FieldMeta(name), None, _, inner_select) | Selection(_, name, _, inner_select)):
+        case (Selection(TypeMeta.FieldMeta(name=name), None, _, inner_select) | Selection(_, name, _, inner_select)):
           match data:
             case list():
               for d in data:

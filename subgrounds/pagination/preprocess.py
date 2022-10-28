@@ -60,8 +60,8 @@ class PaginationNode:
       list[VariableDefinition]: _description_
     """
     vardefs = [
-      VariableDefinition(f'first{self.node_idx}', TypeRef.Named('Int')),
-      VariableDefinition(f'skip{self.node_idx}', TypeRef.Named('Int')),
+      VariableDefinition(f'first{self.node_idx}', TypeRef.Named(name="Int", kind="SCALAR")),
+      VariableDefinition(f'skip{self.node_idx}', TypeRef.Named(name="Int", kind="SCALAR")),
       VariableDefinition(f'lastOrderingValue{self.node_idx}', self.filter_value_type),
     ]
 
@@ -219,7 +219,7 @@ def normalize(
       selections = current.selection
       if not any(selections | map(lambda s: s.fmeta.name == 'id')):
         selections.append(
-          Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')))
+          Selection(fmeta=TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")))
         )
 
       if (
@@ -231,8 +231,8 @@ def normalize(
           Selection(fmeta=TypeMeta.FieldMeta(
             name=orderBy_value,
             description='',
-            arguments=[],
-            type_=current_type.type_of_field(orderBy_value)
+            args=[],
+            type=current_type.type_of_field(orderBy_value)
           ))
         )
 
