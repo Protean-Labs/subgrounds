@@ -385,6 +385,6 @@ class SplitTransform(RequestTransform):
 DEFAULT_GLOBAL_TRANSFORMS: list[RequestTransform] = []
 
 DEFAULT_SUBGRAPH_TRANSFORMS: list[DocumentTransform] = [
-  TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal)),
-  TypeTransform(TypeRef.Named('BigInt'), lambda bigint: int(bigint)),
+  TypeTransform(TypeRef.Named(name='BigDecimal', kind="SCALAR"), lambda bigdecimal: float(bigdecimal)),
+  TypeTransform(TypeRef.Named(name='BigInt', kind="SCALAR"), lambda bigint: int(bigint)),
 ]

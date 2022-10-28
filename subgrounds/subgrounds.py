@@ -20,7 +20,7 @@ from subgrounds.dataframe_utils import df_of_json
 from subgrounds.pagination.pagination import PaginationStrategy
 from subgrounds.pagination.strategies import ShallowStrategy, LegacyStrategy
 from subgrounds.query import DataRequest, Document, Query
-from subgrounds.schema import mk_schema
+from subgrounds.schema import SchemaMeta
 from subgrounds.subgraph.fieldpath import FieldPath
 from subgrounds.subgraph.subgraph import Subgraph
 from subgrounds.transform import DEFAULT_GLOBAL_TRANSFORMS, DEFAULT_SUBGRAPH_TRANSFORMS, DocumentTransform, RequestTransform
@@ -75,7 +75,7 @@ class Subgrounds:
     else:
       schema = client.get_schema(url)
 
-    subgraph = Subgraph(url, mk_schema(schema), DEFAULT_SUBGRAPH_TRANSFORMS, is_subgraph)
+    subgraph = Subgraph(url, SchemaMeta(**schema["__schema"]), DEFAULT_SUBGRAPH_TRANSFORMS, is_subgraph)
     self.subgraphs[url] = subgraph
     return subgraph
 

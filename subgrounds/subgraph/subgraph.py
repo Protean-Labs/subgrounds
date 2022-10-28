@@ -54,10 +54,10 @@ class Subgraph:
     name: str,
     sfield: SyntheticField
   ) -> None:
-    fmeta = TypeMeta.FieldMeta(name, '', [], sfield._type)
+    fmeta = TypeMeta.FieldMeta(name=name, description='', args=[], type=sfield._type)
     object_.fields.append(fmeta)
 
-    sfield_fpath = FieldPath(self, TypeRef.Named(object_.name), sfield._type, [(None, fmeta)])
+    sfield_fpath = FieldPath(self, TypeRef.Named(name=object_.name, kind="OBJECT"), sfield._type, [(None, fmeta)])
     logger.debug(f'Subgraph: Adding SyntheticField at FieldPath {sfield_fpath._root_type.name}.{sfield_fpath._name_path()}')
 
     transform = LocalSyntheticField(

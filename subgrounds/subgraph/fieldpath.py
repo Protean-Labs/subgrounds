@@ -26,14 +26,14 @@ def typeref_of_binary_op(op: str, t1: TypeRef.T, t2: int | float | str | bool | 
   def f_typeref(t1, t2):
     match (op, TypeRef.root_type_name(t1), TypeRef.root_type_name(t2)):
       case ('add', 'String' | 'Bytes', 'String' | 'Bytes'):
-        return TypeRef.Named('String')
+        return TypeRef.Named(name='String', kind="SCALAR")
 
       case ('add' | 'sub' | 'mul' | 'div' | 'pow' | 'mod', 'BigInt' | 'Int', 'BigInt' | 'Int'):
-        return TypeRef.Named('Int')
+        return TypeRef.Named(name='Int', kind="SCALAR")
       case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int', 'BigDecimal' | 'Float'):
-        return TypeRef.Named('Float')
+        return TypeRef.Named(name='Float', kind="SCALAR")
       case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigDecimal' | 'Float', 'BigInt' | 'Int' | 'BigDecimal' | 'Float'):
-        return TypeRef.Named('Float')
+        return TypeRef.Named(name='Float', kind="SCALAR")
 
       case _ as args:
         raise Exception(f'typeref_of_binary_op: f_typeref: unhandled arguments {args}')
@@ -41,14 +41,14 @@ def typeref_of_binary_op(op: str, t1: TypeRef.T, t2: int | float | str | bool | 
   def f_const(t1, const):
     match (op, TypeRef.root_type_name(t1), const):
       case ('add', 'String' | 'Bytes', str()):
-        return TypeRef.Named('String')
+        return TypeRef.Named(name='String', kind="SCALAR")
 
       case ('add' | 'sub' | 'mul' | 'div' | 'pow' | 'mod', 'BigInt' | 'Int', int()):
-        return TypeRef.Named('Int')
+        return TypeRef.Named(name='Int', kind="SCALAR")
       case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigInt' | 'Int', float()):
-        return TypeRef.Named('Float')
+        return TypeRef.Named(name='Float', kind="SCALAR")
       case ('add' | 'sub' | 'mul' | 'div' | 'pow', 'BigDecimal' | 'Float', int() | float()):
-        return TypeRef.Named('Float')
+        return TypeRef.Named(name='Float', kind="SCALAR")
 
       case _ as args:
         raise Exception(f'typeref_of_binary_op: f_typeref: unhandled arguments {args}')
@@ -63,14 +63,14 @@ def typeref_of_binary_op(op: str, t1: TypeRef.T, t2: int | float | str | bool | 
 def type_ref_of_unary_op(op: str, t: TypeRef.T):
   match (op, TypeRef.root_type_name(t)):
     case ('abs', 'BigInt' | 'Int'):
-      return TypeRef.Named('Int')
+      return TypeRef.Named(name='Int', kind="SCALAR")
     case ('abs', 'BigDecimal' | 'Float'):
-      return TypeRef.Named('Float')
+      return TypeRef.Named(name='Float', kind="SCALAR")
 
     case ('neg', 'BigInt' | 'Int'):
-      return TypeRef.Named('Int')
+      return TypeRef.Named(name='Int', kind="SCALAR")
     case ('neg', 'BigDecimal' | 'Float'):
-      return TypeRef.Named('Float')
+      return TypeRef.Named(name='Float', kind="SCALAR")
 
     case _ as args:
       raise Exception(f'typeref_of_binary_op: f_typeref: unhandled arguments {args}')
@@ -523,10 +523,10 @@ class FieldPath(FieldOperatorMixin):
 
 @dataclass
 class SyntheticField(FieldOperatorMixin):
-  STRING: ClassVar[TypeRef.Named] = TypeRef.Named('String')
-  INT: ClassVar[TypeRef.Named] = TypeRef.Named('Int')
-  FLOAT: ClassVar[TypeRef.Named] = TypeRef.Named('Float')
-  BOOL: ClassVar[TypeRef.Named] = TypeRef.Named('Boolean')
+  STRING: ClassVar[TypeRef.Named] = TypeRef.Named(name='String', kind="SCALAR")
+  INT: ClassVar[TypeRef.Named] = TypeRef.Named(name='Int', kind="SCALAR")
+  FLOAT: ClassVar[TypeRef.Named] = TypeRef.Named(name='Float', kind="SCALAR")
+  BOOL: ClassVar[TypeRef.Named] = TypeRef.Named(name='Boolean', kind="SCALAR")
 
   _counter: ClassVar[int] = 0
 

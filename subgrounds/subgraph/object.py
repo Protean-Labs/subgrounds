@@ -47,7 +47,7 @@ class Object:
 
     match self._schema.type_of_typeref(field.type_):
       case TypeMeta.ObjectMeta() | TypeMeta.InterfaceMeta() | TypeMeta.EnumMeta() | TypeMeta.ScalarMeta() as type_:
-        return FieldPath(self._subgraph, TypeRef.Named(self._object.name), field.type_, [(None, field)])
+        return FieldPath(self._subgraph, TypeRef.Named(name=self._object.name, kind="OBJECT"), field.type_, [(None, field)])
 
       case TypeMeta.T as type_:
         raise TypeError(f"Object: Unexpected type {type_.name} when selection {name} on {self}")

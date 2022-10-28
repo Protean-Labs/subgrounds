@@ -411,9 +411,9 @@ class Selection:
   def data_paths(self) -> list[list[str]]:
     def f(select: Selection, keys: list[str] = []):
       match select:
-        case Selection(TypeMeta.FieldMeta(name), None, _, []) | Selection(TypeMeta.FieldMeta(_), str() as name, _, []):
+        case Selection(TypeMeta.FieldMeta(name=name), None, _, []) | Selection(TypeMeta.FieldMeta(name=_), str() as name, _, []):
           yield [*keys, name]
-        case Selection(TypeMeta.FieldMeta(name), None, _, inner) | Selection(TypeMeta.FieldMeta(_), str() as name, _, inner):
+        case Selection(TypeMeta.FieldMeta(name=name), None, _, inner) | Selection(TypeMeta.FieldMeta(name=_), str() as name, _, inner):
           for select in inner:
             yield from f(select, keys=[*keys, name])
 
@@ -1737,31 +1737,31 @@ def input_value_of_argument(
           raise TypeError(f"Argument {argmeta.name} cannot be None!")
 
       # If type is non_null, recurse with non_null=True
-      case (TypeRef.NonNull(t), _, _):
+      case (TypeRef.NonNull(inner=t), _, _):
         return fmt_value(t, value, non_null=True)
 
-      case (TypeRef.Named("ID"), _, str()):
+      case (TypeRef.Named(name="ID"), _, str()):
         return InputValue.String(value)
 
-      case (TypeRef.Named("Int"), _, int()):
+      case (TypeRef.Named(name="Int"), _, int()):
         return InputValue.Int(value)
-      case (TypeRef.Named("BigInt"), _, int()):
+      case (TypeRef.Named(name="BigInt"), _, int()):
         return InputValue.String(str(value))
 
-      case (TypeRef.Named("Float"), _, int() | float()):
+      case (TypeRef.Named(name="Float"), _, int() | float()):
         return InputValue.Float(float(value))
-      case (TypeRef.Named("BigDecimal"), _, int() | float()):
+      case (TypeRef.Named(name="BigDecimal"), _, int() | float()):
         return InputValue.String(str(float(value)))
 
-      case (TypeRef.Named("String" | "Bytes"), _, str()):
+      case (TypeRef.Named(name="String" | "Bytes"), _, str()):
         return InputValue.String(value)
-      case (TypeRef.Named(), TypeMeta.EnumMeta(_), str()):
+      case (TypeRef.Named(), TypeMeta.EnumMeta(), str()):
         return InputValue.Enum(value)
 
-      case (TypeRef.Named("Boolean"), _, bool()):
+      case (TypeRef.Named(name="Boolean"), _, bool()):
         return InputValue.Boolean(value)
 
-      case (TypeRef.List(t), _, list()):
+      case (TypeRef.List(inner=t), _, list()):
         return InputValue.List([fmt_value(t, val, non_null) for val in value])
 
       case (TypeRef.Named(), TypeMeta.InputObjectMeta() as input_object, dict()):
