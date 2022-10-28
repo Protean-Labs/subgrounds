@@ -12,61 +12,61 @@ import tests.queries as queries
   (
     queries.doc0(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ]
   ),
   (
     queries.doc1(),
     [
-      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [
-        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'swaps'], [])
+      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [
+        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs', 'swaps'], [])
       ])
     ]
   ),
   (
     queries.doc2(),
     [
-      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [
-        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'swaps'], [])
+      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [
+        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs', 'swaps'], [])
       ]),
-      PaginationNode(2, 'id', 100, 0, None, TypeRef.Named('String'), ['swaps'], [])
+      PaginationNode(2, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['swaps'], [])
     ]
   ),
   (
     queries.doc3(),
     [
-      PaginationNode(0, 'id', 455, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 455, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ]
   ),
   (
     queries.doc4(),
     [
-      PaginationNode(0, 'id', 100, 10, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 10, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ]
   ),
   (
     queries.doc5(),
     [
-      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])
+      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named(name="BigInt", kind="SCALAR"), ['pairs'], [])
     ]
   ),
   (
     queries.doc6(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ]
   ),
   (
     queries.doc7(),
     [
-      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])
+      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named(name="BigInt", kind="SCALAR"), ['pairs'], [])
     ]
   ),
   (
     queries.doc8(),
     [
-      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [
-        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'foo', 'swaps'], [])
+      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [
+        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs', 'foo', 'swaps'], [])
       ])
     ]
   ),
@@ -77,25 +77,25 @@ import tests.queries as queries
   (
     queries.doc10(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pair', 'swaps'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pair', 'swaps'], [])
     ]
   ),
   (
     queries.doc11(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ]
   ),
   (
     queries.doc12(),
     [
-      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])
+      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named(name="BigInt", kind="SCALAR"), ['pairs'], [])
     ]
   ),
   (
     queries.doc13(),
     [
-      PaginationNode(0, 'createdAtTimestamp', 100, 0, 10000, TypeRef.Named('BigInt'), ['pairs'], [])
+      PaginationNode(0, 'createdAtTimestamp', 100, 0, 10000, TypeRef.Named(name="BigInt", kind="SCALAR"), ['pairs'], [])
     ]
   ),
 ])
@@ -111,16 +111,16 @@ def test_gen_pagination_nodes(
   (
     queries.doc0(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -132,32 +132,32 @@ def test_gen_pagination_nodes(
         ],
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+            fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
           )
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc1(),
     [
-      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [
-        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'swaps'], [])
+      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [
+        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs', 'swaps'], [])
       ])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first1')),
           Argument('skip', InputValue.Variable('skip1')),
@@ -169,11 +169,11 @@ def test_gen_pagination_nodes(
         ],
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('swaps', '', [
-              TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-            ], TypeRef.non_null_list('Swap')),
+            fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+              TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+            ], type=TypeRef.non_null_list('Swap')),
             arguments=[
               Argument('first', InputValue.Variable('first0')),
               Argument('skip', InputValue.Variable('skip0')),
@@ -185,40 +185,40 @@ def test_gen_pagination_nodes(
             ],
             selection=[
               Selection(
-                fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
               )
             ]
           ),
-          Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
-        VariableDefinition('first1', TypeRef.Named('Int')),
-        VariableDefinition('skip1', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue1', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
+        VariableDefinition('first1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue1', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc2(),
     [
-      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [
-        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'swaps'], [])
+      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [
+        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs', 'swaps'], [])
       ]),
-      PaginationNode(2, 'id', 100, 0, None, TypeRef.Named('String'), ['swaps'], [])
+      PaginationNode(2, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['swaps'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-          ], TypeRef.non_null_list('Pair')),
+          fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Pair')),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -230,11 +230,11 @@ def test_gen_pagination_nodes(
           ],
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('swaps', '', [
-                TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-              ], TypeRef.non_null_list('Swap')),
+              fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+                TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+              ], type=TypeRef.non_null_list('Swap')),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
@@ -246,19 +246,19 @@ def test_gen_pagination_nodes(
               ],
               selection=[
                 Selection(
-                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                  fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
                 )
               ]
             ),
-            Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
           ]
         ),
         Selection(
-          fmeta=TypeMeta.FieldMeta('swaps', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-          ], TypeRef.non_null_list('Swap')),
+          fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Swap')),
           arguments=[
             Argument('first', InputValue.Variable('first2')),
             Argument('skip', InputValue.Variable('skip2')),
@@ -270,37 +270,37 @@ def test_gen_pagination_nodes(
           ],
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+              fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
             )
           ]
         ),
       ],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
-        VariableDefinition('first1', TypeRef.Named('Int')),
-        VariableDefinition('skip1', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue1', TypeRef.Named('String')),
-        VariableDefinition('first2', TypeRef.Named('Int')),
-        VariableDefinition('skip2', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue2', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
+        VariableDefinition('first1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue1', TypeRef.Named(name="String", kind="SCALAR")),
+        VariableDefinition('first2', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip2', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue2', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc3(),
     [
-      PaginationNode(0, 'id', 455, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 455, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -312,30 +312,30 @@ def test_gen_pagination_nodes(
         ],
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+            fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
           )
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc4(),
     [
-      PaginationNode(0, 'id', 100, 10, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 10, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -347,30 +347,30 @@ def test_gen_pagination_nodes(
         ],
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+            fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
           )
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc5(),
     [
-      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])
+      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named(name="BigInt", kind="SCALAR"), ['pairs'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -381,30 +381,30 @@ def test_gen_pagination_nodes(
           })),
         ],
         selection=[
-          Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
-          Selection(fmeta=TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')))
+          Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='createdAtTimestamp', description='', args=[], type=TypeRef.Named(name="BigInt", kind="SCALAR")))
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('BigInt')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="BigInt", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc6(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -415,29 +415,29 @@ def test_gen_pagination_nodes(
           })),
         ],
         selection=[
-          Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc7(),
     [
-      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named('BigInt'), ['pairs'], [])
+      PaginationNode(0, 'createdAtTimestamp', 100, 0, None, TypeRef.Named(name="BigInt", kind="SCALAR"), ['pairs'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -448,32 +448,32 @@ def test_gen_pagination_nodes(
           })),
         ],
         selection=[
-          Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
-          Selection(fmeta=TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')))
+          Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='createdAtTimestamp', description='', args=[], type=TypeRef.Named(name="BigInt", kind="SCALAR")))
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('BigInt')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="BigInt", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc8(),
     [
-      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [
-        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs', 'foo', 'swaps'], [])
+      PaginationNode(1, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [
+        PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs', 'foo', 'swaps'], [])
       ])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first1')),
           Argument('skip', InputValue.Variable('skip1')),
@@ -485,14 +485,14 @@ def test_gen_pagination_nodes(
         ],
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('foo', '', [], TypeRef.Named('Foo')),
+            fmeta=TypeMeta.FieldMeta(name='foo', description='', args=[], type=TypeRef.Named(name='Foo', kind="OBJECT")),
             selection=[
               Selection(
-                fmeta=TypeMeta.FieldMeta('swaps', '', [
-                  TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-                  TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-                  TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-                ], TypeRef.non_null_list('Swap')),
+                fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+                  TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                  TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                  TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+                ], type=TypeRef.non_null_list('Swap')),
                 arguments=[
                   Argument('first', InputValue.Variable('first0')),
                   Argument('skip', InputValue.Variable('skip0')),
@@ -504,46 +504,46 @@ def test_gen_pagination_nodes(
                 ],
                 selection=[
                   Selection(
-                    fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                    fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
                   )
                 ]
               )
             ]
           ),
-          Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
-        VariableDefinition('first1', TypeRef.Named('Int')),
-        VariableDefinition('skip1', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue1', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
+        VariableDefinition('first1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue1', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc10(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pair', 'swaps'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pair', 'swaps'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pair', '', [
-          TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None)
-        ], TypeRef.Named('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pair', description='', args=[
+          TypeMeta.ArgumentMeta(name='id', description='', type=TypeRef.Named(name="String", kind="SCALAR"), defaultValue=None)
+        ], type=TypeRef.Named(name='Pair', kind="OBJECT")),
         arguments=[
           Argument('id', InputValue.String('0x786b582a0bbcac5d192d7e039f49c116ac5f05a8'))
         ],
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('swaps', '', [
-              TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-            ], TypeRef.non_null_list('Swap')),
+            fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+              TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+            ], type=TypeRef.non_null_list('Swap')),
             arguments=[
               Argument('first', InputValue.Variable('first0')),
               Argument('skip', InputValue.Variable('skip0')),
@@ -555,32 +555,32 @@ def test_gen_pagination_nodes(
             ],
             selection=[
               Selection(
-                fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
               )
             ]
           )
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc11(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -592,29 +592,29 @@ def test_gen_pagination_nodes(
           })),
         ],
         selection=[
-          Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc12(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -626,30 +626,30 @@ def test_gen_pagination_nodes(
           })),
         ],
         selection=[
-          Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
-          Selection(fmeta=TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt'))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='createdAtTimestamp', description='', args=[], type=TypeRef.Named(name="BigInt", kind="SCALAR"))),
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
   (
     queries.doc13(),
     [
-      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named('String'), ['pairs'], [])
+      PaginationNode(0, 'id', 100, 0, None, TypeRef.Named(name="String", kind="SCALAR"), ['pairs'], [])
     ],
     Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -660,14 +660,14 @@ def test_gen_pagination_nodes(
           })),
         ],
         selection=[
-          Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
-          Selection(fmeta=TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt'))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
+          Selection(fmeta=TypeMeta.FieldMeta(name='createdAtTimestamp', description='', args=[], type=TypeRef.Named(name="BigInt", kind="SCALAR"))),
         ]
       )],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ))
   ),
@@ -687,11 +687,11 @@ def test_normalize_doc(
       name=None,
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-          ], TypeRef.non_null_list('Pair')),
+          fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Pair')),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -704,11 +704,11 @@ def test_normalize_doc(
           ],
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('swaps', '', [
-                TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-              ], TypeRef.non_null_list('Swap')),
+              fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+                TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+              ], type=TypeRef.non_null_list('Swap')),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
@@ -721,19 +721,19 @@ def test_normalize_doc(
               ],
               selection=[
                 Selection(
-                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                  fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
                 )
               ]
             ),
-            Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
           ]
         ),
         Selection(
-          fmeta=TypeMeta.FieldMeta('swaps', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-          ], TypeRef.non_null_list('Swap')),
+          fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Swap')),
           arguments=[
             Argument('first', InputValue.Variable('first2')),
             Argument('skip', InputValue.Variable('skip2')),
@@ -745,21 +745,21 @@ def test_normalize_doc(
           ],
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+              fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
             )
           ]
         ),
       ],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
-        VariableDefinition('first1', TypeRef.Named('Int')),
-        VariableDefinition('skip1', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue1', TypeRef.Named('String')),
-        VariableDefinition('first2', TypeRef.Named('Int')),
-        VariableDefinition('skip2', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue2', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
+        VariableDefinition('first1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue1', TypeRef.Named(name="String", kind="SCALAR")),
+        VariableDefinition('first2', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip2', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue2', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     )),
     {
@@ -774,11 +774,11 @@ def test_normalize_doc(
       name=None,
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-          ], TypeRef.non_null_list('Pair')),
+          fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Pair')),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -791,11 +791,11 @@ def test_normalize_doc(
           ],
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('swaps', '', [
-                TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-              ], TypeRef.non_null_list('Swap')),
+              fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+                TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+              ], type=TypeRef.non_null_list('Swap')),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
@@ -808,21 +808,21 @@ def test_normalize_doc(
               ],
               selection=[
                 Selection(
-                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                  fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
                 )
               ]
             ),
-            Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
           ]
         ),
       ],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
-        VariableDefinition('first1', TypeRef.Named('Int')),
-        VariableDefinition('skip1', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue1', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
+        VariableDefinition('first1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue1', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     ), variables={
       'first0': 10,
@@ -838,11 +838,11 @@ def test_normalize_doc(
       name=None,
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-          ], TypeRef.non_null_list('Pair')),
+          fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Pair')),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -855,11 +855,11 @@ def test_normalize_doc(
           ],
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('swaps', '', [
-                TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-              ], TypeRef.non_null_list('Swap')),
+              fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+                TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+              ], type=TypeRef.non_null_list('Swap')),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
@@ -872,19 +872,19 @@ def test_normalize_doc(
               ],
               selection=[
                 Selection(
-                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                  fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
                 )
               ]
             ),
-            Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
           ]
         ),
         Selection(
-          fmeta=TypeMeta.FieldMeta('swaps', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-          ], TypeRef.non_null_list('Swap')),
+          fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Swap')),
           arguments=[
             Argument('first', InputValue.Variable('first2')),
             Argument('skip', InputValue.Variable('skip2')),
@@ -896,21 +896,21 @@ def test_normalize_doc(
           ],
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+              fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
             )
           ]
         ),
       ],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue0', TypeRef.Named('String')),
-        VariableDefinition('first1', TypeRef.Named('Int')),
-        VariableDefinition('skip1', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue1', TypeRef.Named('String')),
-        VariableDefinition('first2', TypeRef.Named('Int')),
-        VariableDefinition('skip2', TypeRef.Named('Int')),
-        VariableDefinition('lastOrderingValue2', TypeRef.Named('String')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue0', TypeRef.Named(name="String", kind="SCALAR")),
+        VariableDefinition('first1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue1', TypeRef.Named(name="String", kind="SCALAR")),
+        VariableDefinition('first2', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip2', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('lastOrderingValue2', TypeRef.Named(name="String", kind="SCALAR")),
       ]
     )),
     {
@@ -923,11 +923,11 @@ def test_normalize_doc(
       name=None,
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-          ], TypeRef.non_null_list('Pair')),
+          fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Pair')),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -939,11 +939,11 @@ def test_normalize_doc(
           ],
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('swaps', '', [
-                TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-              ], TypeRef.non_null_list('Swap')),
+              fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+                TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+              ], type=TypeRef.non_null_list('Swap')),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
@@ -955,19 +955,19 @@ def test_normalize_doc(
               ],
               selection=[
                 Selection(
-                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                  fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
                 )
               ]
             ),
-            Selection(fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
           ]
         ),
       ],
       variables=[
-        VariableDefinition('first0', TypeRef.Named('Int')),
-        VariableDefinition('skip0', TypeRef.Named('Int')),
-        VariableDefinition('first1', TypeRef.Named('Int')),
-        VariableDefinition('skip1', TypeRef.Named('Int')),
+        VariableDefinition('first0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip0', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('first1', TypeRef.Named(name="Int", kind="SCALAR")),
+        VariableDefinition('skip1', TypeRef.Named(name="Int", kind="SCALAR")),
       ]
     ), variables={
       'first0': 10,

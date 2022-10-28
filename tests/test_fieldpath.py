@@ -12,8 +12,8 @@ from subgrounds.subgrounds import Subgrounds
 def test_fieldpath_building_1(subgraph):
   expected = FieldPath(
     subgraph,
-    TypeRef.Named('Query'),
-    TypeRef.Named('String'),
+    TypeRef.Named(name='Query', kind="OBJECT"),
+    TypeRef.Named(name="String", kind="SCALAR"),
     [
       (
         {
@@ -24,16 +24,16 @@ def test_fieldpath_building_1(subgraph):
           'orderBy': 'reserveUSD',
           'orderDirection': 'desc'
         },
-        TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-          TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-          TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-        ], TypeRef.non_null_list('Pair')),
+        TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+        ], type=TypeRef.non_null_list('Pair'))
       ),
       (
-        None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+        None, TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
       )
     ]
   )
@@ -47,15 +47,15 @@ def test_fieldpath_building_1(subgraph):
   query = pairs.id
 
   FieldPath.__test_mode = True
-  query == expected
+  assert query == expected
 
 
 def test_fieldpath_building_2(subgraph):
   expected = [
     FieldPath(
       subgraph,
-      TypeRef.Named('Query'),
-      TypeRef.Named('String'),
+      TypeRef.Named(name='Query', kind="OBJECT"),
+      TypeRef.Named(name="String", kind="SCALAR"),
       [
         (
           {
@@ -66,23 +66,23 @@ def test_fieldpath_building_2(subgraph):
             'orderBy': 'reserveUSD',
             'orderDirection': 'desc'
           },
-          TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-            TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-            TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair')),
+          TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+          ], type=TypeRef.non_null_list('Pair'))
         ),
         (
-          None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          None, TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
         )
       ]
     ),
     FieldPath(
       subgraph,
-      TypeRef.Named('Query'),
-      TypeRef.Named('BigDecimal'),
+      TypeRef.Named(name='Query', kind="OBJECT"),
+      TypeRef.Named(name="BigDecimal", kind="SCALAR"),
       [
         (
           {
@@ -93,16 +93,16 @@ def test_fieldpath_building_2(subgraph):
             'orderBy': 'reserveUSD',
             'orderDirection': 'desc'
           },
-          TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-            TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-            TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair')),
+          TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+          ], type=TypeRef.non_null_list('Pair'))
         ),
         (
-          None, TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal'))
+          None, TypeMeta.FieldMeta(name='reserveUSD', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR"))
         )
       ]
     )
@@ -127,8 +127,8 @@ def test_fieldpath_building_3(subgraph):
   expected = [
     FieldPath(
       subgraph,
-      TypeRef.Named('Query'),
-      TypeRef.Named('String'),
+      TypeRef.Named(name='Query', kind="OBJECT"),
+      TypeRef.Named(name="String", kind="SCALAR"),
       [
         (
           {
@@ -139,23 +139,23 @@ def test_fieldpath_building_3(subgraph):
             'orderBy': 'reserveUSD',
             'orderDirection': 'desc'
           },
-          TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-            TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-            TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair')),
+          TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+          ], type=TypeRef.non_null_list('Pair'))
         ),
         (
-          None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          None, TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
         )
       ]
     ),
     FieldPath(
       subgraph,
-      TypeRef.Named('Query'),
-      TypeRef.Named('BigDecimal'),
+      TypeRef.Named(name='Query', kind="OBJECT"),
+      TypeRef.Named(name="BigDecimal", kind="SCALAR"),
       [
         (
           {
@@ -166,16 +166,16 @@ def test_fieldpath_building_3(subgraph):
             'orderBy': 'reserveUSD',
             'orderDirection': 'desc'
           },
-          TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-            TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-            TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair')),
+          TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+          ], type=TypeRef.non_null_list('Pair'))
         ),
         (
-          None, TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal'))
+          None, TypeMeta.FieldMeta(name='reserveUSD', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR"))
         )
       ]
     )

@@ -18,20 +18,20 @@ def datarequest(subgraph: Subgraph):
       url=subgraph._url,
       query=Query(None, [
         Selection(
-          fmeta=TypeMeta.FieldMeta('swaps', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
-            TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
-            TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Swap')),
+          fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+          ], type=TypeRef.non_null_list('Swap')),
           alias=None,
           arguments=[],
           selection=[
-            Selection(fmeta=TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal'))),
-            Selection(fmeta=TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal'))),
-            Selection(fmeta=TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal'))),
-            Selection(fmeta=TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal'))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='amount0In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='amount0Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='amount1In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='amount1Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
           ]
         )
       ])
@@ -55,7 +55,7 @@ def response():
 
 @pytest.mark.parametrize("transforms, expected", [
   (
-    [TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal))],
+    [TypeTransform(TypeRef.Named(name='BigDecimal', kind="SCALAR"), lambda bigdecimal: float(bigdecimal))],
     [{
       'swaps': [{
         'amount0In': 0.25,
@@ -113,21 +113,21 @@ def test_localsyntheticfield_literal_roundtrip1(
       url=subgraph._url,
       query=Query(None, [
         Selection(
-          fmeta=TypeMeta.FieldMeta('swaps', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
-            TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
-            TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Swap')),
+          fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+          ], type=TypeRef.non_null_list('Swap')),
           alias=None,
           arguments=[],
           selection=[
-            Selection(fmeta=TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal'))),
-            Selection(fmeta=TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal'))),
-            Selection(fmeta=TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal'))),
-            Selection(fmeta=TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal'))),
-            Selection(fmeta=TypeMeta.FieldMeta('price0', '', [], TypeRef.Named('BigDecimal'))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='amount0In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='amount0Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='amount1In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='amount1Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+            Selection(fmeta=TypeMeta.FieldMeta(name='price0', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
           ]
         )
       ])
@@ -137,25 +137,25 @@ def test_localsyntheticfield_literal_roundtrip1(
   subgraph_transforms = [
     LocalSyntheticField(
       subgraph=subgraph,
-      fmeta=TypeMeta.FieldMeta('price0', '', [], TypeRef.non_null('Float')),
-      type_=TypeMeta.ObjectMeta('Swap', '', fields=[
-        TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-        TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt')),
-        TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')),
-        TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')),
+      fmeta=TypeMeta.FieldMeta(name='price0', description='', args=[], type=TypeRef.non_null('Float')),
+      type_=TypeMeta.ObjectMeta(name='Swap', description='', fields=[
+        TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
+        TypeMeta.FieldMeta(name='timestamp', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR")),
+        TypeMeta.FieldMeta(name='amount0In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+        TypeMeta.FieldMeta(name='amount0Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+        TypeMeta.FieldMeta(name='amount1In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+        TypeMeta.FieldMeta(name='amount1Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
       ]),
       f=lambda in0, out0, in1, out1: abs(in1 - out1) / abs(in0 - out0),
       default=0.0,
       args=[
-        Selection(TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal'))),
-        Selection(TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal'))),
-        Selection(TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal'))),
-        Selection(TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal'))),
+        Selection(TypeMeta.FieldMeta(name='amount0In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+        Selection(TypeMeta.FieldMeta(name='amount0Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+        Selection(TypeMeta.FieldMeta(name='amount1In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
+        Selection(TypeMeta.FieldMeta(name='amount1Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR"))),
       ]
     ),
-    TypeTransform(TypeRef.Named('BigDecimal'), lambda bigdecimal: float(bigdecimal))
+    TypeTransform(TypeRef.Named(name='BigDecimal', kind="SCALAR"), lambda bigdecimal: float(bigdecimal))
   ]
 
   subgraph._transforms = subgraph_transforms

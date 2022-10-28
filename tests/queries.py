@@ -15,14 +15,14 @@ def doc0():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
         )
       ]
     )]
@@ -42,21 +42,21 @@ def doc1():
   return Document(url='www.abc.xyz/graphql', query=Query(
       name=None,
       selection=[Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('swaps', '', [
-              TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-            ], TypeRef.non_null_list('Swap')),
+            fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+              TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+            ], type=TypeRef.non_null_list('Swap')),
             selection=[
               Selection(
-                fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
               )
             ]
           )
@@ -82,35 +82,35 @@ def doc2():
     name=None,
     selection=[
       Selection(
-        fmeta=TypeMeta.FieldMeta('pairs', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-        ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('swaps', '', [
-              TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-            ], TypeRef.non_null_list('Swap')),
+            fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+              TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+            ], type=TypeRef.non_null_list('Swap')),
             selection=[
               Selection(
-                fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
               )
             ]
           ),
         ]
       ),
       Selection(
-        fmeta=TypeMeta.FieldMeta('swaps', '', [
-          TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-          TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-        ], TypeRef.non_null_list('Swap')),
+        fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Swap')),
         selection=[
           Selection(
-            fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+            fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
           )
         ]
       ),
@@ -129,17 +129,17 @@ def doc3():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+        fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+          TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+        ], type=TypeRef.non_null_list('Pair')),
       arguments=[
         Argument('first', InputValue.Int(455)),
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
         )
       ]
     )]
@@ -157,17 +157,17 @@ def doc4():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
       arguments=[
         Argument('skip', InputValue.Int(10)),
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
         )
       ]
     )]
@@ -185,17 +185,17 @@ def doc5():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
       arguments=[
         Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
         )
       ]
     )]
@@ -213,17 +213,17 @@ def doc6():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
       arguments=[
         Argument('orderDirection', InputValue.Enum('desc')),
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
         )
       ]
     )]
@@ -244,18 +244,18 @@ def doc7():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
       arguments=[
         Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
         Argument('orderDirection', InputValue.Enum('desc')),
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
         )
       ]
     )]
@@ -277,24 +277,24 @@ def doc8():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('foo', '', [], TypeRef.Named('Foo')),
+          fmeta=TypeMeta.FieldMeta(name='foo', description='', args=[], type=TypeRef.Named(name='Foo', kind="OBJECT")),
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('swaps', '', [
-                TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-                TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-              ], TypeRef.non_null_list('Swap')),
+              fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+                TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+              ], type=TypeRef.non_null_list('Swap')),
               selection=[
                 Selection(
-                  fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+                  fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
                 )
               ]
             )
@@ -316,15 +316,15 @@ def doc9():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pair', '', [
-        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None)
-      ], TypeRef.Named('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pair', description='', args=[
+        TypeMeta.ArgumentMeta(name='id', description='', type=TypeRef.Named(name="String", kind="SCALAR"), defaultValue=None)
+      ], type=TypeRef.Named(name='Pair', kind="OBJECT")),
       arguments=[
         Argument('id', InputValue.String('0x786b582a0bbcac5d192d7e039f49c116ac5f05a8'))
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
           selection=[]
         )
       ]
@@ -345,22 +345,22 @@ def doc10():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pair', '', [
-        TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None)
-      ], TypeRef.Named('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pair', description='', args=[
+        TypeMeta.ArgumentMeta(name='id', description='', type=TypeRef.Named(name="String", kind="SCALAR"), defaultValue=None)
+      ], type=TypeRef.Named(name='Pair', kind="OBJECT")),
       arguments=[
         Argument('id', InputValue.String('0x786b582a0bbcac5d192d7e039f49c116ac5f05a8'))
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('swaps', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None)
-          ], TypeRef.non_null_list('Swap')),
+          fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Swap')),
           selection=[
             Selection(
-              fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+              fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
             )
           ]
         )
@@ -384,11 +384,11 @@ def doc11():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
       arguments=[
         Argument('where', InputValue.Object({
           'createdAtTimestamp_gt': InputValue.Int(10000)
@@ -396,7 +396,7 @@ def doc11():
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
         )
       ]
     )]
@@ -420,11 +420,11 @@ def doc12():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
       arguments=[
         Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
         Argument('orderDirection', InputValue.Enum('desc')),
@@ -434,7 +434,7 @@ def doc12():
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
         )
       ]
     )]
@@ -458,11 +458,11 @@ def doc13():
   return Document(url='www.abc.xyz/graphql', query=Query(
     name=None,
     selection=[Selection(
-      fmeta=TypeMeta.FieldMeta('pairs', '', [
-        TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-        TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None)
-      ], TypeRef.non_null_list('Pair')),
+      fmeta=TypeMeta.FieldMeta(name='pairs', description='', args=[
+        TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
+      ], type=TypeRef.non_null_list('Pair')),
       arguments=[
         Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
         Argument('orderDirection', InputValue.Enum('asc')),
@@ -472,7 +472,7 @@ def doc13():
       ],
       selection=[
         Selection(
-          fmeta=TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))
+          fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
         )
       ]
     )]

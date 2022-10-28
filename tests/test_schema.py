@@ -8,17 +8,17 @@ from subgrounds.schema import TypeMeta, TypeRef
 
 @pytest.mark.parametrize("argmeta, argvalue, expected", [
   (
-    TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
+    TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None),
     {'reserveUSD_lt': 10},
     InputValue.Object({'reserveUSD_lt': InputValue.String('10.0')})
   ),
   (
-    TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
+    TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="ENUM"), defaultValue=None),
     'reserveUSD',
     InputValue.Enum('reserveUSD'),
   ),
   (
-    TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
+    TypeMeta.ArgumentMeta(name='id', description='', type=TypeRef.Named(name='String', kind="SCALAR"), defaultValue=None),
     'abc',
     InputValue.String('abc')
   )

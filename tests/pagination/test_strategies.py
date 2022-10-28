@@ -49,7 +49,7 @@ def __test_args(
       first_value=1100,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],
@@ -70,7 +70,7 @@ def __test_args(
       first_value=1100,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],
@@ -89,7 +89,7 @@ def __test_args(
       first_value=100,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],
@@ -108,7 +108,7 @@ def __test_args(
       first_value=4,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['pairs'],
       inner=[
         PaginationNode(
@@ -117,7 +117,7 @@ def __test_args(
           first_value=7000,
           skip_value=0,
           filter_value=None,
-          filter_value_type=TypeRef.Named('BigInt'),
+          filter_value_type=TypeRef.Named(name="BigInt", kind="SCALAR"),
           key_path=['pairs', 'swaps'],
           inner=[]
         )
@@ -146,7 +146,7 @@ def __test_args(
       first_value=4,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['pairs'],
       inner=[
         PaginationNode(
@@ -155,7 +155,7 @@ def __test_args(
           first_value=7000,
           skip_value=0,
           filter_value=None,
-          filter_value_type=TypeRef.Named('BigInt'),
+          filter_value_type=TypeRef.Named(name="BigInt", kind="SCALAR"),
           key_path=['pairs', 'swaps'],
           inner=[],
         ),
@@ -165,7 +165,7 @@ def __test_args(
           first_value=10,
           skip_value=0,
           filter_value=None,
-          filter_value_type=TypeRef.Named('BigInt'),
+          filter_value_type=TypeRef.Named(name="BigInt", kind="SCALAR"),
           key_path=['pairs', 'users'],
           inner=[],
         ),
@@ -202,7 +202,7 @@ def __test_args(
       first_value=1500,
       skip_value=10,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],
@@ -223,7 +223,7 @@ def __test_args(
       first_value=1500,
       skip_value=0,
       filter_value='0',
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],
@@ -254,7 +254,7 @@ def test_legacy_strategy(
       first_value=1100,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],
@@ -274,7 +274,7 @@ def test_legacy_strategy(
       first_value=1100,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],
@@ -292,7 +292,7 @@ def test_legacy_strategy(
       first_value=100,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],
@@ -311,7 +311,7 @@ def test_legacy_strategy(
       first_value=1000,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['pairs'],
       inner=[
         PaginationNode(
@@ -320,7 +320,7 @@ def test_legacy_strategy(
           first_value=7000,
           skip_value=0,
           filter_value=None,
-          filter_value_type=TypeRef.Named('BigInt'),
+          filter_value_type=TypeRef.Named(name="BigInt", kind="SCALAR"),
           key_path=['pairs', 'swaps'],
           inner=[]
         )
@@ -343,7 +343,7 @@ def test_legacy_strategy(
       first_value=4,
       skip_value=0,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['pairs'],
       inner=[
         PaginationNode(
@@ -352,7 +352,7 @@ def test_legacy_strategy(
           first_value=7000,
           skip_value=0,
           filter_value=None,
-          filter_value_type=TypeRef.Named('BigInt'),
+          filter_value_type=TypeRef.Named(name="BigInt", kind="SCALAR"),
           key_path=['pairs', 'swaps'],
           inner=[],
         ),
@@ -362,7 +362,7 @@ def test_legacy_strategy(
           first_value=10,
           skip_value=0,
           filter_value=None,
-          filter_value_type=TypeRef.Named('BigInt'),
+          filter_value_type=TypeRef.Named(name="BigInt", kind="SCALAR"),
           key_path=['pairs', 'users'],
           inner=[],
         ),
@@ -390,7 +390,7 @@ def test_legacy_strategy(
       first_value=1500,
       skip_value=10,
       filter_value=None,
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],
@@ -411,7 +411,7 @@ def test_legacy_strategy(
       first_value=1500,
       skip_value=0,
       filter_value='0',
-      filter_value_type=TypeRef.Named('String'),
+      filter_value_type=TypeRef.Named(name="String", kind="SCALAR"),
       key_path=['swaps'],
       inner=[]
     )],

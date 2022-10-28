@@ -17,20 +17,20 @@ def test_mk_request_1(subgraph):
       'www.abc.xyz/graphql',
       Query(selection=[
         Selection(
-          TypeMeta.FieldMeta('pairs', '', [
-            TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-            TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-            TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-            TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-          ], TypeRef.non_null_list('Pair')),
+          TypeMeta.FieldMeta(name='pairs', description='', args=[
+            TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+          ], type=TypeRef.non_null_list('Pair')),
           alias='x7ecb1bc5fd9e0dcf',
           arguments=[
             Argument("first", InputValue.Int(10))
           ],
           selection=[
-            Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
-            Selection(TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))
+            Selection(TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
+            Selection(TypeMeta.FieldMeta(name='reserveUSD', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")))
           ]
         )
       ])
@@ -54,20 +54,20 @@ def test_mk_request_2(subgraph, subgraph_diff_url):
         'www.abc.xyz/graphql',
         Query(selection=[
           Selection(
-            TypeMeta.FieldMeta('pairs', '', [
-              TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-              TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-              TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-            ], TypeRef.non_null_list('Pair')),
+            TypeMeta.FieldMeta(name='pairs', description='', args=[
+              TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+            ], type=TypeRef.non_null_list('Pair')),
             alias='x7ecb1bc5fd9e0dcf',
             arguments=[
               Argument("first", InputValue.Int(10))
             ],
             selection=[
-              Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
-              Selection(TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')))
+              Selection(TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
+              Selection(TypeMeta.FieldMeta(name='reserveUSD', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")))
             ]
           )
         ])
@@ -76,20 +76,20 @@ def test_mk_request_2(subgraph, subgraph_diff_url):
         'www.foo.xyz/graphql',
         Query(selection=[
           Selection(
-            TypeMeta.FieldMeta('pairs', '', [
-              TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-              TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-              TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-              TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-            ], TypeRef.non_null_list('Pair')),
+            TypeMeta.FieldMeta(name='pairs', description='', args=[
+              TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
+              TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+            ], type=TypeRef.non_null_list('Pair')),
             alias='x7ecb1bc5fd9e0dcf',
             arguments=[
               Argument("first", InputValue.Int(10))
             ],
             selection=[
-              Selection(TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
-              Selection(TypeMeta.FieldMeta('token0Id', '', [], TypeRef.Named('String')))
+              Selection(TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
+              Selection(TypeMeta.FieldMeta(name='token0Id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")))
             ]
           )
         ])
