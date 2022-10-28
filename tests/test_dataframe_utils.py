@@ -109,14 +109,14 @@ def test_df_of_json_1(klima_bridged_carbon_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('carbonOffsets', '', [], TypeRef.non_null_list('CarbonOffset'))),
-      (None, TypeMeta.FieldMeta('retirements', '', [], TypeRef.non_null_list('Retirement'))),
-      (None, TypeMeta.FieldMeta('value', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='carbonOffsets', description='', args=[], type=TypeRef.non_null_list(name='CarbonOffset', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='retirements', description='', args=[], type=TypeRef.non_null_list(name='Retirement', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='value', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('carbonOffsets', '', [], TypeRef.non_null_list('CarbonOffset'))),
-      (None, TypeMeta.FieldMeta('tokenAddress', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='carbonOffsets', description='', args=[], type=TypeRef.non_null_list(name='CarbonOffset', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='tokenAddress', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
   ]
 
@@ -170,19 +170,19 @@ def test_df_of_json_multidf_1(klima_bridged_carbon_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('carbonOffsets', '', [], TypeRef.non_null_list('CarbonOffset'))),
-      (None, TypeMeta.FieldMeta('retirements', '', [], TypeRef.non_null_list('Retirement'))),
-      (None, TypeMeta.FieldMeta('value', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='carbonOffsets', description='', args=[], type=TypeRef.non_null_list(name='CarbonOffset', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='retirements', description='', args=[], type=TypeRef.non_null_list(name='Retirement', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='value', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('carbonOffsets', '', [], TypeRef.non_null_list('CarbonOffset'))),
-      (None, TypeMeta.FieldMeta('bridges', '', [], TypeRef.non_null_list('Bridge'))),
-      (None, TypeMeta.FieldMeta('value', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='carbonOffsets', description='', args=[], type=TypeRef.non_null_list(name='CarbonOffset', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='bridges', description='', args=[], type=TypeRef.non_null_list(name='Bridge', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='value', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('carbonOffsets', '', [], TypeRef.non_null_list('CarbonOffset'))),
-      (None, TypeMeta.FieldMeta('tokenAddress', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('CarbonOffset'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='carbonOffsets', description='', args=[], type=TypeRef.non_null_list(name='CarbonOffset', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='tokenAddress', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
   ]
 
@@ -241,51 +241,51 @@ def test_df_of_json_multidf_2(univ3_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list(name='Mint', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='timestamp', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('tx_type', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list(name='Mint', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='tx_type', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('pool', '', [], TypeRef.Named('Pool'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list(name='Mint', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='pool', description='', args=[], type=TypeRef.Named(name='Pool', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list(name='Mint', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='token0', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list(name='Mint', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='token1', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='timestamp', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('tx_type', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='tx_type', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('pool', '', [], TypeRef.Named('Pool'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='pool', description='', args=[], type=TypeRef.Named(name='Pool', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='token0', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='token1', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
   ]
 
@@ -330,51 +330,51 @@ def test_df_of_json_merge(klima_bridged_carbon_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list('Mint'))),
+      (None, TypeMeta.FieldMeta(name='timestamp', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('tx_type', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list('Mint'))),
+      (None, TypeMeta.FieldMeta(name='tx_type', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('pool', '', [], TypeRef.Named('Pool'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list('Mint'))),
+      (None, TypeMeta.FieldMeta(name='pool', description='', args=[], type=TypeRef.Named(name='Pool', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list('Mint'))),
+      (None, TypeMeta.FieldMeta(name='token0', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('mints', '', [], TypeRef.non_null_list('Mint'))),
-      (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Mint'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='mints', description='', args=[], type=TypeRef.non_null_list('Mint'))),
+      (None, TypeMeta.FieldMeta(name='token1', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='timestamp', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('tx_type', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='tx_type', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('pool', '', [], TypeRef.Named('Pool'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='pool', description='', args=[], type=TypeRef.Named(name='Pool', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='token0', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='token1', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
   ]
 
@@ -448,24 +448,24 @@ def test_df_of_json_3(univ3_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='timestamp', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('pool', '', [], TypeRef.Named('Pool'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='pool', description='', args=[], type=TypeRef.Named(name='Pool', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='token0', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description='', args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='token1', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
   ]
 
@@ -495,26 +495,26 @@ def test_df_of_json_flat_1(klima_bridged_carbon_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named('Foo'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('foo', '', [], TypeRef.Named('Foo'))),
-      (None, TypeMeta.FieldMeta('a', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named(name='Foo', kind="OBJECT"), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='foo', description='', args=[], type=TypeRef.Named(name='Foo', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='a', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named('Foo'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('foo', '', [], TypeRef.Named('Foo'))),
-      (None, TypeMeta.FieldMeta('b', '', [], TypeRef.Named('String'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named(name='Foo', kind="OBJECT"), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='foo', description='', args=[], type=TypeRef.Named(name='Foo', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='b', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named('Foo'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('foo', '', [], TypeRef.Named('Foo'))),
-      (None, TypeMeta.FieldMeta('c', '', [], TypeRef.Named('C'))),
-      (None, TypeMeta.FieldMeta('x', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named(name='Foo', kind="OBJECT"), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='foo', description='', args=[], type=TypeRef.Named(name='Foo', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='c', description='', args=[], type=TypeRef.Named(name='C', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='x', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named('Bar'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('bar', '', [], TypeRef.Named('Bar'))),
-      (None, TypeMeta.FieldMeta('d', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named(name='Bar', kind="OBJECT"), TypeRef.Named(name='BigInt', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='bar', description='', args=[], type=TypeRef.Named(name='Bar', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='d', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR"))),
     ]),
-    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named('Bar'), TypeRef.Named('Boolean'), [
-      (None, TypeMeta.FieldMeta('bar', '', [], TypeRef.Named('Bar'))),
-      (None, TypeMeta.FieldMeta('e', '', [], TypeRef.Named('Boolean'))),
+    FieldPath(klima_bridged_carbon_subgraph, TypeRef.Named(name='Bar', kind="OBJECT"), TypeRef.Named(name='Boolean', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='bar', description='', args=[], type=TypeRef.Named(name='Bar', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='e', description='', args=[], type=TypeRef.Named(name='Boolean', kind="SCALAR"))),
     ]),
   ]
 
@@ -536,17 +536,17 @@ def test_df_of_json_flat_2(univ3_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(univ3_subgraph, TypeRef.Named('Token'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('token', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.Named(name='Token', kind="OBJECT"), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='token', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.Named('Token'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('token', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.Named(name='Token', kind="OBJECT"), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='token', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='name', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.Named('Token'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('token', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.Named(name='Token', kind="OBJECT"), TypeRef.Named(name='String', kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='token', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))),
     ]),
   ]
 
@@ -632,28 +632,28 @@ def test_df_of_json_sfield(univ3_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description="", args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='timestamp', description="", args=[], type=TypeRef.Named(name="BigInt", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('pool', '', [], TypeRef.Named('Pool'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name="String", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description="", args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='pool', description="", args=[], type=TypeRef.Named(name="Pool", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name="String", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description="", args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('String'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name="String", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description="", args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='token1', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('price', '', [], TypeRef.Named('BigDecimal'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Swap'), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='swaps', description="", args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='price', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="OBJECT"))),
     ]),
   ]
 
@@ -707,29 +707,29 @@ def test_df_of_json_6(univ3_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('pools', '', [], TypeRef.non_null_list('Pool'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='pools', description="", args=[], type=TypeRef.non_null_list('Pool'))),
+      (None, TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('pools', '', [], TypeRef.non_null_list('Pool'))),
-      (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='pools', description="", args=[], type=TypeRef.non_null_list('Pool'))),
+      (None, TypeMeta.FieldMeta(name='token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('pools', '', [], TypeRef.non_null_list('Pool'))),
-      (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='pools', description="", args=[], type=TypeRef.non_null_list('Pool'))),
+      (None, TypeMeta.FieldMeta(name='token1', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('pools', '', [], TypeRef.non_null_list('Pool'))),
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='pools', description="", args=[], type=TypeRef.non_null_list('Pool'))),
+      (None, TypeMeta.FieldMeta(name='swaps', description="", args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='timestamp', description="", args=[], type=TypeRef.Named(name="BigInt", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('pools', '', [], TypeRef.non_null_list('Pool'))),
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('amountUSD', '', [], TypeRef.Named('BigDecimal'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='pools', description="", args=[], type=TypeRef.non_null_list('Pool'))),
+      (None, TypeMeta.FieldMeta(name='swaps', description="", args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='amountUSD', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="OBJECT"))),
     ]),
   ]
 
@@ -759,22 +759,22 @@ def test_df_of_json_semiflat_1(univ3_subgraph: Subgraph):
   }]
 
   fpaths = [
-    FieldPath(univ3_subgraph, TypeRef.Named('Token'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('token', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.Named(name="Token", kind="OBJECT"), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='token', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.Named('Token'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('token', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.Named(name="Token", kind="OBJECT"), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='token', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='name', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.Named('Token'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('token', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.Named(name="Token", kind="OBJECT"), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='token', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.Named('Token'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('token', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('whitelistPools', '', [], TypeRef.non_null_list('Pool'))),
-      (None, TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.Named(name="Token", kind="OBJECT"), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='token', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='whitelistPools', description="", args=[], type=TypeRef.non_null_list('Pool'))),
+      (None, TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
   ]
 
@@ -801,20 +801,20 @@ def test_df_of_json_semiflat_2(univ3_subgraph: Subgraph):
   ]
 
   fpaths = [
-    FieldPath(univ3_subgraph, TypeRef.Named('Pool'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('pool', '', [], TypeRef.non_null_list('Pool'))),
-      (None, TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.Named(name="Pool", kind="OBJECT"), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='pool', description="", args=[], type=TypeRef.non_null_list('Pool'))),
+      (None, TypeMeta.FieldMeta(name='token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.Named('Pool'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('pool', '', [], TypeRef.non_null_list('Pool'))),
-      (None, TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token'))),
-      (None, TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String'))),
+    FieldPath(univ3_subgraph, TypeRef.Named(name="Pool", kind="OBJECT"), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='pool', description="", args=[], type=TypeRef.non_null_list('Pool'))),
+      (None, TypeMeta.FieldMeta(name='token1', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
+      (None, TypeMeta.FieldMeta(name='symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
     ]),
-    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named('BigInt'), [
-      (None, TypeMeta.FieldMeta('pool', '', [], TypeRef.non_null_list('Pool'))),
-      (None, TypeMeta.FieldMeta('swaps', '', [], TypeRef.non_null_list('Swap'))),
-      (None, TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt'))),
+    FieldPath(univ3_subgraph, TypeRef.non_null_list('Pool'), TypeRef.Named(name="BigInt", kind="SCALAR"), [
+      (None, TypeMeta.FieldMeta(name='pool', description="", args=[], type=TypeRef.non_null_list('Pool'))),
+      (None, TypeMeta.FieldMeta(name='swaps', description="", args=[], type=TypeRef.non_null_list('Swap'))),
+      (None, TypeMeta.FieldMeta(name='timestamp', description="", args=[], type=TypeRef.Named(name="BigInt", kind="SCALAR"))),
     ]),
   ]
 

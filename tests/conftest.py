@@ -8,59 +8,80 @@ from subgrounds import Subgrounds
 
 @pytest.fixture
 def pairs_fieldmeta():
-  return TypeMeta.FieldMeta('pairs', '', [
-    TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-    TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-    TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Pair_filter'), None),
-    TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Pair_orderBy'), None),
-    TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-  ], TypeRef.non_null_list('Pair'))
+  return TypeMeta.FieldMeta(
+    name='pairs',
+    description='', 
+    args=[
+      TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+      TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+      TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
+      TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
+      TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+    ],
+    type=TypeRef.non_null_list('Pair')
+  )
 
 
 @pytest.fixture
 def swaps_fieldmeta():
-  return TypeMeta.FieldMeta('swaps', '', [
-    TypeMeta.ArgumentMeta('first', '', TypeRef.Named('Int'), None),
-    TypeMeta.ArgumentMeta('skip', '', TypeRef.Named('Int'), None),
-    TypeMeta.ArgumentMeta('where', '', TypeRef.Named('Swap_filter'), None),
-    TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named('Swap_orderBy'), None),
-    TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named('OrderDirection'), None),
-  ], TypeRef.non_null_list('Swap'))
+  return TypeMeta.FieldMeta(
+    name='swaps',
+    description='', 
+    args=[
+      TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+      TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
+      TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="SCALAR"), defaultValue=None),
+      TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="SCALAR"), defaultValue=None),
+      TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+    ],
+    type=TypeRef.non_null_list('Swap')
+  )
 
 
 @pytest.fixture
 def swap_objectmeta():
-  return TypeMeta.ObjectMeta('Swap', '', fields=[
-    TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-    TypeMeta.FieldMeta('timestamp', '', [], TypeRef.Named('BigInt')),
-    TypeMeta.FieldMeta('amount0In', '', [], TypeRef.Named('BigDecimal')),
-    TypeMeta.FieldMeta('amount0Out', '', [], TypeRef.Named('BigDecimal')),
-    TypeMeta.FieldMeta('amount1In', '', [], TypeRef.Named('BigDecimal')),
-    TypeMeta.FieldMeta('amount1Out', '', [], TypeRef.Named('BigDecimal')),
-  ])
+  return TypeMeta.ObjectMeta(
+    name='Swap',
+    description='', fields=[
+      TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='timestamp', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='amount0In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='amount0Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='amount1In', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='amount1Out', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+    ]
+  )
 
 
 @pytest.fixture
 def token_objectmeta():
-  return TypeMeta.ObjectMeta('Token', '', fields=[
-    TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-    TypeMeta.FieldMeta('name', '', [], TypeRef.Named('String')),
-    TypeMeta.FieldMeta('symbol', '', [], TypeRef.Named('String')),
-    TypeMeta.FieldMeta('decimals', '', [], TypeRef.Named('Int')),
-  ])
+  return TypeMeta.ObjectMeta(
+    name='Token',
+    description='',
+    fields=[
+      TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='name', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='symbol', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='decimals', description='', args=[], type=TypeRef.Named(name='Int', kind="SCALAR")),
+    ]
+  )
 
 
 @pytest.fixture
 def pair_objectmeta():
-  return TypeMeta.ObjectMeta('Pair', '', fields=[
-    TypeMeta.FieldMeta('id', '', [], TypeRef.Named('String')),
-    TypeMeta.FieldMeta('token0', '', [], TypeRef.Named('Token')),
-    TypeMeta.FieldMeta('token1', '', [], TypeRef.Named('Token')),
-    TypeMeta.FieldMeta('reserveUSD', '', [], TypeRef.Named('BigDecimal')),
-    TypeMeta.FieldMeta('priceToken0', '', [], TypeRef.Named('BigDecimal')),
-    TypeMeta.FieldMeta('priceToken1', '', [], TypeRef.Named('BigDecimal')),
-    TypeMeta.FieldMeta('createdAtTimestamp', '', [], TypeRef.Named('BigInt')),
-  ])
+  return TypeMeta.ObjectMeta(
+    name='Pair',
+    description='',
+    fields=[
+      TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='token0', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT")),
+      TypeMeta.FieldMeta(name='token1', description='', args=[], type=TypeRef.Named(name='Token', kind="OBJECT")),
+      TypeMeta.FieldMeta(name='reserveUSD', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='priceToken0', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='priceToken1', description='', args=[], type=TypeRef.Named(name='BigDecimal', kind="SCALAR")),
+      TypeMeta.FieldMeta(name='createdAtTimestamp', description='', args=[], type=TypeRef.Named(name='BigInt', kind="SCALAR")),
+    ]
+  )
 
 
 @pytest.fixture
@@ -71,56 +92,60 @@ def schema(
   token_objectmeta,
   pair_objectmeta
 ):
-  return SchemaMeta(query_type='Query', type_map={
-    'Int': TypeMeta.ScalarMeta('Int', ''),
-    'Float': TypeMeta.ScalarMeta('Float', ''),
-    'BigInt': TypeMeta.ScalarMeta('BigInt', ''),
-    'BigDecimal': TypeMeta.ScalarMeta('BigDecimal', ''),
-    'String': TypeMeta.ScalarMeta('String', ''),
-    'OrderDirection': TypeMeta.EnumMeta('OrderDirection', '', [
-      TypeMeta.EnumValueMeta('asc', ''),
-      TypeMeta.EnumValueMeta('desc', '')
-    ]),
-    'Query': TypeMeta.ObjectMeta('Query', '', fields=[
-      pairs_fieldmeta,
-      swaps_fieldmeta,
-    ]),
-    'Swap': swap_objectmeta,
-    'Swap_filter': TypeMeta.InputObjectMeta('Swap_filter', '', [
-      TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('timestamp', '', TypeRef.Named('BigInt'), None),
-      TypeMeta.ArgumentMeta('timestamp_gt', '', TypeRef.Named('BigInt'), None),
-      TypeMeta.ArgumentMeta('timestamp_lt', '', TypeRef.Named('BigInt'), None),
-      TypeMeta.ArgumentMeta('amount0In', '', TypeRef.Named('BigDecimal'), None),
-      TypeMeta.ArgumentMeta('amount0Out', '', TypeRef.Named('BigDecimal'), None),
-      TypeMeta.ArgumentMeta('amount1In', '', TypeRef.Named('BigDecimal'), None),
-      TypeMeta.ArgumentMeta('amount1Out', '', TypeRef.Named('BigDecimal'), None),
-    ]),
-    'Token': token_objectmeta,
-    'Pair': pair_objectmeta,
-    'Pair_filter': TypeMeta.InputObjectMeta('Pair_filter', '', [
-      TypeMeta.ArgumentMeta('id', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('id_gt', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('id_lt', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('token0', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('token1', '', TypeRef.Named('String'), None),
-      TypeMeta.ArgumentMeta('reserveUSD_lt', '', TypeRef.Named('BigDecimal'), None),
-      TypeMeta.ArgumentMeta('reserveUSD_gt', '', TypeRef.Named('BigDecimal'), None),
-      TypeMeta.ArgumentMeta('priceToken0_lt', '', TypeRef.Named('BigDecimal'), None),
-      TypeMeta.ArgumentMeta('priceToken0_gt', '', TypeRef.Named('BigDecimal'), None),
-      TypeMeta.ArgumentMeta('priceToken1_lt', '', TypeRef.Named('BigDecimal'), None),
-      TypeMeta.ArgumentMeta('priceToken1_gt', '', TypeRef.Named('BigDecimal'), None),
-      TypeMeta.ArgumentMeta('createdAtTimestamp_lt', '', TypeRef.Named('BigInt'), None),
-      TypeMeta.ArgumentMeta('createdAtTimestamp_gt', '', TypeRef.Named('BigInt'), None),
-    ]),
-    'Pair_orderBy': TypeMeta.EnumMeta('Pair_orderBy', '', [
-      TypeMeta.EnumValueMeta('id', ''),
-      TypeMeta.EnumValueMeta('reserveUSD', ''),
-      TypeMeta.EnumValueMeta('createdAtTimestamp', ''),
-    ]),
-  })
+  return SchemaMeta(
+    queryType={"name": 'Query'},
+    types=[],
+    type_map={
+      'Int': TypeMeta.ScalarMeta(name='Int', description=''),
+      'Float': TypeMeta.ScalarMeta(name='Float', description=''),
+      'BigInt': TypeMeta.ScalarMeta(name='BigInt', description=''),
+      'BigDecimal': TypeMeta.ScalarMeta(name='BigDecimal', description=''),
+      'String': TypeMeta.ScalarMeta(name='String', description=''),
+      'OrderDirection': TypeMeta.EnumMeta(name='OrderDirection', description='', enumValues=[
+        TypeMeta.EnumValueMeta(name='asc', description=''),
+        TypeMeta.EnumValueMeta(name='desc', description='')
+      ]),
+      'Query': TypeMeta.ObjectMeta(name='Query', description='', fields=[
+        pairs_fieldmeta,
+        swaps_fieldmeta,
+      ]),
+      'Swap': swap_objectmeta,
+      'Swap_filter': TypeMeta.InputObjectMeta(name='Swap_filter', description='', inputFields=[
+        TypeMeta.ArgumentMeta(name='id', description='', type=TypeRef.Named(name='String', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='id_gt', description='', type=TypeRef.Named(name='String', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='id_lt', description='', type=TypeRef.Named(name='String', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='timestamp', description='', type=TypeRef.Named(name='BigInt', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='timestamp_gt', description='', type=TypeRef.Named(name='BigInt', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='timestamp_lt', description='', type=TypeRef.Named(name='BigInt', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='amount0In', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='amount0Out', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='amount1In', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='amount1Out', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+      ]),
+      'Token': token_objectmeta,
+      'Pair': pair_objectmeta,
+      'Pair_filter': TypeMeta.InputObjectMeta(name='Pair_filter', description='', inputFields=[
+        TypeMeta.ArgumentMeta(name='id', description='', type=TypeRef.Named(name='String', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='id_gt', description='', type=TypeRef.Named(name='String', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='id_lt', description='', type=TypeRef.Named(name='String', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='token0', description='', type=TypeRef.Named(name='String', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='token1', description='', type=TypeRef.Named(name='String', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='reserveUSD_lt', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='reserveUSD_gt', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='priceToken0_lt', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='priceToken0_gt', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='priceToken1_lt', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='priceToken1_gt', description='', type=TypeRef.Named(name='BigDecimal', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='createdAtTimestamp_lt', description='', type=TypeRef.Named(name='BigInt', kind="SCALAR"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='createdAtTimestamp_gt', description='', type=TypeRef.Named(name='BigInt', kind="SCALAR"), defaultValue=None),
+      ]),
+      'Pair_orderBy': TypeMeta.EnumMeta(name='Pair_orderBy', description='', enumValues=[
+        TypeMeta.EnumValueMeta(name='id', description=''),
+        TypeMeta.EnumValueMeta(name='reserveUSD', description=''),
+        TypeMeta.EnumValueMeta(name='createdAtTimestamp', description=''),
+      ]),
+    }
+  )
 
 
 @pytest.fixture
