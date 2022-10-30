@@ -27,9 +27,9 @@ def test_fieldpath_building_1(subgraph):
         TypeMeta.FieldMeta(name='pairs', description='', args=[
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
-          TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
-          TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="ENUM"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
         ], type=TypeRef.non_null_list('Pair'))
       ),
       (
@@ -69,9 +69,9 @@ def test_fieldpath_building_2(subgraph):
           TypeMeta.FieldMeta(name='pairs', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="ENUM"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
           ], type=TypeRef.non_null_list('Pair'))
         ),
         (
@@ -96,9 +96,9 @@ def test_fieldpath_building_2(subgraph):
           TypeMeta.FieldMeta(name='pairs', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="ENUM"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
           ], type=TypeRef.non_null_list('Pair'))
         ),
         (
@@ -142,9 +142,9 @@ def test_fieldpath_building_3(subgraph):
           TypeMeta.FieldMeta(name='pairs', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="ENUM"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
           ], type=TypeRef.non_null_list('Pair'))
         ),
         (
@@ -169,9 +169,9 @@ def test_fieldpath_building_3(subgraph):
           TypeMeta.FieldMeta(name='pairs', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="ENUM"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
           ], type=TypeRef.non_null_list('Pair'))
         ),
         (
