@@ -9,7 +9,6 @@ from functools import reduce
 import functools
 from typing import Any, Iterator, Optional, Type
 from pipe import map, groupby, traverse, where
-import os
 import json
 import pandas as pd
 import logging
@@ -18,7 +17,7 @@ from pathlib import Path
 
 from subgrounds.dataframe_utils import df_of_json
 from subgrounds.pagination.pagination import PaginationStrategy
-from subgrounds.pagination.strategies import ShallowStrategy, LegacyStrategy
+from subgrounds.pagination.strategies import LegacyStrategy
 from subgrounds.query import DataRequest, Document, Query
 from subgrounds.schema import SchemaMeta
 from subgrounds.subgraph.fieldpath import FieldPath
