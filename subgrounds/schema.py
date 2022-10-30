@@ -169,7 +169,17 @@ class TypeMeta:
         """ Class representing an object definition."""
         kind: Literal["OBJECT"] = "OBJECT"
         fields: list[TypeMeta.FieldMeta]
-        interfaces: list[str] = Field(default_factory=list)
+        interfaces_: list[dict] = Field(alias="interfaces", default_factory=list)
+
+
+        # interfaces: list[str] = Field(default_factory=list)
+
+        @property
+        def interfaces(self) -> list[str]:
+            return list(
+                self.interfaces_
+                | map(lambda intf: intf["name"])
+            )
 
         @property
         def is_object(self) -> bool:
