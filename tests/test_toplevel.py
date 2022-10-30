@@ -23,7 +23,7 @@ def test_mk_request_1(subgraph):
             TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="ENUM"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
-          ], type=TypeRef.non_null_list('Pair')),
+          ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
           alias='x7ecb1bc5fd9e0dcf',
           arguments=[
             Argument("first", InputValue.Int(10))
@@ -60,7 +60,7 @@ def test_mk_request_2(subgraph, subgraph_diff_url):
               TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="ENUM"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
-            ], type=TypeRef.non_null_list('Pair')),
+            ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
             alias='x7ecb1bc5fd9e0dcf',
             arguments=[
               Argument("first", InputValue.Int(10))
@@ -82,7 +82,7 @@ def test_mk_request_2(subgraph, subgraph_diff_url):
               TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Pair_orderBy', kind="ENUM"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
-            ], type=TypeRef.non_null_list('Pair')),
+            ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
             alias='x7ecb1bc5fd9e0dcf',
             arguments=[
               Argument("first", InputValue.Int(10))

@@ -41,7 +41,7 @@ def test_add_synthetic_field_1(subgraph: Subgraph):
       TypeMeta.FieldMeta(name='swaps', description='', args=[
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_orderBy', kind="INPUT_OBJECT"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="ENUM"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
         ], type=TypeRef.non_null_list('Swap', kind="OBJECT")
@@ -132,7 +132,7 @@ def test_add_synthetic_field_2(subgraph: Subgraph):
       TypeMeta.FieldMeta(name='swaps', description='', args=[
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_orderBy', kind="INPUT_OBJECT"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="ENUM"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
         ], type=TypeRef.non_null_list('Swap', kind="OBJECT")
@@ -223,7 +223,7 @@ def test_add_synthetic_field_3(subgraph: Subgraph):
       TypeMeta.FieldMeta(name='swaps', description='', args=[
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_orderBy', kind="INPUT_OBJECT"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="ENUM"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
         ], type=TypeRef.non_null_list('Swap', kind="OBJECT")
@@ -316,7 +316,7 @@ def test_add_synthetic_field_4(subgraph: Subgraph):
       TypeMeta.FieldMeta(name='swaps', description='', args=[
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_orderBy', kind="INPUT_OBJECT"), defaultValue=None),
+          TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="ENUM"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
         ], type=TypeRef.non_null_list('Swap', kind="OBJECT")
@@ -565,7 +565,7 @@ def test_field_path_args_1(subgraph: Subgraph):
   expected = FieldPath(
     subgraph,
     TypeRef.Named(name="Query", kind="OBJECT"),
-    TypeRef.non_null_list('Pair'),
+    TypeRef.non_null_list("Pair", kind="OBJECT"),
     [
       (
         {
@@ -602,7 +602,7 @@ def test_field_path_args_2(subgraph: Subgraph):
   expected = FieldPath(
     subgraph,
     TypeRef.Named(name="Query", kind="OBJECT"),
-    TypeRef.non_null_list('Pair'),
+    TypeRef.non_null_list("Pair", kind="OBJECT"),
     [
       (
         {
@@ -645,8 +645,8 @@ def test_field_path_args_3(subgraph: Subgraph):
     #     TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name="Pair_filter", kind="INPUT_OBJECT"), defaultValue=None),
     #     TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name="Pair_orderBy", kind="ENUM"), defaultValue=None),
     #     TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name="OrderDirection", kind="ENUM"), defaultValue=None),
-    #   ], type=TypeRef.non_null_list('Pair')),
-    #   TypeMeta.FieldMeta('swaps', description="", args=[], type=TypeRef.non_null_list('Swap')),
+    #   ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
+    #   TypeMeta.FieldMeta('swaps', description="", args=[], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
     # ]),
     TypeRef.Named(name='Query', kind="OBJECT"),
     TypeRef.non_null_list('Pair', kind="OBJECT"),
@@ -666,7 +666,7 @@ def test_field_path_args_3(subgraph: Subgraph):
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name="Pair_filter", kind="INPUT_OBJECT"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name="Pair_orderBy", kind="ENUM"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name="OrderDirection", kind="ENUM"), defaultValue=None),
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
       ),
     ]
   )
@@ -689,8 +689,8 @@ def test_field_path_extend_1(subgraph: Subgraph):
     #     TypeMeta.ArgumentMeta('where', '', TypeRef.Named(name="Pair_filter", kind="INPUT_OBJECT"), None),
     #     TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named(name="Pair_orderBy", kind="ENUM"), None),
     #     TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named(name="OrderDirection", kind="ENUM"), None),
-    #   ], TypeRef.non_null_list('Pair')),
-    #   TypeMeta.FieldMeta('swaps', description="", args=[], type=TypeRef.non_null_list('Swap')),
+    #   ], TypeRef.non_null_list("Pair", kind="OBJECT")),
+    #   TypeMeta.FieldMeta('swaps', description="", args=[], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
     # ]),
     TypeRef.Named(name="Query", kind="OBJECT"),
     TypeRef.Named(name="String", kind="SCALAR"),
@@ -703,7 +703,7 @@ def test_field_path_extend_1(subgraph: Subgraph):
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name="Pair_filter", kind="INPUT_OBJECT"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name="Pair_orderBy", kind="ENUM"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name="OrderDirection", kind="ENUM"), defaultValue=None),
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
       ),
       (None, TypeMeta.FieldMeta(name='token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT"))),
       (None, TypeMeta.FieldMeta(name='symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR"))),
@@ -794,7 +794,7 @@ def test_mk_request_3(sg: Subgrounds, subgraph: Subgraph):
       TypeMeta.FieldMeta(name='swaps', description='', args=[
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_orderBy', kind="INPUT_OBJECT"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="ENUM"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
       ], type=TypeRef.non_null_list('Swap', kind="OBJECT")),
@@ -823,7 +823,7 @@ def test_mk_request_4(sg: Subgrounds, subgraph: Subgraph):
       TypeMeta.FieldMeta(name='swaps', description='', args=[
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_orderBy', kind="INPUT_OBJECT"), defaultValue=None),
+        TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="ENUM"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
       ], type=TypeRef.non_null_list('Swap', kind="OBJECT")),
