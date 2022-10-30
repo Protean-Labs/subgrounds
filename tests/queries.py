@@ -19,7 +19,7 @@ def doc0():
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       selection=[
         Selection(
           fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
@@ -46,14 +46,14 @@ def doc1():
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
         selection=[
           Selection(
             fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
               TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
-            ], type=TypeRef.non_null_list('Swap')),
+            ], type=TypeRef.non_null_list('Swap', kind="OBJECT")),
             selection=[
               Selection(
                 fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
@@ -86,14 +86,14 @@ def doc2():
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
         selection=[
           Selection(
             fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
               TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
-            ], type=TypeRef.non_null_list('Swap')),
+            ], type=TypeRef.non_null_list('Swap', kind="OBJECT")),
             selection=[
               Selection(
                 fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
@@ -107,7 +107,7 @@ def doc2():
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Swap')),
+        ], type=TypeRef.non_null_list('Swap', kind="OBJECT")),
         selection=[
           Selection(
             fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR"))
@@ -133,7 +133,7 @@ def doc3():
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       arguments=[
         Argument('first', InputValue.Int(455)),
       ],
@@ -161,7 +161,7 @@ def doc4():
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       arguments=[
         Argument('skip', InputValue.Int(10)),
       ],
@@ -189,7 +189,7 @@ def doc5():
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       arguments=[
         Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
       ],
@@ -217,7 +217,7 @@ def doc6():
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       arguments=[
         Argument('orderDirection', InputValue.Enum('desc')),
       ],
@@ -248,7 +248,7 @@ def doc7():
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       arguments=[
         Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
         Argument('orderDirection', InputValue.Enum('desc')),
@@ -281,7 +281,7 @@ def doc8():
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       selection=[
         Selection(
           fmeta=TypeMeta.FieldMeta(name='foo', description='', args=[], type=TypeRef.Named(name='Foo', kind="OBJECT")),
@@ -291,7 +291,7 @@ def doc8():
                 TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
                 TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
                 TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
-              ], type=TypeRef.non_null_list('Swap')),
+              ], type=TypeRef.non_null_list('Swap', kind="OBJECT")),
               selection=[
                 Selection(
                   fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR"))
@@ -356,8 +356,8 @@ def doc10():
           fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-          ], type=TypeRef.non_null_list('Swap')),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+          ], type=TypeRef.non_null_list('Swap', kind="OBJECT")),
           selection=[
             Selection(
               fmeta=TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
@@ -388,7 +388,7 @@ def doc11():
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       arguments=[
         Argument('where', InputValue.Object({
           'createdAtTimestamp_gt': InputValue.Int(10000)
@@ -424,7 +424,7 @@ def doc12():
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       arguments=[
         Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
         Argument('orderDirection', InputValue.Enum('desc')),
@@ -462,7 +462,7 @@ def doc13():
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
       arguments=[
         Argument('orderBy', InputValue.Enum('createdAtTimestamp')),
         Argument('orderDirection', InputValue.Enum('asc')),

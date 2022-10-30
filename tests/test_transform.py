@@ -21,10 +21,10 @@ def datarequest(subgraph: Subgraph):
           fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
-          ], type=TypeRef.non_null_list('Swap')),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="ENUM"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
+          ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
           alias=None,
           arguments=[],
           selection=[
@@ -116,10 +116,10 @@ def test_localsyntheticfield_literal_roundtrip1(
           fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name='Int', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="SCALAR"), defaultValue=None),
-          ], type=TypeRef.non_null_list('Swap')),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="ENUM"), defaultValue=None),
+            TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
+          ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
           alias=None,
           arguments=[],
           selection=[

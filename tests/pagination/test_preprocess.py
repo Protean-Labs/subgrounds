@@ -120,7 +120,7 @@ def test_gen_pagination_nodes(
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -157,7 +157,7 @@ def test_gen_pagination_nodes(
         TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
         TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-      ], type=TypeRef.non_null_list('Pair')),
+      ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first1')),
           Argument('skip', InputValue.Variable('skip1')),
@@ -172,8 +172,8 @@ def test_gen_pagination_nodes(
             fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
               TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-            ], type=TypeRef.non_null_list('Swap')),
+              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+            ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
             arguments=[
               Argument('first', InputValue.Variable('first0')),
               Argument('skip', InputValue.Variable('skip0')),
@@ -218,7 +218,7 @@ def test_gen_pagination_nodes(
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-          ], type=TypeRef.non_null_list('Pair')),
+          ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -233,8 +233,8 @@ def test_gen_pagination_nodes(
               fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
                 TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
                 TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-              ], type=TypeRef.non_null_list('Swap')),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+              ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
@@ -257,8 +257,8 @@ def test_gen_pagination_nodes(
           fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-          ], type=TypeRef.non_null_list('Swap')),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+          ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
           arguments=[
             Argument('first', InputValue.Variable('first2')),
             Argument('skip', InputValue.Variable('skip2')),
@@ -300,7 +300,7 @@ def test_gen_pagination_nodes(
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -335,7 +335,7 @@ def test_gen_pagination_nodes(
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -370,7 +370,7 @@ def test_gen_pagination_nodes(
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -404,7 +404,7 @@ def test_gen_pagination_nodes(
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -437,7 +437,7 @@ def test_gen_pagination_nodes(
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -473,7 +473,7 @@ def test_gen_pagination_nodes(
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list('Pair', kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first1')),
           Argument('skip', InputValue.Variable('skip1')),
@@ -491,8 +491,8 @@ def test_gen_pagination_nodes(
                 fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
                   TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
                   TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-                  TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-                ], type=TypeRef.non_null_list('Swap')),
+                  TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+                ], type=TypeRef.non_null_list('Swap', kind="OBJECT")),
                 arguments=[
                   Argument('first', InputValue.Variable('first0')),
                   Argument('skip', InputValue.Variable('skip0')),
@@ -542,8 +542,8 @@ def test_gen_pagination_nodes(
             fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
               TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
               TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-            ], type=TypeRef.non_null_list('Swap')),
+              TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+            ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
             arguments=[
               Argument('first', InputValue.Variable('first0')),
               Argument('skip', InputValue.Variable('skip0')),
@@ -580,7 +580,7 @@ def test_gen_pagination_nodes(
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -614,7 +614,7 @@ def test_gen_pagination_nodes(
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -649,7 +649,7 @@ def test_gen_pagination_nodes(
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-        ], type=TypeRef.non_null_list('Pair')),
+        ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
         arguments=[
           Argument('first', InputValue.Variable('first0')),
           Argument('skip', InputValue.Variable('skip0')),
@@ -691,7 +691,7 @@ def test_normalize_doc(
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-          ], type=TypeRef.non_null_list('Pair')),
+          ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -707,8 +707,8 @@ def test_normalize_doc(
               fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
                 TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
                 TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-              ], type=TypeRef.non_null_list('Swap')),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+              ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
@@ -732,8 +732,8 @@ def test_normalize_doc(
           fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-          ], type=TypeRef.non_null_list('Swap')),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+          ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
           arguments=[
             Argument('first', InputValue.Variable('first2')),
             Argument('skip', InputValue.Variable('skip2')),
@@ -778,7 +778,7 @@ def test_normalize_doc(
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-          ], type=TypeRef.non_null_list('Pair')),
+          ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -794,8 +794,8 @@ def test_normalize_doc(
               fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
                 TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
                 TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-              ], type=TypeRef.non_null_list('Swap')),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+              ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
@@ -842,7 +842,7 @@ def test_normalize_doc(
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-          ], type=TypeRef.non_null_list('Pair')),
+          ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -858,8 +858,8 @@ def test_normalize_doc(
               fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
                 TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
                 TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-              ], type=TypeRef.non_null_list('Swap')),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+              ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),
@@ -883,8 +883,8 @@ def test_normalize_doc(
           fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-          ], type=TypeRef.non_null_list('Swap')),
+            TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+          ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
           arguments=[
             Argument('first', InputValue.Variable('first2')),
             Argument('skip', InputValue.Variable('skip2')),
@@ -927,7 +927,7 @@ def test_normalize_doc(
             TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
             TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Pair_filter', kind="INPUT_OBJECT"), defaultValue=None)
-          ], type=TypeRef.non_null_list('Pair')),
+          ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
           arguments=[
             Argument('first', InputValue.Variable('first1')),
             Argument('skip', InputValue.Variable('skip1')),
@@ -942,8 +942,8 @@ def test_normalize_doc(
               fmeta=TypeMeta.FieldMeta(name='swaps', description='', args=[
                 TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
                 TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_VALUE"), defaultValue=None)
-              ], type=TypeRef.non_null_list('Swap')),
+                TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None)
+              ], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
               arguments=[
                 Argument('first', InputValue.Variable('first0')),
                 Argument('skip', InputValue.Variable('skip0')),

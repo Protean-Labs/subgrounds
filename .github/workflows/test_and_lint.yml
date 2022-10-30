@@ -38,7 +38,7 @@ jobs:
       run: poetry install -E dash
 
     - name: Run unit tests
-      run: poetry run nose2
+      run: poetry run pytest
 
     - name: Run examples smoke tests
       shell: bash
