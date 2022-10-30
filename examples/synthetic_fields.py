@@ -23,7 +23,7 @@ Swap.price1 = abs(Swap.amount0In - Swap.amount0Out) / abs(Swap.amount1In - Swap.
 # This is a synthetic field
 Swap.datetime = SyntheticField(
   lambda timestamp: str(datetime.fromtimestamp(timestamp)),
-  TypeRef.Named('String'),
+  TypeRef.Named(name="String", kind="SCALAR"),
   Swap.timestamp,
 )
 

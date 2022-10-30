@@ -24,7 +24,7 @@ PairDayData.exchange_rate = PairDayData.reserve0 / PairDayData.reserve1
 # This is a synthetic field
 PairDayData.datetime = SyntheticField(
   lambda timestamp: str(datetime.fromtimestamp(timestamp)),
-  TypeRef.Named('String'),
+  TypeRef.Named(name="String", kind="SCALAR"),
   PairDayData.date
 )
 
