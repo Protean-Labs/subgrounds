@@ -23,6 +23,23 @@ def pairs_fieldmeta():
 
 
 @pytest.fixture
+def pair_fieldmeta():
+    return TypeMeta.FieldMeta(
+        name="pair",
+        description="",
+        args=[
+            TypeMeta.ArgumentMeta(
+                name="id",
+                description="",
+                type=TypeRef.non_null("ID", kind="SCALAR"),
+                defaultValue=None,
+            ),
+        ],
+        type=TypeRef.Named(name="Pair", kind="OBJECT"),
+    )
+
+
+@pytest.fixture
 def swaps_fieldmeta():
   return TypeMeta.FieldMeta(
     name='swaps',
@@ -87,6 +104,7 @@ def pair_objectmeta():
 @pytest.fixture
 def schema(
   pairs_fieldmeta,
+  pair_fieldmeta,
   swaps_fieldmeta,
   swap_objectmeta,
   token_objectmeta,
@@ -96,6 +114,7 @@ def schema(
     queryType={"name": 'Query'},
     types=[],
     type_map={
+      "ID": TypeMeta.ScalarMeta(name="ID", description=""),
       'Int': TypeMeta.ScalarMeta(name='Int', description=''),
       'Float': TypeMeta.ScalarMeta(name='Float', description=''),
       'BigInt': TypeMeta.ScalarMeta(name='BigInt', description=''),
@@ -108,6 +127,7 @@ def schema(
       'Query': TypeMeta.ObjectMeta(name='Query', description='', fields=[
         pairs_fieldmeta,
         swaps_fieldmeta,
+        pair_fieldmeta,
       ]),
       'Swap': swap_objectmeta,
       'Swap_filter': TypeMeta.InputObjectMeta(name='Swap_filter', description='', inputFields=[
