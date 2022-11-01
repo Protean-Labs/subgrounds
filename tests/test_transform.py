@@ -1,11 +1,12 @@
 import unittest
-from typing import Any
+from typing import Any, Callable
 
 import pytest
 
 from subgrounds.query import DataRequest, Document, Query, Selection
 from subgrounds.schema import TypeMeta, TypeRef
-from subgrounds.subgraph import Subgraph
+from subgrounds.subgraph import Subgraph, Object
+from subgrounds.subgraph.fieldpath import FieldPath, SyntheticField
 from subgrounds.subgrounds import Subgrounds
 from subgrounds.transform import (DocumentTransform, LocalSyntheticField,
                                   TypeTransform)
@@ -168,35 +169,73 @@ def test_localsyntheticfield_literal_roundtrip1(
   assert data == expected
 
 
+
+@pytest.mark.parametrize(["response", "expected", "synthfield_f", "object_f", "fpaths_f"], [
+  (
+    {
+      'swaps': [{
+        'amount0In': '0.25',
+        'amount0Out': '0.0',
+        'amount1In': '0.0',
+        'amount1Out': '89820.904371079570860909',
+        'id': '0xf457e61e2aa310c8a7f01570bf96f24323fc317925c42f2a33d2061e1944df4d-0',
+        'timestamp': '1638554699'
+      }]
+    },
+    [{
+      'swaps': [{
+        'amount0In': 0.25,
+        'amount0Out': 0.0,
+        'amount1In': 0.0,
+        'amount1Out': 89820.904371079570860909,
+        'synthfield': 359283.61748431827,
+        'id': '0xf457e61e2aa310c8a7f01570bf96f24323fc317925c42f2a33d2061e1944df4d-0',
+        'timestamp': '1638554699'
+      }]
+    }],
+    lambda subgraph: abs(subgraph.Swap.amount1In - subgraph.Swap.amount1Out) / abs(subgraph.Swap.amount0In - subgraph.Swap.amount0Out),
+    lambda subgraph: subgraph.Swap,
+    lambda subgraph: [
+      subgraph.Query.swaps.synthfield
+    ]
+  ),
+  (
+    {
+      'xa6436bbcebab2a86': None
+    },
+    [{
+      'xa6436bbcebab2a86': {
+        "id": None,
+        "synthfield": "FOO"
+      }
+    }],
+    lambda _: SyntheticField.constant("FOO"),
+    lambda subgraph: subgraph.Pair,
+    lambda subgraph: [
+      subgraph.Query.pair(id="ABC").id,
+      subgraph.Query.pair(id="ABC").synthfield,
+    ]
+  )
+])
 def test_localsyntheticfield_toplevel_roundtrip(
   mocker,
   response: list[dict[str, Any]],
+  expected: list[dict[str, Any]],
+  synthfield_f: Callable[[Subgraph], SyntheticField],
+  object_f: Callable[[Subgraph], Object],
+  fpaths_f: Callable[[Subgraph], list[FieldPath]],
   subgraph: Subgraph,
 ):
   mocker.patch("subgrounds.client.query", return_value=response)
   
-  expected = [{
-    'swaps': [{
-      'amount0In': 0.25,
-      'amount0Out': 0.0,
-      'amount1In': 0.0,
-      'amount1Out': 89820.904371079570860909,
-      'price0': 359283.61748431827,
-      'id': '0xf457e61e2aa310c8a7f01570bf96f24323fc317925c42f2a33d2061e1944df4d-0',
-      'timestamp': '1638554699'
-    }]
-  }]
-
   sg = Subgrounds(
     global_transforms=[],
     subgraphs={subgraph._url: subgraph}
   )
 
-  subgraph.Swap.price0 = abs(subgraph.Swap.amount1In - subgraph.Swap.amount1Out) / abs(subgraph.Swap.amount0In - subgraph.Swap.amount0Out)
+  object_f(subgraph).synthfield = synthfield_f(subgraph)
 
-  req = sg.mk_request([
-    subgraph.Query.swaps.price0
-  ])
+  req = sg.mk_request(fpaths_f(subgraph))
 
   data = sg.execute(req)
 
