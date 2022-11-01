@@ -285,7 +285,7 @@ class LocalSyntheticField(DocumentTransform):
 
           try:
             data[name] = self.f(*arg_values)
-          except ZeroDivisionError:
+          except Exception:
             data[name] = self.default
 
         case (
