@@ -274,25 +274,49 @@ class LocalSyntheticField(DocumentTransform):
   def transform_response(self, doc: Document, data: dict[str, Any]) -> dict[str, Any]:
     def transform(select: Selection, data: dict) -> None:
       match (select, data):
-        case (Selection(TypeMeta.FieldMeta(name=name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data) if name == self.fmeta.name and name not in data:
+        case (
+          Selection(TypeMeta.FieldMeta(name=name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data
+        ) if name == self.fmeta.name and name not in data:
+          # Case where the selection selects a the syntheticfield of the curren transform
+          # that is not in the data blob and there are no inner selections
+
+          # Try to grab the arguments to the synthetic field transform in the data blob
           arg_values = flatten(list(self.args | map(partial(select_data, data=data))))
 
           try:
             data[name] = self.f(*arg_values)
-          except ZeroDivisionError:
+          except Exception:
             data[name] = self.default
 
+        case (
+          Selection(TypeMeta.FieldMeta(name=name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data
+        ) if name not in data:
+          # Case where the selection selects a regular field but it is not in the data blob (caused by None value at higher selection)
+          data[name] = None
+
         case (Selection(TypeMeta.FieldMeta(name=name), None, _, [] | None) | Selection(TypeMeta.FieldMeta(), name, _, [] | None), dict() as data):
+          # Case where the selection selects a regular field and there are no inner selections
+          # (nothing to do)
           pass
-        case (Selection(TypeMeta.FieldMeta(name=name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data) if name in data:
+
+        case (
+          Selection(TypeMeta.FieldMeta(name=name), None, _, inner_select) | Selection(TypeMeta.FieldMeta(), name, _, inner_select), dict() as data
+        ) if name in data:
           match data[name]:
             case list() as elts:
               for elt in elts:
                 for select in inner_select:
                   transform(select, elt)
+
             case dict() as elt:
               for select in inner_select:
                 transform(select, elt)
+
+            case None:
+              data[name] = {}
+              for select in inner_select:
+                transform(select, data[name])
+
             case _:
               raise Exception(f"transform_response: data for selection {select} is neither list or dict {data[name]}")
 

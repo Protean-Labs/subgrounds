@@ -21,6 +21,7 @@ def test_add_synthetic_field_1(subgraph: Subgraph):
   sfield = SyntheticField(identity, SyntheticField.FLOAT, subgraph.Pair.reserveUSD)
 
   expected = SchemaMeta(queryType={"name": 'Query'}, types=[], type_map={
+    "ID": TypeMeta.ScalarMeta(name="ID", description=""),
     'Int': TypeMeta.ScalarMeta(name='Int', description='', kind="SCALAR"),
     'Float': TypeMeta.ScalarMeta(name='Float', description='', kind="SCALAR"),
     'BigInt': TypeMeta.ScalarMeta(name='BigInt', description='', kind="SCALAR"),
@@ -46,6 +47,15 @@ def test_add_synthetic_field_1(subgraph: Subgraph):
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
         ], type=TypeRef.non_null_list('Swap', kind="OBJECT")
       ),
+      TypeMeta.FieldMeta(name="pair",description="",args=[
+            TypeMeta.ArgumentMeta(
+                name="id",
+                description="",
+                type=TypeRef.non_null("ID", kind="SCALAR"),
+                defaultValue=None,
+            ),
+        ], type=TypeRef.Named(name="Pair", kind="OBJECT"),
+      )
     ]),
     'Swap': TypeMeta.ObjectMeta(name='Swap', description='', fields=[
       TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
@@ -112,6 +122,7 @@ def test_add_synthetic_field_1(subgraph: Subgraph):
 
 def test_add_synthetic_field_2(subgraph: Subgraph):
   expected = SchemaMeta(queryType={"name": 'Query'}, types=[], type_map={
+    "ID": TypeMeta.ScalarMeta(name="ID", description=""),
     'Int': TypeMeta.ScalarMeta(name='Int', description='', kind="SCALAR"),
     'Float': TypeMeta.ScalarMeta(name='Float', description='', kind="SCALAR"),
     'BigInt': TypeMeta.ScalarMeta(name='BigInt', description='', kind="SCALAR"),
@@ -135,8 +146,17 @@ def test_add_synthetic_field_2(subgraph: Subgraph):
           TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name='Swap_filter', kind="INPUT_OBJECT"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name='Swap_orderBy', kind="ENUM"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
-        ], type=TypeRef.non_null_list('Swap', kind="OBJECT")
+        ], type=TypeRef.non_null_list('Swap', kind="OBJECT"),
       ),
+      TypeMeta.FieldMeta(name="pair",description="",args=[
+            TypeMeta.ArgumentMeta(
+                name="id",
+                description="",
+                type=TypeRef.non_null("ID", kind="SCALAR"),
+                defaultValue=None,
+            ),
+        ], type=TypeRef.Named(name="Pair", kind="OBJECT"),
+      )
     ]),
     'Swap': TypeMeta.ObjectMeta(name='Swap', description='', fields=[
       TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
@@ -203,6 +223,7 @@ def test_add_synthetic_field_2(subgraph: Subgraph):
 
 def test_add_synthetic_field_3(subgraph: Subgraph):
   expected = SchemaMeta(queryType={"name": 'Query'}, types=[], type_map={
+    "ID": TypeMeta.ScalarMeta(name="ID", description=""),
     'Int': TypeMeta.ScalarMeta(name='Int', description='', kind="SCALAR"),
     'Float': TypeMeta.ScalarMeta(name='Float', description='', kind="SCALAR"),
     'BigInt': TypeMeta.ScalarMeta(name='BigInt', description='', kind="SCALAR"),
@@ -228,6 +249,15 @@ def test_add_synthetic_field_3(subgraph: Subgraph):
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
         ], type=TypeRef.non_null_list('Swap', kind="OBJECT")
       ),
+      TypeMeta.FieldMeta(name="pair",description="",args=[
+            TypeMeta.ArgumentMeta(
+                name="id",
+                description="",
+                type=TypeRef.non_null("ID", kind="SCALAR"),
+                defaultValue=None,
+            ),
+        ], type=TypeRef.Named(name="Pair", kind="OBJECT"),
+      )
     ]),
     'Swap': TypeMeta.ObjectMeta(name='Swap', description='', fields=[
       TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
@@ -296,6 +326,7 @@ def test_add_synthetic_field_3(subgraph: Subgraph):
 
 def test_add_synthetic_field_4(subgraph: Subgraph):
   expected = SchemaMeta(queryType={"name": 'Query'}, types=[], type_map={
+    "ID": TypeMeta.ScalarMeta(name="ID", description=""),
     'Int': TypeMeta.ScalarMeta(name='Int', description='', kind="SCALAR"),
     'Float': TypeMeta.ScalarMeta(name='Float', description='', kind="SCALAR"),
     'BigInt': TypeMeta.ScalarMeta(name='BigInt', description='', kind="SCALAR"),
@@ -321,6 +352,15 @@ def test_add_synthetic_field_4(subgraph: Subgraph):
           TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name='OrderDirection', kind="ENUM"), defaultValue=None),
         ], type=TypeRef.non_null_list('Swap', kind="OBJECT")
       ),
+      TypeMeta.FieldMeta(name="pair",description="",args=[
+            TypeMeta.ArgumentMeta(
+                name="id",
+                description="",
+                type=TypeRef.non_null("ID", kind="SCALAR"),
+                defaultValue=None,
+            ),
+        ], type=TypeRef.Named(name="Pair", kind="OBJECT"),
+      )
     ]),
     'Swap': TypeMeta.ObjectMeta(name='Swap', description='', fields=[
       TypeMeta.FieldMeta(name='id', description='', args=[], type=TypeRef.Named(name='String', kind="SCALAR")),
@@ -408,14 +448,6 @@ def test_object(subgraph: Subgraph):
 def test_field_path_1(subgraph: Subgraph):
   expected = FieldPath(
     subgraph,
-    # TypeMeta.ObjectMeta(name='Pair', description='', fields=[
-    #   TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
-    #   TypeMeta.FieldMeta(name='token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")),
-    #   TypeMeta.FieldMeta(name='token1', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")),
-    #   TypeMeta.FieldMeta(name='reserveUSD', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    #   TypeMeta.FieldMeta(name='priceToken0', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    #   TypeMeta.FieldMeta(name='priceToken1', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    # ]),
     TypeRef.Named(name="Pair", kind="OBJECT"),
     TypeRef.Named(name="Token", kind="OBJECT"),
     [
@@ -432,14 +464,6 @@ def test_field_path_1(subgraph: Subgraph):
 def test_field_path_2(subgraph: Subgraph):
   expected = FieldPath(
     subgraph,
-    # TypeMeta.ObjectMeta('Pair', '', fields=[
-    #   TypeMeta.FieldMeta('id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
-    #   TypeMeta.FieldMeta('token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")),
-    #   TypeMeta.FieldMeta('token1', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")),
-    #   TypeMeta.FieldMeta('reserveUSD', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    #   TypeMeta.FieldMeta('priceToken0', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    #   TypeMeta.FieldMeta('priceToken1', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    # ]),
     TypeRef.Named(name="Pair", kind="OBJECT"),
     TypeRef.Named(name="String", kind="SCALAR"),
     [
@@ -456,14 +480,6 @@ def test_field_path_2(subgraph: Subgraph):
 def test_field_path_3(subgraph: Subgraph):
   expected = FieldPath(
     subgraph,
-    # TypeMeta.ObjectMeta('Pair', '', fields=[
-    #   TypeMeta.FieldMeta('id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
-    #   TypeMeta.FieldMeta('token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")),
-    #   TypeMeta.FieldMeta('token1', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")),
-    #   TypeMeta.FieldMeta('reserveUSD', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    #   TypeMeta.FieldMeta('priceToken0', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    #   TypeMeta.FieldMeta('priceToken1', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    # ]),
     TypeRef.Named(name="Pair", kind="OBJECT"),
     TypeRef.Named(name="String", kind="SCALAR"),
     [
@@ -483,14 +499,6 @@ def test_synthetic_field_path_1(subgraph: Subgraph):
 
   expected = FieldPath(
     subgraph,
-    # TypeMeta.ObjectMeta(name='Pair', description='', fields=[
-    #   TypeMeta.FieldMeta(name='id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
-    #   TypeMeta.FieldMeta(name='token0', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")),
-    #   TypeMeta.FieldMeta(name='token1', description="", args=[], type=TypeRef.Named(name="Token", kind="OBJECT")),
-    #   TypeMeta.FieldMeta(name='reserveUSD', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    #   TypeMeta.FieldMeta(name='priceToken0', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    #   TypeMeta.FieldMeta(name='priceToken1', description="", args=[], type=TypeRef.Named(name="BigDecimal", kind="SCALAR")),
-    # ]),
     TypeRef.Named(name="Pair", kind="OBJECT"),
     TypeRef.Named(name="Float", kind="SCALAR"),
     [
@@ -510,12 +518,6 @@ def test_synthetic_field_path_2(subgraph: Subgraph):
 
   expected = FieldPath(
     subgraph,
-    # TypeMeta.ObjectMeta('Token', '', fields=[
-    #   TypeMeta.FieldMeta('id', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
-    #   TypeMeta.FieldMeta('name', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
-    #   TypeMeta.FieldMeta('symbol', description="", args=[], type=TypeRef.Named(name="String", kind="SCALAR")),
-    #   TypeMeta.FieldMeta('decimals', description="", args=[], type=TypeRef.Named(name="Int", kind="SCALAR")),
-    # ]),
     TypeRef.Named(name="Token", kind="OBJECT"),
     TypeRef.Named(name="String", kind="SCALAR"),
     [
@@ -639,15 +641,6 @@ def test_field_path_args_2(subgraph: Subgraph):
 def test_field_path_args_3(subgraph: Subgraph):
   expected = FieldPath(
     subgraph,
-    # TypeMeta.ObjectMeta(name='Query', description='', fields=[
-    #   TypeMeta.FieldMeta(name='pairs', description='', args=[
-    #     TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
-    #     TypeMeta.ArgumentMeta(name='where', description='', type=TypeRef.Named(name="Pair_filter", kind="INPUT_OBJECT"), defaultValue=None),
-    #     TypeMeta.ArgumentMeta(name='orderBy', description='', type=TypeRef.Named(name="Pair_orderBy", kind="ENUM"), defaultValue=None),
-    #     TypeMeta.ArgumentMeta(name='orderDirection', description='', type=TypeRef.Named(name="OrderDirection", kind="ENUM"), defaultValue=None),
-    #   ], type=TypeRef.non_null_list("Pair", kind="OBJECT")),
-    #   TypeMeta.FieldMeta('swaps', description="", args=[], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
-    # ]),
     TypeRef.Named(name='Query', kind="OBJECT"),
     TypeRef.non_null_list('Pair', kind="OBJECT"),
     [
@@ -656,10 +649,6 @@ def test_field_path_args_3(subgraph: Subgraph):
           'first': 100,
           'orderBy': 'reserveUSD'
         },
-        # [
-        #   Argument('first', InputValue.Int(100)),
-        #   Argument('orderBy', InputValue.Enum('reserveUSD'))
-        # ],
         TypeMeta.FieldMeta(name='pairs', description='', args=[
           TypeMeta.ArgumentMeta(name='first', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
           TypeMeta.ArgumentMeta(name='skip', description='', type=TypeRef.Named(name="Int", kind="SCALAR"), defaultValue=None),
@@ -683,15 +672,6 @@ def test_field_path_args_3(subgraph: Subgraph):
 def test_field_path_extend_1(subgraph: Subgraph):
   expected = FieldPath(
     subgraph,
-    # TypeMeta.ObjectMeta('Query', '', fields=[
-    #   TypeMeta.FieldMeta('pairs', '', [
-    #     TypeMeta.ArgumentMeta('first', '', TypeRef.Named(name="Int", kind="SCALAR"), None),
-    #     TypeMeta.ArgumentMeta('where', '', TypeRef.Named(name="Pair_filter", kind="INPUT_OBJECT"), None),
-    #     TypeMeta.ArgumentMeta('orderBy', '', TypeRef.Named(name="Pair_orderBy", kind="ENUM"), None),
-    #     TypeMeta.ArgumentMeta('orderDirection', '', TypeRef.Named(name="OrderDirection", kind="ENUM"), None),
-    #   ], TypeRef.non_null_list("Pair", kind="OBJECT")),
-    #   TypeMeta.FieldMeta('swaps', description="", args=[], type=TypeRef.non_null_list("Swap", kind="OBJECT")),
-    # ]),
     TypeRef.Named(name="Query", kind="OBJECT"),
     TypeRef.Named(name="String", kind="SCALAR"),
     [
