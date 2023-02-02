@@ -1,8 +1,8 @@
+# ⚠️ This repository is no longer maintained ⚠️
+The official repository has been moved to https://github.com/0xPlaygrounds/subgrounds
+
 # Subgrounds
 A Pythonic data access layer for applications querying data from The Graph Network.
-
-<!-- ## WARNING
-Subgrounds is still in the very early stages of development. APIs can and will change (now is the time to make suggestions!). Some features are still incomplete. Documentation is sparse (but getting better). Expect the Subgrounds API to change frequently. -->
 
 ## Design goals
 - **Simple**: Small, easy to use toplevel API
