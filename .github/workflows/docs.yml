@@ -7,6 +7,8 @@ on:
       - "pyproject.toml"
       - "docs/**"
       - "README.md"
+      - "CONTRIBUTING.md"
+      - "CHANGELOG.md"
 
 env:
   POETRY_VERSION: "1.3.2"
